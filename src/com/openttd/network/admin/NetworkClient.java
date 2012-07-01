@@ -24,6 +24,7 @@ import com.openttd.network.core.Socket;
 
 /**
  * Network listening thread, own a second speaking thread.
+ * See tcp_admin.h for updates
  */
 public class NetworkClient extends Thread {
 
@@ -105,8 +106,12 @@ public class NetworkClient extends Thread {
 	}
 
 	/**
-	 * See tcp_admin.h for updates
+	 * Extract infos from the server's packets,
+	 * Update the networkModel with these infos,
+	 * Update the server's protocols,
+	 * Dispatch a game related event.
 	 * 
+	 * See tcp_admin.h for updates, search "ADMIN_PACKET_SERVER_"
 	 * @param packet
 	 * @throws NetworkException
 	 */
@@ -510,9 +515,7 @@ public class NetworkClient extends Thread {
 	}
 
 	/**
-	 * See tcp_admin.h for updates
-	 * 
-	 * @author root
+	 * See tcp_admin.h for updates, search "ADMIN_PACKET_ADMIN_"
 	 */
 	public class Send implements Runnable {
 		/* Network */

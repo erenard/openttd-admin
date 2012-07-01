@@ -153,13 +153,13 @@ public class GameInfoClient {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		System.out.println("Testing UDP GameInfoClient");
-		System.out.println("Connection...");
+		log.info("Testing UDP GameInfoClient");
+		log.info("Connection...");
 		GameInfoClient gameInfoClient = new GameInfoClient("localhost", 3979);
-		System.out.println("Connected !");
-		System.out.println("Requesting...");
+		log.info("Connected !");
+		log.info("Requesting...");
 		GameInfo gameInfo = gameInfoClient.getGameInfo();
-		System.out.println("Results :");
-		System.out.println(gameInfo);
+		log.info("Results :");
+		log.info(gameInfo.toString());
 	}
 }

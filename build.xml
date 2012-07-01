@@ -5,6 +5,10 @@
 		<!-- jar -->
 		<delete file="openttd-admin.jar" />
 		<jar destfile="openttd-admin.jar">
+			<manifest>
+				<attribute name="Manifest-Version" value="1.0"/>
+				<attribute name="Main-Class" value="com.openttd.admin.SimpleAdmin"/>
+			</manifest>
 			<fileset dir="bin">
 				<include name="**/*" />
 			</fileset>
