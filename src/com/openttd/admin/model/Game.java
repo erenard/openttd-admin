@@ -95,6 +95,10 @@ public class Game {
 			eventDispatcher.dispatch(new DateEvent(this));
 			break;
 		}
+		case ADMIN_PACKET_SERVER_NEWGAME: {
+			this.reset();
+			break;
+		}
 		case ADMIN_PACKET_SERVER_RCON: {
 			break;
 		}

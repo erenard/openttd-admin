@@ -6,5 +6,5 @@ public class Configuration {
 	public Integer clientPort = 3979;
 	public String password = "";
 	public String robotClientName = "openttd-admin";
-	public String openttdVersion = "1.1.5";
+	public String openttdVersion = "1.2.0";
 }

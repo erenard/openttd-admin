@@ -111,7 +111,7 @@ public class NetworkClient extends Thread {
 	 * Update the server's protocols,
 	 * Dispatch a game related event.
 	 * 
-	 * See tcp_admin.h for updates, search "ADMIN_PACKET_SERVER_"
+	 * See tcp_admin.h for updates, search "Receive_SERVER_"
 	 * @param packet
 	 * @throws NetworkException
 	 */
@@ -463,6 +463,14 @@ public class NetworkClient extends Thread {
 			break;
 		}
 		/**
+		 * Send a JSON string to the current active GameScript.
+		 * json  JSON string for the GameScript.
+		 */
+		case ADMIN_PACKET_SERVER_GAMESCRIPT: {
+			String json = packet.readString();
+			break;
+		}
+		/**
 		 * The source IP address is banned (connection gets closed).
 		 */
 		case ADMIN_PACKET_SERVER_BANNED:
@@ -515,7 +523,7 @@ public class NetworkClient extends Thread {
 	}
 
 	/**
-	 * See tcp_admin.h for updates, search "ADMIN_PACKET_ADMIN_"
+	 * See tcp_admin.h for updates, search "Receive_ADMIN_"
 	 */
 	public class Send implements Runnable {
 		/* Network */
