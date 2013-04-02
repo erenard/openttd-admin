@@ -43,7 +43,7 @@ public class SimpleAdmin extends OpenttdAdmin implements ClientEventListener, Ch
 		Configuration configuration = new Configuration();
 		
 		try {
-			String url = configuration.password = args[0];
+			String url = args[0];
 			configuration.host = url.split(":")[0];
 			configuration.adminPort = new Integer(url.split(":")[1]);
 			configuration.password = args[1];

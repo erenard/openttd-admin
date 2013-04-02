@@ -2,3 +2,6 @@
 /.project
 /openttd-admin.jar
 /bin
+/build/
+/nb-build.xml
+/nbproject/
