@@ -2,7 +2,7 @@ package com.openttd.admin.event;
 
 import com.openttd.admin.model.Game;
 
-public class ClientEvent implements Event {
+public class ClientEvent implements Event<ClientEventListener> {
 
 	public enum Action {
 		CREATE,
@@ -35,5 +35,10 @@ public class ClientEvent implements Event {
 	@Override
 	public String toString() {
 		return action + ":" + clientId;
+	}
+
+	@Override
+	public void notify(ClientEventListener listener) {
+		listener.onClientEvent(this);
 	}
 }

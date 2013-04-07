@@ -58,11 +58,11 @@ public class OpenttdAdmin {
 	}
 
 	/* Event Dispatcher delegation */
-	public void addListener(EventListener listener) {
-		eventDispatcher.addListener(listener);
+	public void addListener(Class eventClass, EventListener listener) {
+		eventDispatcher.addListener(eventClass, listener);
 	}
 
-	public void removeListener(EventListener listener) {
-		eventDispatcher.removeListener(listener);
+	public void removeListener(Class eventClass, EventListener listener) {
+		eventDispatcher.removeListener(eventClass, listener);
 	}
 }

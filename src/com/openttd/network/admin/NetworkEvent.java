@@ -8,6 +8,8 @@ public class NetworkEvent {
 	private long clientId;
 	private short companyId;
 	private short extraId;
+	private char color;
+	private String origin;
 	private String message;
 	private long date;
 
@@ -15,35 +17,35 @@ public class NetworkEvent {
 		this.packetServerType = packetServerType;
 	}
 
-	public static NetworkEvent newClientEvent(PacketServerType packetServerType, long clientId) {
-		NetworkEvent networkEvent = new NetworkEvent(packetServerType);
-		networkEvent.clientId = clientId;
-		return networkEvent;
+	void setClientEvent(PacketServerType packetServerType, long clientId) {
+		this.clientId = clientId;
 	}
 
-	public static NetworkEvent newCompanyEvent(PacketServerType packetServerType, short companyId) {
-		NetworkEvent networkEvent = new NetworkEvent(packetServerType);
-		networkEvent.companyId = companyId;
-		return networkEvent;
+	void setCompanyEvent(PacketServerType packetServerType, short companyId) {
+		this.companyId = companyId;
 	}
 
-	public static NetworkEvent newRConEvent(PacketServerType packetServerType, char color, String message) {
-		NetworkEvent networkEvent = new NetworkEvent(packetServerType);
-		networkEvent.message = message;
-		return networkEvent;
+	void setRConEvent(PacketServerType packetServerType, char color, String message) {
+		this.color = color;
+		this.message = message;
 	}
 
-	public static NetworkEvent newDateEvent(PacketServerType packetServerType, long date) {
-		NetworkEvent networkEvent = new NetworkEvent(packetServerType);
-		networkEvent.date = date;
-		return networkEvent;
+	void setDateEvent(PacketServerType packetServerType, long date) {
+		this.date = date;
 	}
 
-	public static NetworkEvent newChatEvent(PacketServerType packetServerType, long clientId, String message) {
-		NetworkEvent networkEvent = new NetworkEvent(packetServerType);
-		networkEvent.clientId = clientId;
-		networkEvent.message = message;
-		return networkEvent;
+	void setChatEvent(PacketServerType packetServerType, long clientId, String message) {
+		this.clientId = clientId;
+		this.message = message;
+	}
+
+	void setGameScriptEvent(PacketServerType packetServerType, String json) {
+		this.message = json;
+	}
+
+	void setConsoleEvent(String origin, String message) {
+		this.origin = origin;
+		this.message = message;
 	}
 
 	public long getClientId() {
@@ -58,10 +60,6 @@ public class NetworkEvent {
 		return companyId;
 	}
 
-	public void setCompanyId(short companyId) {
-		this.companyId = companyId;
-	}
-
 	public short getExtraId() {
 		return extraId;
 	}
@@ -74,16 +72,16 @@ public class NetworkEvent {
 		return message;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
-
 	public long getDate() {
 		return date;
 	}
 
-	public void setDate(long date) {
-		this.date = date;
+	public char getColor() {
+		return color;
+	}
+
+	public String getOrigin() {
+		return origin;
 	}
 
 	public PacketServerType getPacketServerType() {

@@ -73,16 +73,17 @@ public class TcpAdmin {
 
 	/** Update types an admin can register a frequency for */
 	public enum AdminUpdateType {
-		ADMIN_UPDATE_DATE, // /< Updates about the date of the game.
-		ADMIN_UPDATE_CLIENT_INFO, // /< Updates about the information of clients.
-		ADMIN_UPDATE_COMPANY_INFO, // /< Updates about the generic information of companies.
-		ADMIN_UPDATE_COMPANY_ECONOMY, // /< Updates about the economy of companies.
-		ADMIN_UPDATE_COMPANY_STATS, // /< Updates about the statistics of companies.
-		ADMIN_UPDATE_CHAT, // /< The admin would like to have chat messages.
-		ADMIN_UPDATE_CONSOLE, // /< The admin would like to have console messages.
-		ADMIN_UPDATE_CMD_NAMES, // /< The admin would like a list of all DoCommand names.
-		ADMIN_UPDATE_CMD_LOGGING, // /< The admin would like to have DoCommand information.
-		ADMIN_UPDATE_END; // /< Must ALWAYS be on the end of this list!! (period)
+		ADMIN_UPDATE_DATE,            ///< Updates about the date of the game.
+		ADMIN_UPDATE_CLIENT_INFO,     ///< Updates about the information of clients.
+		ADMIN_UPDATE_COMPANY_INFO,    ///< Updates about the generic information of companies.
+		ADMIN_UPDATE_COMPANY_ECONOMY, ///< Updates about the economy of companies.
+		ADMIN_UPDATE_COMPANY_STATS,   ///< Updates about the statistics of companies.
+		ADMIN_UPDATE_CHAT,            ///< The admin would like to have chat messages.
+		ADMIN_UPDATE_CONSOLE,         ///< The admin would like to have console messages.
+		ADMIN_UPDATE_CMD_NAMES,       ///< The admin would like a list of all DoCommand names.
+		ADMIN_UPDATE_CMD_LOGGING,     ///< The admin would like to have DoCommand information.
+		ADMIN_UPDATE_GAMESCRIPT,      ///< The admin would like to have gamescript messages.
+		ADMIN_UPDATE_END;             ///< Must ALWAYS be on the end of this list!! (period)
 		public static AdminUpdateType valueOf(int order) {
 			for (AdminUpdateType value : values()) {
 				if (value.ordinal() == order) return value;
@@ -93,13 +94,13 @@ public class TcpAdmin {
 
 	/** Update frequencies an admin can register. */
 	public enum AdminUpdateFrequency {
-		ADMIN_FREQUENCY_POLL(0x01), // /< The admin can poll this.
-		ADMIN_FREQUENCY_DAILY(0x02), // /< The admin gets information about this on a daily basis.
-		ADMIN_FREQUENCY_WEEKLY(0x04), // /< The admin gets information about this on a weekly basis.
-		ADMIN_FREQUENCY_MONTHLY(0x08), // /< The admin gets information about this on a monthly basis.
-		ADMIN_FREQUENCY_QUARTERLY(0x10), // /< The admin gets information about this on a quarterly basis.
-		ADMIN_FREQUENCY_ANUALLY(0x20), // /< The admin gets information about this on a yearly basis.
-		ADMIN_FREQUENCY_AUTOMATIC(0x40); // /< The admin gets information about this when it changes.
+		ADMIN_FREQUENCY_POLL(0x01),		 ///< The admin can poll this.
+		ADMIN_FREQUENCY_DAILY(0x02),	 ///< The admin gets information about this on a daily basis.
+		ADMIN_FREQUENCY_WEEKLY(0x04),	 ///< The admin gets information about this on a weekly basis.
+		ADMIN_FREQUENCY_MONTHLY(0x08),	 ///< The admin gets information about this on a monthly basis.
+		ADMIN_FREQUENCY_QUARTERLY(0x10), ///< The admin gets information about this on a quarterly basis.
+		ADMIN_FREQUENCY_ANUALLY(0x20),	 ///< The admin gets information about this on a yearly basis.
+		ADMIN_FREQUENCY_AUTOMATIC(0x40); ///< The admin gets information about this when it changes.
 		public int mask;
 
 		private AdminUpdateFrequency(int s) {
@@ -109,10 +110,10 @@ public class TcpAdmin {
 
 	/** Reasons for removing a company - communicated to admins. */
 	public enum AdminCompanyRemoveReason {
-		ADMIN_CRR_MANUAL, // /< The company is manually removed.
-		ADMIN_CRR_AUTOCLEAN, // /< The company is removed due to autoclean.
-		ADMIN_CRR_BANKRUPT, // /< The company went belly-up.
-		ADMIN_CRR_END // /< Sentinel for end.
+		ADMIN_CRR_MANUAL,	 ///< The company is manually removed.
+		ADMIN_CRR_AUTOCLEAN, ///< The company is removed due to autoclean.
+		ADMIN_CRR_BANKRUPT,	 ///< The company went belly-up.
+		ADMIN_CRR_END		 ///< Sentinel for end.
 	};
 
 }

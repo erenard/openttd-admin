@@ -1,5 +1,3 @@
 package com.openttd.admin.event;
 
-public interface EventListener {
-
-}
+public interface EventListener {}

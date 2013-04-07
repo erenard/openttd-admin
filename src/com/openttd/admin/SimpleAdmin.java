@@ -55,7 +55,9 @@ public class SimpleAdmin extends OpenttdAdmin implements ClientEventListener, Ch
 		}
 
 		SimpleAdmin simpleAdmin = new SimpleAdmin(configuration);
-		simpleAdmin.addListener(simpleAdmin);
+		simpleAdmin.addListener(ChatEvent.class, simpleAdmin);
+		simpleAdmin.addListener(ClientEvent.class, simpleAdmin);
+		simpleAdmin.addListener(CompanyEvent.class, simpleAdmin);
 		simpleAdmin.startup();
 		log.info("Openttd admin started");
 

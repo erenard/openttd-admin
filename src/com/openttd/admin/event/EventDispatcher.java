@@ -2,6 +2,8 @@ package com.openttd.admin.event;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -10,60 +12,59 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Thread doing the event dispatching.
+ */
 public class EventDispatcher implements Runnable {
 
 	private static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
+	private class EventMessage {
+		Event event;
+		Class eventClass;
+		public EventMessage(Event event, Class eventClass) {
+			this.event = event;
+			this.eventClass = eventClass;
+		}
+	}
 	// Events queue
-	private BlockingQueue<Event> events = new LinkedBlockingQueue<Event>();
-	// Listeners
-	private Collection<ChatEventListener> chatEventListeners = new ArrayList<ChatEventListener>();
-	private Collection<CompanyEventListener> companyEventListeners = new ArrayList<CompanyEventListener>();
-	private Collection<ClientEventListener> clientEventListeners = new ArrayList<ClientEventListener>();
-	private Collection<DateEventListener> dateEventListeners = new ArrayList<DateEventListener>();
-	//
-	private ReentrantReadWriteLock eventListenersLock = new ReentrantReadWriteLock();
+	private BlockingQueue<EventMessage> eventMessages = new LinkedBlockingQueue<EventMessage>();
 	// Simple thread managing
 	private boolean running;
 
-	public void addListener(EventListener listener) {
+	// Listeners
+	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+	private Map<Class, Collection<EventListener>> listenersByEventClass = new HashMap<Class, Collection<EventListener>>();
+	
+	public void addListener(Class eventClass, EventListener listener) {
 		try {
-			eventListenersLock.writeLock().lock();
-			if (listener instanceof ChatEventListener) {
-				chatEventListeners.add((ChatEventListener) listener);
+			lock.writeLock().lock();
+			if(!listenersByEventClass.containsKey(eventClass)) {
+				listenersByEventClass.put(eventClass, new ArrayList());
 			}
-			if (listener instanceof CompanyEventListener) {
-				companyEventListeners.add((CompanyEventListener) listener);
-			}
-			if (listener instanceof ClientEventListener) {
-				clientEventListeners.add((ClientEventListener) listener);
-			}
-			if (listener instanceof DateEventListener) {
-				dateEventListeners.add((DateEventListener) listener);
-			}
+			Collection<EventListener> listeners = listenersByEventClass.get(eventClass);
+			listeners.add(listener);
 		} finally {
-			eventListenersLock.writeLock().unlock();
+			lock.writeLock().unlock();
 		}
 	}
 
-	public void removeListener(EventListener listener) {
+	public void removeListener(Class eventClass, EventListener listener) {
 		try {
-			eventListenersLock.writeLock().lock();
-			if (listener instanceof ChatEventListener) {
-				chatEventListeners.add((ChatEventListener) listener);
-			} else if (listener instanceof CompanyEventListener) {
-				companyEventListeners.add((CompanyEventListener) listener);
-			} else if (listener instanceof ClientEventListener) {
-				clientEventListeners.add((ClientEventListener) listener);
-			} else {
-				log.error("Unknown EventListener.");
+			lock.writeLock().lock();
+			if(!listenersByEventClass.containsKey(eventClass)) {
+				listenersByEventClass.put(eventClass, new ArrayList());
 			}
+			Collection<EventListener> listeners = listenersByEventClass.get(eventClass);
+			listeners.remove(listener);
 		} finally {
-			eventListenersLock.writeLock().unlock();
+			lock.writeLock().unlock();
 		}
 	}
 
-	public void dispatch(Event event) {
-		events.offer(event);
+	public <L> void dispatch(Event<L> event) {
+		@SuppressWarnings("unchecked")
+		Class<Event<L>> evtClass = (Class<Event<L>>) event.getClass();
+		eventMessages.offer(new EventMessage(event, evtClass));
 	}
 
 	@Override
@@ -71,41 +72,23 @@ public class EventDispatcher implements Runnable {
 		running = true;
 		while (this.running) {
 			try {
-				Event event = events.poll(5, TimeUnit.SECONDS);
-				if (event != null) {
+				EventMessage eventClass = eventMessages.poll(5, TimeUnit.SECONDS);
+				if (eventClass != null) {
 					try {
-						eventListenersLock.readLock().lock();
-						if (event instanceof ChatEvent) {
-							ChatEvent chatEvent = (ChatEvent) event;
-							for (ChatEventListener chatEventListener : chatEventListeners) {
-								chatEventListener.onChatEvent(chatEvent);
-							}
-						} else if (event instanceof CompanyEvent) {
-							CompanyEvent companyEvent = (CompanyEvent) event;
-							for (CompanyEventListener companyEventListener : companyEventListeners) {
-								companyEventListener.onCompanyEvent(companyEvent);
-							}
-						} else if (event instanceof DateEvent) {
-							DateEvent dateEvent = (DateEvent) event;
-							for (DateEventListener dateEventListener : dateEventListeners) {
-								dateEventListener.onDateEvent(dateEvent);
-							}
-						} else if (event instanceof ClientEvent) {
-							ClientEvent clientEvent = (ClientEvent) event;
-							for (ClientEventListener clientEventListener : clientEventListeners) {
-								clientEventListener.onClientEvent(clientEvent);
-							}
+						lock.readLock().lock();
+						Collection<EventListener> listeners = listenersByEventClass.get(eventClass.eventClass);
+						if(listeners != null) for(EventListener eventListener : listeners) {
+							eventClass.event.notify(eventListener);
 						}
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);
 					} finally {
-						eventListenersLock.readLock().unlock();
+						lock.readLock().unlock();
 					}
 				}
 			} catch (InterruptedException e) {
 				log.error(e.getMessage(), e);
 			}
-
 		}
 	}
 
@@ -114,7 +97,7 @@ public class EventDispatcher implements Runnable {
 	public void startup() {
 		log.debug("startup...");
 		running = true;
-		events.clear();
+		eventMessages.clear();
 		thread = new Thread(this);
 		thread.start();
 		log.debug("started");
@@ -123,7 +106,7 @@ public class EventDispatcher implements Runnable {
 	public void shutdown() {
 		log.debug("shutdown...");
 		running = false;
-		events.clear();
+		eventMessages.clear();
 		try {
 			thread.join(5000);
 		} catch (InterruptedException e) {
@@ -136,5 +119,4 @@ public class EventDispatcher implements Runnable {
 	public final boolean isAlive() {
 		return thread != null && thread.isAlive();
 	}
-
 }

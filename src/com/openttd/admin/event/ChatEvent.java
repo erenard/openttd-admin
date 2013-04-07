@@ -2,7 +2,7 @@ package com.openttd.admin.event;
 
 import com.openttd.admin.model.Game;
 
-public class ChatEvent implements Event {
+public class ChatEvent implements Event<ChatEventListener> {
 
 	private final Game openttd;
 	private final int clientId;
@@ -29,5 +29,10 @@ public class ChatEvent implements Event {
 	@Override
 	public String toString() {
 		return clientId + " says " + message;
+	}
+
+	@Override
+	public void notify(ChatEventListener listener) {
+		listener.onChatEvent(this);
 	}
 }

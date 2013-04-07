@@ -133,7 +133,7 @@ public class NetworkClient extends Thread {
 		case ADMIN_PACKET_SERVER_CLIENT_JOIN: {
 			// This packet arrives after CLIENT_INFO
 			long clientId = packet.readUint32();
-			event = NetworkEvent.newClientEvent(packetType, clientId);
+			event.setClientEvent(packetType, clientId);
 			break;
 		}
 		/**
@@ -147,7 +147,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_CLIENT_INFO: {
 			long clientId = packet.readUint32();
-			event = NetworkEvent.newClientEvent(packetType, clientId);
+			event.setClientEvent(packetType, clientId);
 			Client client = networkModel.retreiveClient(clientId);
 			client.setIp(packet.readString());
 			client.setName(packet.readString());
@@ -164,7 +164,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_CLIENT_UPDATE: {
 			long clientId = packet.readUint32();
-			event = NetworkEvent.newClientEvent(packetType, clientId);
+			event.setClientEvent(packetType, clientId);
 			Client client = networkModel.retreiveClient(clientId);
 			client.setName(packet.readString());
 			client.setCompanyId(packet.readUint8());
@@ -178,7 +178,7 @@ public class NetworkClient extends Thread {
 		case ADMIN_PACKET_SERVER_CLIENT_ERROR: {
 			long clientId = packet.readUint32();
 			short error = packet.readUint8();
-			event = NetworkEvent.newClientEvent(packetType, clientId);
+			event.setClientEvent(packetType, clientId);
 
 			networkModel.deleteClient(clientId);
 			break;
@@ -189,7 +189,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_CLIENT_QUIT: {
 			long clientId = packet.readUint32();
-			event = NetworkEvent.newClientEvent(packetType, clientId);
+			event.setClientEvent(packetType, clientId);
 			networkModel.deleteClient(clientId);
 			break;
 		}
@@ -203,7 +203,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_COMPANY_NEW: {
 			short companyId = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			// This packet arrives after COMPANY_INFO
 			break;
 		}
@@ -219,7 +219,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_COMPANY_INFO: {
 			short companyId = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			Company company = networkModel.retreiveCompany(companyId);
 			company.setName(packet.readString());
 			company.setPresident(packet.readString());
@@ -244,7 +244,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_COMPANY_UPDATE: {
 			short companyId = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			Company company = networkModel.retreiveCompany(companyId);
 			company.setName(packet.readString());
 			company.setPresident(packet.readString());
@@ -274,7 +274,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_COMPANY_ECONOMY: {
 			short companyId = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			Company company = networkModel.retreiveCompany(companyId);
 			company.setMoney(packet.readInt64());
 			company.setLoan(packet.readUint64());
@@ -306,7 +306,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_COMPANY_STATS: {
 			short companyId = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			Company company = networkModel.retreiveCompany(companyId);
 			char[] vehicules = new char[5];
 			for (int i = 0; i < 5; i++) {
@@ -328,7 +328,7 @@ public class NetworkClient extends Thread {
 		case ADMIN_PACKET_SERVER_COMPANY_REMOVE: {
 			short companyId = packet.readUint8();
 			short reason = packet.readUint8();
-			event = NetworkEvent.newCompanyEvent(packetType, companyId);
+			event.setCompanyEvent(packetType, companyId);
 			event.setExtraId(reason);
 			networkModel.deleteCompany(companyId);
 			break;
@@ -392,6 +392,7 @@ public class NetworkClient extends Thread {
 		case ADMIN_PACKET_SERVER_CONSOLE: {
 			String origin = packet.readString();
 			String message = packet.readString();
+			event.setConsoleEvent(origin, message);
 			break;
 		}
 		/**
@@ -408,7 +409,7 @@ public class NetworkClient extends Thread {
 			long clientId = packet.readUint32();
 			String message = packet.readString();
 			BigInteger data = packet.readUint64();
-			event = NetworkEvent.newChatEvent(packetType, clientId, message);
+			event.setChatEvent(packetType, clientId, message);
 			event.setExtraId(destinationType);
 			break;
 		}
@@ -420,7 +421,7 @@ public class NetworkClient extends Thread {
 			GameInfo gameInfo = networkModel.getGameInfo();
 			long date = packet.readUint32();
 			gameInfo.setCurrentDate(date);
-			event = NetworkEvent.newDateEvent(packetType, date);
+			event.setDateEvent(packetType, date);
 			break;
 		}
 		/**
@@ -459,7 +460,7 @@ public class NetworkClient extends Thread {
 		case ADMIN_PACKET_SERVER_RCON: {
 			char color = packet.readUint16();
 			String message = packet.readString();
-			event = NetworkEvent.newRConEvent(packetType, color, message);
+			event.setRConEvent(packetType, color, message);
 			break;
 		}
 		/**
@@ -468,6 +469,7 @@ public class NetworkClient extends Thread {
 		 */
 		case ADMIN_PACKET_SERVER_GAMESCRIPT: {
 			String json = packet.readString();
+			event.setGameScriptEvent(packetType, json);
 			break;
 		}
 		/**
@@ -710,6 +712,15 @@ public class NetworkClient extends Thread {
 		public void chatBroadcast(String message) {
 			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_BROADCAST, 0, message);
 		}
+                
+                /**
+                 * Send a gamescript
+                 */
+                public void gameScript(String json) {
+			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
+			packet.writeString(json);
+			queue.offer(packet);
+                }
 	}
 
 	public Send getSend() {
