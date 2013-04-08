@@ -15,7 +15,9 @@ public class TcpAdmin {
 
 		public static PacketAdminType valueOf(int order) {
 			for (PacketAdminType value : values()) {
-				if (value.ordinal() == order) return value;
+				if (value.ordinal() == order) {
+					return value;
+				}
 			}
 			return null;
 		}
@@ -60,7 +62,9 @@ public class TcpAdmin {
 
 		public static PacketServerType valueOf(int order) {
 			for (PacketServerType value : values()) {
-				if (value.ordinal() + PacketServerTypeStartValue == order) return value;
+				if (value.ordinal() + PacketServerTypeStartValue == order) {
+					return value;
+				}
 			}
 			return INVALID_ADMIN_PACKET;
 		}
@@ -86,7 +90,9 @@ public class TcpAdmin {
 		ADMIN_UPDATE_END;             ///< Must ALWAYS be on the end of this list!! (period)
 		public static AdminUpdateType valueOf(int order) {
 			for (AdminUpdateType value : values()) {
-				if (value.ordinal() == order) return value;
+				if (value.ordinal() == order) {
+					return value;
+				}
 			}
 			return ADMIN_UPDATE_END;
 		}

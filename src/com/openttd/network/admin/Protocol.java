@@ -1,12 +1,13 @@
 package com.openttd.network.admin;
 
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
+import java.util.EnumMap;
+
 
 public class Protocol {
 	private final short version;
@@ -19,7 +20,7 @@ public class Protocol {
 		return version;
 	}
 
-	private final Map<AdminUpdateType, Integer> protocols = new HashMap<AdminUpdateType, Integer>();
+	private final Map<AdminUpdateType, Integer> protocols = new EnumMap<AdminUpdateType, Integer>(AdminUpdateType.class);
 
 	public void putProtocol(int key, int value) {
 		protocols.put(AdminUpdateType.valueOf(key), value);
@@ -33,7 +34,7 @@ public class Protocol {
 	@Override
 	public String toString() {
 		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("Protocol version '" + version + "' :\n");
+		stringBuffer.append("Protocol version '").append(version).append("' :\n");
 		Formatter formatter = new Formatter(stringBuffer, Locale.getDefault());
 		for (AdminUpdateType adminUpdateType : AdminUpdateType.values()) {
 			for (AdminUpdateFrequency adminUpdateFrequency : AdminUpdateFrequency.values()) {
