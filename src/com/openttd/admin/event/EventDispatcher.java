@@ -72,13 +72,13 @@ public class EventDispatcher implements Runnable {
 		running = true;
 		while (this.running) {
 			try {
-				EventMessage eventClass = eventMessages.poll(5, TimeUnit.SECONDS);
-				if (eventClass != null) {
+				EventMessage eventMessage = eventMessages.poll(5, TimeUnit.SECONDS);
+				if (eventMessage != null) {
 					try {
 						lock.readLock().lock();
-						Collection<EventListener> listeners = listenersByEventClass.get(eventClass.eventClass);
+						Collection<EventListener> listeners = listenersByEventClass.get(eventMessage.eventClass);
 						if(listeners != null) for(EventListener eventListener : listeners) {
-							eventClass.event.notify(eventListener);
+							eventMessage.event.notify(eventListener);
 						}
 					} catch (Exception e) {
 						log.error(e.getMessage(), e);
