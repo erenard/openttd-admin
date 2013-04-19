@@ -9,7 +9,7 @@
 				<attribute name="Manifest-Version" value="1.0"/>
 				<attribute name="Main-Class" value="com.openttd.admin.SimpleAdmin"/>
 			</manifest>
-			<fileset dir="bin">
+			<fileset dir="build/classes">
 				<include name="**/*" />
 			</fileset>
 		</jar>

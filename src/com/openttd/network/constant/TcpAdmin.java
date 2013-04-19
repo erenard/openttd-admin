@@ -3,7 +3,7 @@ package com.openttd.network.constant;
 /**
  * See tcp_admin.h for updates
  */
-public class TcpAdmin {
+public interface TcpAdmin {
 	public enum PacketAdminType implements PacketType {
 		ADMIN_PACKET_ADMIN_JOIN,             ///< The admin announces and authenticates itself to the server.
 		ADMIN_PACKET_ADMIN_QUIT,             ///< The admin tells the server that it is quitting.

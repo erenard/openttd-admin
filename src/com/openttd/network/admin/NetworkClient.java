@@ -1,5 +1,9 @@
 package com.openttd.network.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ConnectException;
@@ -21,6 +25,8 @@ import com.openttd.network.constant.TcpAdmin.PacketServerType;
 import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
 import com.openttd.network.core.Socket;
+import com.openttd.network.constant.GameScript.GSCommand;
+import com.openttd.network.constant.GameScript.GoalType;
 
 /**
  * Network listening thread, own a second speaking thread.
@@ -709,18 +715,104 @@ public class NetworkClient extends Thread {
 			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_TEAM, companyId, message);
 		}
 
+		/**
+		 * Chat to all
+		 * @param message 
+		 */
 		public void chatBroadcast(String message) {
 			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_BROADCAST, 0, message);
 		}
-                
-                /**
-                 * Send a gamescript
-                 */
-                public void gameScript(String json) {
+
+		/**
+		 * Newspaper to a company.
+		 */
+		public void newsCompany(short companyId, String message) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(message));
+			arguments.add(new JsonPrimitive(companyId));
+			JsonObject json = new JsonObject();
+			json.add("cmd", new JsonPrimitive(GSCommand.createNews.ordinal()));
+			json.add("arg", arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Newspaper to all.
+		 */
+		public void newsBroadcast(String message) {
+			newsCompany((short) 0, message);
+		}
+
+		/**
+		 * Add a global goal to the game.
+		 * @param text Text displayed for this goal
+		 * @param goalType Type of the goal's destination
+		 * @param destinationId Id of the goal's destination
+		 */
+		public void addGlobalGoal(String text, GoalType goalType, int destinationId) {
+			addCompanyGoal((short) -1, text, goalType, destinationId);
+		}
+
+		/**
+		 * Add a goal to a company.
+		 * @param companyId
+		 * @param text Text displayed for this goal
+		 * @param goalType Type of the goal's destination
+		 * @param destinationId Id of the goal's destination
+		 */
+		public void addCompanyGoal(short companyId, String text, GoalType goalType, int destinationId) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(companyId));
+			arguments.add(new JsonPrimitive(text));
+			arguments.add(new JsonPrimitive(goalType.ordinal()));
+			arguments.add(new JsonPrimitive(destinationId));
+			JsonObject json = new JsonObject();
+			json.add("cmd", new JsonPrimitive(GSCommand.addGoal.ordinal()));
+			json.add("arg", arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Remove a goal
+		 * @param goalId
+		 */
+		public void removeGoal(int goalId) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(goalId));
+			JsonObject json = new JsonObject();
+			json.add("cmd", new JsonPrimitive(GSCommand.removeGoal.ordinal()));
+			json.add("arg", arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Clear the goal list.
+		 */
+		public void removeAllGoal() {
+			JsonObject json = new JsonObject();
+			json.add("cmd", new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
+			json.add("arg", new JsonPrimitive(0));
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Send a gamescript
+		 * @return false if packet was too long
+		 */
+		public boolean gameScript(String json) {
+			if(json == null || json.length() > Packet.MTU) {
+				log.error(json + " is " + json.length() + " long, max: " + Packet.MTU);
+				return false;
+			}
 			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
 			packet.writeString(json);
 			queue.offer(packet);
-                }
+			return true;
+		}
 	}
 
 	public Send getSend() {

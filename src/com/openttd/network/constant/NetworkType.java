@@ -3,7 +3,7 @@ package com.openttd.network.constant;
 /**
  * See network_type.h for updates
  */
-public class NetworkType {
+public interface NetworkType {
 	/**
 	 * Vehicletypes in the order they are send in info packets.
 	 */

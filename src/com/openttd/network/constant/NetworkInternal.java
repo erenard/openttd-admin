@@ -3,7 +3,7 @@ package com.openttd.network.constant;
 /**
  * See network_internal.h for changes
  */
-public class NetworkInternal {
+public interface NetworkInternal {
 
 	public enum NetworkLanguage {
 		NETLANG_ANY,
