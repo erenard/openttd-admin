@@ -1,6 +1,5 @@
 package com.openttd.admin;
 
-import com.openttd.admin.OpenttdAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,7 +7,7 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
-import com.openttd.network.constant.GameScript.GoalType;
+import com.openttd.constant.OTTD;
 import com.openttd.network.core.Configuration;
 
 public class GameScript extends OpenttdAdmin implements DateEventListener, GameScriptEventListener {
@@ -23,18 +22,19 @@ public class GameScript extends OpenttdAdmin implements DateEventListener, GameS
 	public void onGameScriptEvent(GameScriptEvent gameScriptEvent) {
 		log.info(gameScriptEvent.toString());
 	}
-
 	private int i = 0;
-	
+
 	@Override
 	public void onDateEvent(DateEvent dateEvent) {
-		if(i < 3) {
-			getSend().addGlobalGoal("Global goal " + i, GoalType.GT_COMPANY, 0);
-		} else if(i == 4) {
+		if (i < 3) {
+			getSend().addGlobalGoal("Global goal " + i, OTTD.GoalType.GT_COMPANY, 0);
+		} else if (i == 4) {
 			getSend().removeAllGoal();
-		} else if(i == 5) {
-                        getSend().newsBroadcast("News Broadcasting !");
-		} else if(i > 5) {
+		} else if (i == 5) {
+			getSend().newsBroadcast(OTTD.NewsType.NT_GENERAL, "News Broadcasting !");
+		} else if (i == 6) {
+			getSend().newsCompany((short) 0, OTTD.NewsType.NT_GENERAL, "News for company 0");
+		} else if (i > 6) {
 			this.shutdown();
 		}
 		i++;
@@ -42,12 +42,12 @@ public class GameScript extends OpenttdAdmin implements DateEventListener, GameS
 
 	/**
 	 * Console output demo
-	 * 
+	 *
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Configuration configuration = new Configuration();
-		
+
 		try {
 			String url = args[0];
 			configuration.host = url.split(":")[0];

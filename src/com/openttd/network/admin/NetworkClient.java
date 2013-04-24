@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openttd.admin.model.Game;
+import com.openttd.constant.OTTD;
+import com.openttd.network.constant.GameScript;
 import com.openttd.network.constant.NetworkType.DestType;
 import com.openttd.network.constant.NetworkType.NetworkAction;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
@@ -26,7 +28,6 @@ import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
 import com.openttd.network.core.Socket;
 import com.openttd.network.constant.GameScript.GSCommand;
-import com.openttd.network.constant.GameScript.GoalType;
 
 /**
  * Network listening thread, own a second speaking thread.
@@ -724,82 +725,6 @@ public class NetworkClient extends Thread {
 		}
 
 		/**
-		 * Newspaper to a company.
-		 */
-		public void newsCompany(short companyId, String message) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(message));
-			arguments.add(new JsonPrimitive(companyId));
-			JsonObject json = new JsonObject();
-			json.add("cmd", new JsonPrimitive(GSCommand.createNews.ordinal()));
-			json.add("arg", arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Newspaper to all.
-		 */
-		public void newsBroadcast(String message) {
-			newsCompany((short) 0, message);
-		}
-
-		/**
-		 * Add a global goal to the game.
-		 * @param text Text displayed for this goal
-		 * @param goalType Type of the goal's destination
-		 * @param destinationId Id of the goal's destination
-		 */
-		public void addGlobalGoal(String text, GoalType goalType, int destinationId) {
-			addCompanyGoal((short) -1, text, goalType, destinationId);
-		}
-
-		/**
-		 * Add a goal to a company.
-		 * @param companyId
-		 * @param text Text displayed for this goal
-		 * @param goalType Type of the goal's destination
-		 * @param destinationId Id of the goal's destination
-		 */
-		public void addCompanyGoal(short companyId, String text, GoalType goalType, int destinationId) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(companyId));
-			arguments.add(new JsonPrimitive(text));
-			arguments.add(new JsonPrimitive(goalType.ordinal()));
-			arguments.add(new JsonPrimitive(destinationId));
-			JsonObject json = new JsonObject();
-			json.add("cmd", new JsonPrimitive(GSCommand.addGoal.ordinal()));
-			json.add("arg", arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Remove a goal
-		 * @param goalId
-		 */
-		public void removeGoal(int goalId) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(goalId));
-			JsonObject json = new JsonObject();
-			json.add("cmd", new JsonPrimitive(GSCommand.removeGoal.ordinal()));
-			json.add("arg", arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Clear the goal list.
-		 */
-		public void removeAllGoal() {
-			JsonObject json = new JsonObject();
-			json.add("cmd", new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
-			json.add("arg", new JsonPrimitive(0));
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
 		 * Send a gamescript
 		 * @return false if packet was too long
 		 */
@@ -812,6 +737,86 @@ public class NetworkClient extends Thread {
 			packet.writeString(json);
 			queue.offer(packet);
 			return true;
+		}
+
+		/**
+		 * Newspaper to a company.
+		 */
+		public void newsCompany(short companyId, OTTD.NewsType newsType, String message) {
+			JsonArray arguments = new JsonArray();
+			if(!newsType.isValid()) {
+				newsType = OTTD.NewsType.NT_GENERAL;
+			}
+			arguments.add(new JsonPrimitive(newsType.ordinal()));
+			arguments.add(new JsonPrimitive(message));
+			arguments.add(new JsonPrimitive(companyId));
+			JsonObject json = new JsonObject();
+			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.createNews.ordinal()));
+			json.add(GameScript.ARGS, arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Newspaper to all.
+		 */
+		public void newsBroadcast(OTTD.NewsType newsType, String message) {
+			newsCompany((short) -1, newsType, message);
+		}
+
+		/**
+		 * Add a goal to a company.
+		 * @param companyId
+		 * @param text Text displayed for this goal
+		 * @param goalType Type of the goal's destination
+		 * @param destinationId Id of the goal's destination
+		 */
+		public void addCompanyGoal(short companyId, String text, OTTD.GoalType goalType, int destinationId) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(companyId));
+			arguments.add(new JsonPrimitive(text));
+			arguments.add(new JsonPrimitive(goalType.ordinal()));
+			arguments.add(new JsonPrimitive(destinationId));
+			JsonObject json = new JsonObject();
+			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.addGoal.ordinal()));
+			json.add(GameScript.ARGS, arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Add a global goal to the game.
+		 * @param text Text displayed for this goal
+		 * @param goalType Type of the goal's destination
+		 * @param destinationId Id of the goal's destination
+		 */
+		public void addGlobalGoal(String text, OTTD.GoalType goalType, int destinationId) {
+			addCompanyGoal((short) -1, text, goalType, destinationId);
+		}
+
+		/**
+		 * Remove a goal
+		 * @param goalId
+		 */
+		public void removeGoal(int goalId) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(goalId));
+			JsonObject json = new JsonObject();
+			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeGoal.ordinal()));
+			json.add(GameScript.ARGS, arguments);
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Clear the goal list.
+		 */
+		public void removeAllGoal() {
+			JsonObject json = new JsonObject();
+			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
+			json.add(GameScript.ARGS, new JsonPrimitive(0));
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
 		}
 	}
 

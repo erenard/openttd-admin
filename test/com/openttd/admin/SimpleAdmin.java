@@ -1,6 +1,5 @@
 package com.openttd.admin;
 
-import com.openttd.admin.OpenttdAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
