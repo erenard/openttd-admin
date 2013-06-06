@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.openttd.admin.model.Game;
 import com.openttd.constant.OTTD;
 import com.openttd.network.constant.GameScript;
+import com.openttd.network.constant.GameScript.GSCommand;
 import com.openttd.network.constant.NetworkType.DestType;
 import com.openttd.network.constant.NetworkType.NetworkAction;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
@@ -27,7 +28,6 @@ import com.openttd.network.constant.TcpAdmin.PacketServerType;
 import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
 import com.openttd.network.core.Socket;
-import com.openttd.network.constant.GameScript.GSCommand;
 
 /**
  * Network listening thread, own a second speaking thread.
@@ -117,7 +117,7 @@ public class NetworkClient extends Thread {
 	 * Update the networkModel with these infos,
 	 * Update the server's protocols,
 	 * Dispatch a game related event.
-	 * 
+	 *
 	 * See tcp_admin.h for updates, search "Receive_SERVER_"
 	 * @param packet
 	 * @throws NetworkException
@@ -708,7 +708,7 @@ public class NetworkClient extends Thread {
 
 		/**
 		 * Chat to a team
-		 * 
+		 *
 		 * @param companyId
 		 * @param message
 		 */
@@ -718,7 +718,7 @@ public class NetworkClient extends Thread {
 
 		/**
 		 * Chat to all
-		 * @param message 
+		 * @param message
 		 */
 		public void chatBroadcast(String message) {
 			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_BROADCAST, 0, message);
@@ -737,31 +737,6 @@ public class NetworkClient extends Thread {
 			packet.writeString(json);
 			queue.offer(packet);
 			return true;
-		}
-
-		/**
-		 * Newspaper to a company.
-		 */
-		public void newsCompany(short companyId, OTTD.NewsType newsType, String message) {
-			JsonArray arguments = new JsonArray();
-			if(!newsType.isValid()) {
-				newsType = OTTD.NewsType.NT_GENERAL;
-			}
-			arguments.add(new JsonPrimitive(newsType.ordinal()));
-			arguments.add(new JsonPrimitive(message));
-			arguments.add(new JsonPrimitive(companyId));
-			JsonObject json = new JsonObject();
-			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.createNews.ordinal()));
-			json.add(GameScript.ARGS, arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Newspaper to all.
-		 */
-		public void newsBroadcast(OTTD.NewsType newsType, String message) {
-			newsCompany((short) -1, newsType, message);
 		}
 
 		/**
@@ -815,6 +790,21 @@ public class NetworkClient extends Thread {
 			JsonObject json = new JsonObject();
 			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
 			json.add(GameScript.ARGS, new JsonPrimitive(0));
+			Gson gson = new Gson();
+			gameScript(gson.toJson(json));
+		}
+
+		/**
+		 * Set a cargo goal for a town.
+		 */
+		public void setTownCargoGoal(int townId, OTTD.TownEffect townEffect, int goal) {
+			JsonArray arguments = new JsonArray();
+			arguments.add(new JsonPrimitive(townId));
+			arguments.add(new JsonPrimitive(townEffect.ordinal()));
+			arguments.add(new JsonPrimitive(goal));
+			JsonObject json = new JsonObject();
+			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.setTownCargoGoal.ordinal()));
+			json.add(GameScript.ARGS, arguments);
 			Gson gson = new Gson();
 			gameScript(gson.toJson(json));
 		}

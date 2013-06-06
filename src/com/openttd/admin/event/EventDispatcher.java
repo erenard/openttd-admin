@@ -34,7 +34,7 @@ public class EventDispatcher implements Runnable {
 	// Listeners
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 	private Map<Class, Collection<EventListener>> listenersByEventClass = new HashMap<Class, Collection<EventListener>>();
-	
+
 	public void addListener(Class eventClass, EventListener listener) {
 		try {
 			lock.writeLock().lock();

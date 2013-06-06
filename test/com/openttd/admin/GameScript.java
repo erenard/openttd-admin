@@ -7,8 +7,10 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.DateEventListener;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
-import com.openttd.constant.OTTD;
+import com.openttd.gamescript.GSNewsPaper;
 import com.openttd.network.core.Configuration;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class GameScript extends OpenttdAdmin implements DateEventListener, GameScriptEventListener {
 
@@ -18,23 +20,32 @@ public class GameScript extends OpenttdAdmin implements DateEventListener, GameS
 		super(configuration);
 	}
 
+	Collection<GSNewsPaper> newsPapers = new ArrayList<GSNewsPaper>();
+	
 	@Override
 	public void onGameScriptEvent(GameScriptEvent gameScriptEvent) {
 		log.info(gameScriptEvent.toString());
+		for(GSNewsPaper newsPaper : newsPapers) {
+			if(newsPaper.hasResponse()) {
+				log.info(newsPaper.toString() + " " + newsPaper.getResult());
+			} else {
+				log.info(newsPaper.toString());
+			}
+		}
 	}
 	private int i = 0;
 
 	@Override
 	public void onDateEvent(DateEvent dateEvent) {
-		if (i < 3) {
-			getSend().addGlobalGoal("Global goal " + i, OTTD.GoalType.GT_COMPANY, 0);
-		} else if (i == 4) {
-			getSend().removeAllGoal();
-		} else if (i == 5) {
-			getSend().newsBroadcast(OTTD.NewsType.NT_GENERAL, "News Broadcasting !");
-		} else if (i == 6) {
-			getSend().newsCompany((short) 0, OTTD.NewsType.NT_GENERAL, "News for company 0");
-		} else if (i > 6) {
+		if (i == 0) {
+			GSNewsPaper newsPaper = new GSNewsPaper((short) -1, GSNewsPaper.NewsType.NT_GENERAL, "News Broadcasting !");
+			getGSExecutor().send(newsPaper);
+			newsPapers.add(newsPaper);
+		} else if (i == 1) {
+			GSNewsPaper newsPaper = new GSNewsPaper((short) 0, GSNewsPaper.NewsType.NT_GENERAL, "News for company 0");
+			getGSExecutor().send(newsPaper);
+			newsPapers.add(newsPaper);
+		} else if (i > 1) {
 			this.shutdown();
 		}
 		i++;
@@ -60,10 +71,10 @@ public class GameScript extends OpenttdAdmin implements DateEventListener, GameS
 			System.exit(0);
 		}
 
-		GameScript simpleAdmin = new GameScript(configuration);
-		simpleAdmin.addListener(DateEvent.class, simpleAdmin);
-		simpleAdmin.addListener(GameScriptEvent.class, simpleAdmin);
-		simpleAdmin.startup();
+		GameScript gameScript = new GameScript(configuration);
+		gameScript.addListener(DateEvent.class, gameScript);
+		gameScript.addListener(GameScriptEvent.class, gameScript);
+		gameScript.startup();
 		log.info("Openttd admin started");
 	}
 }
