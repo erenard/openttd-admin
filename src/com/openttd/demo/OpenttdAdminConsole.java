@@ -1,5 +1,6 @@
-package com.openttd.admin;
+package com.openttd.demo;
 
+import com.openttd.admin.OpenttdAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,11 +12,11 @@ import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.CompanyEventListener;
 import com.openttd.network.core.Configuration;
 
-public class SimpleAdmin extends OpenttdAdmin implements ClientEventListener, ChatEventListener, CompanyEventListener {
+public class OpenttdAdminConsole extends OpenttdAdmin implements ClientEventListener, ChatEventListener, CompanyEventListener {
 
-	private static final Logger log = LoggerFactory.getLogger(SimpleAdmin.class);
+	private static final Logger log = LoggerFactory.getLogger(OpenttdAdminConsole.class);
 
-	public SimpleAdmin(Configuration configuration) {
+	public OpenttdAdminConsole(Configuration configuration) {
 		super(configuration);
 	}
 
@@ -54,7 +55,7 @@ public class SimpleAdmin extends OpenttdAdmin implements ClientEventListener, Ch
 			System.exit(0);
 		}
 
-		SimpleAdmin simpleAdmin = new SimpleAdmin(configuration);
+		OpenttdAdminConsole simpleAdmin = new OpenttdAdminConsole(configuration);
 		simpleAdmin.addListener(ChatEvent.class, simpleAdmin);
 		simpleAdmin.addListener(ClientEvent.class, simpleAdmin);
 		simpleAdmin.addListener(CompanyEvent.class, simpleAdmin);
