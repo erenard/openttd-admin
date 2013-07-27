@@ -15,9 +15,9 @@ import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.EventDispatcher;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.RConEvent;
-import com.openttd.network.admin.NetworkEvent;
+import com.openttd.network.admin.NetworkAdminEvent;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.network.admin.NetworkModel;
-import com.openttd.network.admin.NetworkClient.Send;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
 import com.openttd.util.Convert;
@@ -98,7 +98,7 @@ public class Game {
 		return companyById.values();
 	}
 
-	public void update(NetworkEvent event, NetworkModel networkModel, Send send) {
+	public void updateAdmin(NetworkAdminEvent event, NetworkModel networkModel, NetworkAdminSender send) {
 		switch (event.getPacketServerType()) {
 			case ADMIN_PACKET_SERVER_CHAT: {
 				eventDispatcher.dispatch(new ChatEvent(this, event.getClientId(), event.getMessage()));

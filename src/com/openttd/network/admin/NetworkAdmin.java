@@ -1,29 +1,14 @@
 package com.openttd.network.admin;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ConnectException;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openttd.admin.model.Game;
-import com.openttd.constant.OTTD;
-import com.openttd.network.constant.GameScript;
-import com.openttd.network.constant.GameScript.GSCommand;
-import com.openttd.network.constant.NetworkType.DestType;
-import com.openttd.network.constant.NetworkType.NetworkAction;
-import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
-import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
-import com.openttd.network.constant.TcpAdmin.PacketAdminType;
 import com.openttd.network.constant.TcpAdmin.PacketServerType;
 import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
@@ -31,15 +16,14 @@ import com.openttd.network.core.Socket;
 
 /**
  * Network listening thread, own a second speaking thread.
- * See tcp_admin.h for updates
  */
-public class NetworkClient extends Thread {
+public class NetworkAdmin extends Thread {
 
-	private static final Logger log = LoggerFactory.getLogger(NetworkClient.class);
+	private static final Logger log = LoggerFactory.getLogger(NetworkAdmin.class);
 
 	private final Configuration configuration;
 
-	public NetworkClient(Configuration configuration) {
+	public NetworkAdmin(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -48,9 +32,7 @@ public class NetworkClient extends Thread {
 	// Network game model
 	private NetworkModel networkModel;
 	// Network speak thread
-	private Send send;
-	// Network protocol model
-	private Protocol protocol;
+	private NetworkAdminSender send;
 	// Client game model
 	private Game game;
 
@@ -77,10 +59,10 @@ public class NetworkClient extends Thread {
 			try {
 				log.debug("connecting...");
 				socket = Socket.newTcpSocket(configuration.host, configuration.adminPort);
-				send = new Send(socket);
+				send = new NetworkAdminSender(socket);
 				send.startup();
 				networkModel = new NetworkModel();
-				send.join();
+				send.join(configuration);
 				// Packets listening
 				while (this.running) {
 					List<Packet> packets = socket.receive();
@@ -127,7 +109,7 @@ public class NetworkClient extends Thread {
 		int packetTypeId = packet.readUint8();
 		PacketServerType packetType = PacketServerType.valueOf(packetTypeId);
 		log.debug("Rcv " + packetType);
-		NetworkEvent event = new NetworkEvent(packetType);
+		NetworkAdminEvent event = new NetworkAdminEvent(packetType);
 		switch (packetType) {
 		/* ********************
 		 * Clients management *
@@ -452,10 +434,11 @@ public class NetworkClient extends Thread {
 		 * uint16 Frequencies allowed for this update packet (bitwise).
 		 */
 		case ADMIN_PACKET_SERVER_PROTOCOL: {
-			this.protocol = new Protocol(packet.readUint8());
+			Protocol protocol = new Protocol(packet.readUint8());
 			while (packet.readBool8()) {
 				protocol.putProtocol(packet.readUint16(), packet.readUint16());
 			}
+			send.setProtocol(protocol);
 			log.debug(protocol.toString());
 			break;
 		}
@@ -527,290 +510,11 @@ public class NetworkClient extends Thread {
 			throw new NetworkException(packetType.toString());
 		}
 		if (game != null) {
-			game.update(event, networkModel.copy(), send);
+			game.updateAdmin(event, networkModel.copy(), send);
 		}
 	}
 
-	/**
-	 * See tcp_admin.h for updates, search "Receive_ADMIN_"
-	 */
-	public class Send implements Runnable {
-		/* Network */
-		private final Socket socket;
-
-		private Send(Socket socket) {
-			this.socket = socket;
-		}
-
-		/* Thread */
-		private boolean running;
-		private Thread senderThread;
-
-		void startup() {
-			this.running = true;
-			this.senderThread = new Thread(this, "OpenttdPacketSender");
-			this.senderThread.start();
-		}
-
-		void shutdown() {
-			this.running = false;
-			if (senderThread != null && senderThread.isAlive()) this.senderThread.interrupt();
-		}
-
-		@Override
-		public void run() {
-			while (running && socket != null && socket.isOpen()) {
-				try {
-					Packet packet = queue.poll(5, TimeUnit.SECONDS);
-					if (packet != null && socket != null) {
-						socket.send(packet);
-						log.debug("Snd " + PacketAdminType.valueOf(packet.getPacketTypeId()));
-						// Clean shutdown
-						if (packet.getPacketTypeId() == PacketAdminType.ADMIN_PACKET_ADMIN_QUIT.ordinal()) {
-							this.running = false;
-						} else {
-							Thread.sleep(100);
-						}
-					}
-				} catch (InterruptedException e) {
-					log.error(e.getMessage(), e);
-				}
-			}
-		}
-
-		/* OpenTTD */
-		private BlockingQueue<Packet> queue = new LinkedBlockingQueue<Packet>();
-
-		/**
-		 * Join the admin network:
-		 * string Password the server is expecting for this network.
-		 * string Name of the application being used to connect.
-		 * string Version string of the application being used to connect.
-		 */
-		void join() {
-			Packet toSend = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_JOIN);
-			toSend.writeString(configuration.password);
-			toSend.writeString(configuration.robotClientName);
-			toSend.writeString(configuration.openttdVersion);
-			queue.offer(toSend);
-		}
-
-		/**
-		 * Notification to the server that this admin is quitting.
-		 */
-		void quit() {
-			queue.offer(Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_QUIT));
-		}
-
-		/**
-		 * Register updates to be sent at certain frequencies (as announced in the PROTOCOL packet):
-		 * uint16 Update type (see #AdminUpdateType).
-		 * uint16 Update frequency (see #AdminUpdateFrequency), setting #ADMIN_FREQUENCY_POLL is always ignored.
-		 */
-		public void updateFrequency(AdminUpdateType adminUpdateType, AdminUpdateFrequency adminUpdateFrequency) {
-			if (!protocol.hasProtocol(adminUpdateType, adminUpdateFrequency)) {
-				log.error("The server does not support " + adminUpdateFrequency + " for " + adminUpdateType);
-				log.error(AdminUpdateFrequency.ADMIN_FREQUENCY_POLL + " used instead.");
-				adminUpdateFrequency = AdminUpdateFrequency.ADMIN_FREQUENCY_POLL;
-			}
-
-			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY);
-			packet.writeUint16((char) adminUpdateType.ordinal());
-			packet.writeUint16((char) adminUpdateFrequency.mask);
-			queue.offer(packet);
-		}
-
-		/**
-		 * Poll the server for certain updates, an invalid poll (e.g. not existent id) gets silently dropped:
-		 * uint8 #AdminUpdateType the server should answer for, only if #AdminUpdateFrequency #ADMIN_FREQUENCY_POLL is advertised in the
-		 * PROTOCOL packet.
-		 * uint32 ID relevant to the packet type, e.g.
-		 * - the client ID for #ADMIN_UPDATE_CLIENT_INFO. Use UINT32_MAX to show all clients.
-		 * - the company ID for #ADMIN_UPDATE_COMPANY_INFO. Use UINT32_MAX to show all companies.
-		 */
-		void poll(AdminUpdateType adminUpdateType, long data) {
-			if (!protocol.hasProtocol(adminUpdateType, AdminUpdateFrequency.ADMIN_FREQUENCY_POLL)) {
-				log.error("The server does not support " + PacketAdminType.ADMIN_PACKET_ADMIN_POLL + " for " + adminUpdateType);
-				return;
-			}
-
-			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_POLL);
-			packet.writeUint8((short) adminUpdateType.ordinal());
-			packet.writeUint32(data);
-			queue.offer(packet);
-		}
-
-		/**
-		 * Send chat as the server:
-		 * uint8 Action such as NETWORK_ACTION_CHAT_CLIENT (see #NetworkAction).
-		 * uint8 Destination type such as DESTTYPE_BROADCAST (see #DestType).
-		 * uint32 ID of the destination such as company or client id.
-		 * string Message.
-		 */
-		public void chat(NetworkAction action, DestType type, long dest, String message) {
-			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_CHAT);
-			packet.writeUint8((short) action.ordinal());
-			packet.writeUint8((short) type.ordinal());
-			packet.writeUint32(dest);
-			packet.writeString(message);
-			queue.offer(packet);
-		}
-
-		/**
-		 * Execute a command on the servers console:
-		 * string Command to be executed.
-		 */
-		public void rcon(String command) {
-			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_RCON);
-			packet.writeString(command);
-			queue.offer(packet);
-		}
-
-		/* Utility methods */
-		public void pollDate() {
-			poll(AdminUpdateType.ADMIN_UPDATE_DATE, 0l);
-		}
-
-		public void pollCmdNames() {
-			poll(AdminUpdateType.ADMIN_UPDATE_CMD_NAMES, 0l);
-		}
-
-		public void pollClientInfo(long clientId) {
-			if (clientId < 0) clientId = Long.MAX_VALUE;
-			poll(AdminUpdateType.ADMIN_UPDATE_CLIENT_INFO, clientId);
-		}
-
-		public void pollCompanyInfo(short companyId) {
-			long longId = (long) companyId;
-			if (longId < 0) longId = Long.MAX_VALUE;
-			poll(AdminUpdateType.ADMIN_UPDATE_COMPANY_INFO, longId);
-		}
-
-		public void pollCompanyEconomy(short companyId) {
-			long longId = (long) companyId;
-			if (longId < 0) longId = Long.MAX_VALUE;
-			poll(AdminUpdateType.ADMIN_UPDATE_COMPANY_ECONOMY, longId);
-		}
-
-		public void pollCompanyStats(short companyId) {
-			long longId = (long) companyId;
-			if (longId < 0) longId = Long.MAX_VALUE;
-			poll(AdminUpdateType.ADMIN_UPDATE_COMPANY_STATS, longId);
-		}
-
-		public void chatClient(long clientId, String message) {
-			if (clientId < 0) {
-				send.chatBroadcast(message);
-			} else {
-				send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_CLIENT, clientId, message);
-			}
-		}
-
-		/**
-		 * Chat to a team
-		 *
-		 * @param companyId
-		 * @param message
-		 */
-		public void chatCompany(short companyId, String message) {
-			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_TEAM, companyId, message);
-		}
-
-		/**
-		 * Chat to all
-		 * @param message
-		 */
-		public void chatBroadcast(String message) {
-			send.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_BROADCAST, 0, message);
-		}
-
-		/**
-		 * Send a gamescript
-		 * @return false if packet was too long
-		 */
-		public boolean gameScript(String json) {
-			if(json == null || json.length() > Packet.MTU) {
-				log.error(json + " is " + json.length() + " long, max: " + Packet.MTU);
-				return false;
-			}
-			Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
-			packet.writeString(json);
-			queue.offer(packet);
-			return true;
-		}
-
-		/**
-		 * Add a goal to a company.
-		 * @param companyId
-		 * @param text Text displayed for this goal
-		 * @param goalType Type of the goal's destination
-		 * @param destinationId Id of the goal's destination
-		 */
-		public void addCompanyGoal(short companyId, String text, OTTD.GoalType goalType, int destinationId) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(companyId));
-			arguments.add(new JsonPrimitive(text));
-			arguments.add(new JsonPrimitive(goalType.ordinal()));
-			arguments.add(new JsonPrimitive(destinationId));
-			JsonObject json = new JsonObject();
-			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.addGoal.ordinal()));
-			json.add(GameScript.ARGS, arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Add a global goal to the game.
-		 * @param text Text displayed for this goal
-		 * @param goalType Type of the goal's destination
-		 * @param destinationId Id of the goal's destination
-		 */
-		public void addGlobalGoal(String text, OTTD.GoalType goalType, int destinationId) {
-			addCompanyGoal((short) -1, text, goalType, destinationId);
-		}
-
-		/**
-		 * Remove a goal
-		 * @param goalId
-		 */
-		public void removeGoal(int goalId) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(goalId));
-			JsonObject json = new JsonObject();
-			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeGoal.ordinal()));
-			json.add(GameScript.ARGS, arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Clear the goal list.
-		 */
-		public void removeAllGoal() {
-			JsonObject json = new JsonObject();
-			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
-			json.add(GameScript.ARGS, new JsonPrimitive(0));
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-
-		/**
-		 * Set a cargo goal for a town.
-		 */
-		public void setTownCargoGoal(int townId, OTTD.TownEffect townEffect, int goal) {
-			JsonArray arguments = new JsonArray();
-			arguments.add(new JsonPrimitive(townId));
-			arguments.add(new JsonPrimitive(townEffect.ordinal()));
-			arguments.add(new JsonPrimitive(goal));
-			JsonObject json = new JsonObject();
-			json.add(GameScript.CMD, new JsonPrimitive(GSCommand.setTownCargoGoal.ordinal()));
-			json.add(GameScript.ARGS, arguments);
-			Gson gson = new Gson();
-			gameScript(gson.toJson(json));
-		}
-	}
-
-	public Send getSend() {
+	public NetworkAdminSender getSend() {
 		return send;
 	}
 

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import com.openttd.network.constant.PacketType;
 import com.openttd.network.constant.PacketUdpType;
 import com.openttd.network.constant.TcpAdmin.PacketAdminType;
+import com.openttd.network.constant.TcpGame.PacketGameType;
 
 public class Packet {
 	private static final Logger log = LoggerFactory.getLogger(Packet.class);
@@ -17,24 +18,27 @@ public class Packet {
 	private ByteBuffer buffer;
 	// Meta information
 	private int packetTypeId;
-	private int subProtocol;
+	private char length;
 
 	private Packet() {
 	}
 
 	public static Packet packetToSend(PacketType packetType) {
-		int type = packetType.getType();
 		Packet packet = null;
-		if (packetType.getType() == PacketType.UDP) {
-			PacketUdpType packetUdp = (PacketUdpType) packetType;
-			packet = packetToSend(packetUdp.ordinal());
-			if (log.isTraceEnabled()) log.trace(packet.hashCode() + " - UDP " + packetUdp);
-		} else {
-			PacketAdminType packetTcp = (PacketAdminType) packetType;
-			packet = packetToSend(packetTcp.ordinal());
-			if (log.isTraceEnabled()) log.trace(packet.hashCode() + " - TCP " + packetTcp);
+		switch (packetType.getType()) {
+		case UDP:
+			packet = packetToSend(((PacketUdpType) packetType).ordinal());
+			break;
+		case TCP_ADMIN:
+			packet = packetToSend(((PacketAdminType) packetType).ordinal());
+			break;
+		case TCP_GAME:
+			packet = packetToSend(((PacketGameType) packetType).ordinal());
+			break;
 		}
-		packet.subProtocol = type;
+		if (log.isTraceEnabled()) {
+			log.trace(packet.hashCode() + " - " + packetType.getType() + " " + packet);
+		}
 		return packet;
 	}
 
@@ -55,16 +59,16 @@ public class Packet {
 		return packet;
 	}
 
-	public int getSubProtocol() {
-		return subProtocol;
-	}
-
 	public int getPacketTypeId() {
 		return packetTypeId;
 	}
 
 	public ByteBuffer getBuffer() {
 		return buffer;
+	}
+	
+	public char getLength() {
+		return length;
 	}
 
 	public void prepareToSend() {
@@ -76,9 +80,9 @@ public class Packet {
 		buffer.rewind();
 	}
 
-	public int prepareToRead() {
+	public char prepareToRead() {
 		buffer.rewind();
-		int length = (int) readUint16();
+		length = readUint16();
 		// buffer.limit(length);
 		return length;
 	}

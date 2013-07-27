@@ -1,5 +1,6 @@
 package com.openttd.network.constant;
 
+
 /**
  * See tcp_admin.h for updates
  */
@@ -23,8 +24,8 @@ public interface TcpAdmin {
 		}
 
 		@Override
-		public int getType() {
-			return TCP;
+		public SubProtocol getType() {
+			return SubProtocol.TCP_ADMIN;
 		}
 	}
 
@@ -70,8 +71,8 @@ public interface TcpAdmin {
 		}
 
 		@Override
-		public int getType() {
-			return TCP;
+		public SubProtocol getType() {
+			return SubProtocol.TCP_ADMIN;
 		}
 	}
 

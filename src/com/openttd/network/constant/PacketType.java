@@ -1,8 +1,9 @@
 package com.openttd.network.constant;
 
 public interface PacketType {
-	static final int TCP = 0;
-	static final int UDP = 1;
+	public enum SubProtocol {
+		UDP, TCP_ADMIN, TCP_GAME;
+	}
 
-	int getType();
+	SubProtocol getType();
 }

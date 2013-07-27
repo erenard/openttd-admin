@@ -21,14 +21,13 @@ public class OpenTTDAdminTest {
 	
 	public OpenTTDAdminTest() {
 		configuration = new Configuration();
-		configuration.host = "127.0.0.1";
-		configuration.adminPort = 3979;
 		configuration.password = "plop";
 	}
 	
 	@Test
 	public void testSimpleAdmin() {
 		OpenttdAdminConsole simpleAdmin = new OpenttdAdminConsole(configuration);
+		simpleAdmin.addListener(DateEvent.class, simpleAdmin);
 		simpleAdmin.addListener(ChatEvent.class, simpleAdmin);
 		simpleAdmin.addListener(ClientEvent.class, simpleAdmin);
 		simpleAdmin.addListener(CompanyEvent.class, simpleAdmin);

@@ -5,13 +5,13 @@ import com.openttd.admin.event.EventListener;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.model.Game;
 import com.openttd.gamescript.GSExecutor;
-import com.openttd.network.admin.NetworkClient;
-import com.openttd.network.admin.NetworkClient.Send;
+import com.openttd.network.admin.NetworkAdmin;
+import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.network.core.Configuration;
 
 public class OpenttdAdmin {
 	private final Configuration configuration;
-	private NetworkClient networkClient;
+	private NetworkAdmin networkClient;
 	private GSExecutor executor;
 	private EventDispatcher eventDispatcher;
 	private Game game;
@@ -38,7 +38,7 @@ public class OpenttdAdmin {
 		// New client model
 		game = new Game(eventDispatcher);
 		// New network layer
-		networkClient = new NetworkClient(configuration);
+		networkClient = new NetworkAdmin(configuration);
 		networkClient.setGame(game);
 		// Startup
 		eventDispatcher.startup();
@@ -59,7 +59,7 @@ public class OpenttdAdmin {
 	 *
 	 * @return message sender
 	 */
-	public Send getSend() {
+	public NetworkAdminSender getSend() {
 		return networkClient.getSend();
 	}
 

@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
-import com.openttd.network.admin.NetworkClient;
+import com.openttd.network.admin.NetworkAdmin;
+import com.openttd.network.admin.NetworkAdminSender;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,7 @@ public class GSExecutor implements GameScriptEventListener {
 	}
 
 	public <T> void send(GSRequest<T> request) {
-		NetworkClient.Send send = this.admin.getSend();
+		NetworkAdminSender send = this.admin.getSend();
 		if(request != null && send != null) {
 			String id = "" + GSExecutor.nextRequestId++;
 			request.setId(id);

@@ -26,7 +26,7 @@ public enum PacketUdpType implements PacketType {
 	}
 
 	@Override
-	public int getType() {
-		return UDP;
+	public SubProtocol getType() {
+		return SubProtocol.UDP;
 	}
 }
