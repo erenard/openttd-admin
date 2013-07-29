@@ -6,8 +6,8 @@ public class NetworkAdminEvent {
 
 	private final PacketServerType packetServerType;
 	private long clientId;
+	private long pingId;
 	private short companyId;
-	private short extraId;
 	private char color;
 	private String origin;
 	private String message;
@@ -30,6 +30,10 @@ public class NetworkAdminEvent {
 		this.message = message;
 	}
 
+	void setRConEndEvent(PacketServerType packetType, String rcon) {
+		this.message = rcon;
+	}
+	
 	void setDateEvent(PacketServerType packetServerType, long date) {
 		this.date = date;
 	}
@@ -48,24 +52,20 @@ public class NetworkAdminEvent {
 		this.message = message;
 	}
 
-	public long getClientId() {
-		return clientId;
+	void setPongEvent(long pingId) {
+		this.pingId = pingId;
 	}
 
-	public void setClientId(long clientId) {
-		this.clientId = clientId;
+	public long getClientId() {
+		return clientId;
 	}
 
 	public short getCompanyId() {
 		return companyId;
 	}
 
-	public short getExtraId() {
-		return extraId;
-	}
-
-	public void setExtraId(short extraId) {
-		this.extraId = extraId;
+	public long getPingId() {
+		return pingId;
 	}
 
 	public String getMessage() {

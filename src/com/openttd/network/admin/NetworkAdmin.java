@@ -318,7 +318,6 @@ public class NetworkAdmin extends Thread {
 			short companyId = packet.readUint8();
 			short reason = packet.readUint8();
 			event.setCompanyEvent(packetType, companyId);
-			event.setExtraId(reason);
 			networkModel.deleteCompany(companyId);
 			break;
 		}
@@ -399,7 +398,6 @@ public class NetworkAdmin extends Thread {
 			String message = packet.readString();
 			BigInteger data = packet.readUint64();
 			event.setChatEvent(packetType, clientId, message);
-			event.setExtraId(destinationType);
 			break;
 		}
 		/**
@@ -463,6 +461,15 @@ public class NetworkAdmin extends Thread {
 			break;
 		}
 		/**
+		 * Notify the admin connection that the rcon command has finished.
+		 * string The command as requested by the admin connection.
+		 */
+		case ADMIN_PACKET_SERVER_RCON_END: {
+			String rcon = packet.readString();
+			event.setRConEndEvent(packetType, rcon);
+			break;
+		}
+		/**
 		 * The source IP address is banned (connection gets closed).
 		 */
 		case ADMIN_PACKET_SERVER_BANNED:
@@ -504,6 +511,15 @@ public class NetworkAdmin extends Thread {
 			gameInfo.setMapHeight(packet.readUint16());
 
 			networkModel.setGameInfo(gameInfo);
+			break;
+		}
+		/**
+		 * Send a ping-reply (pong) to the admin that sent us the ping packet.
+		 * uint32  Integer identifier - should be the same as read from the admins ping packet.
+		 */
+		case ADMIN_PACKET_SERVER_PONG: {
+			long id = packet.readUint32();
+			event.setPongEvent(id);
 			break;
 		}
 		case INVALID_ADMIN_PACKET:

@@ -184,14 +184,24 @@ public class NetworkAdminSender extends NetworkSender {
 	 * @return false if packet was too long
 	 */
 	public boolean gameScript(String json) {
-		if(json == null || json.length() > Packet.MTU) {
-			log.error(json + " is " + json.length() + " long, max: " + Packet.MTU);
+		if(json == null || json.length() > Packet.MTU - 3) {
+			log.error(json + " is " + json.length() + " long, max: " + (Packet.MTU - 3));
 			return false;
 		}
 		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
 		packet.writeString(json);
 		queue.offer(packet);
 		return true;
+	}
+
+	/**
+	 * Ping the server
+	 * @param pingId
+	 */
+	public void ping(long pingId) {
+		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_PING);
+		packet.writeUint32(pingId);
+		queue.offer(packet);
 	}
 
 	/**

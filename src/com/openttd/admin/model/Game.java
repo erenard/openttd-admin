@@ -14,12 +14,15 @@ import com.openttd.admin.event.ConsoleEvent;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.EventDispatcher;
 import com.openttd.admin.event.GameScriptEvent;
+import com.openttd.admin.event.PongEvent;
+import com.openttd.admin.event.RConEndEvent;
 import com.openttd.admin.event.RConEvent;
 import com.openttd.network.admin.NetworkAdminEvent;
 import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.network.admin.NetworkModel;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
+import static com.openttd.network.constant.TcpAdmin.PacketServerType.ADMIN_PACKET_SERVER_GAMESCRIPT;
 import com.openttd.util.Convert;
 
 /**
@@ -188,9 +191,16 @@ public class Game {
 				eventDispatcher.dispatch(new GameScriptEvent(this, event.getMessage()));
 				break;
 			}
+			case ADMIN_PACKET_SERVER_RCON_END: {
+				eventDispatcher.dispatch(new RConEndEvent(this, event.getMessage()));
+				break;
+			}
 			case ADMIN_PACKET_SERVER_CONSOLE: {
 				eventDispatcher.dispatch(new ConsoleEvent(this, event.getOrigin(), event.getMessage()));
 				break;
+			}
+			case ADMIN_PACKET_SERVER_PONG: {
+				eventDispatcher.dispatch(new PongEvent(this, event.getPingId()));
 			}
 		}
 	}

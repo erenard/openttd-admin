@@ -12,7 +12,8 @@ public interface TcpAdmin {
 		ADMIN_PACKET_ADMIN_POLL,             ///< The admin explicitly polls for a piece of information.
 		ADMIN_PACKET_ADMIN_CHAT,             ///< The admin sends a chat message to be distributed.
 		ADMIN_PACKET_ADMIN_RCON,             ///< The admin sends a remote console command.
-		ADMIN_PACKET_ADMIN_GAMESCRIPT;       ///< The admin sends a JSON string for the GameScript.
+		ADMIN_PACKET_ADMIN_GAMESCRIPT,       ///< The admin sends a JSON string for the GameScript.
+		ADMIN_PACKET_ADMIN_PING;             ///< The admin sends a ping to the server, expecting a ping-reply (PONG) packet.
 
 		public static PacketAdminType valueOf(int order) {
 			for (PacketAdminType value : values()) {
@@ -56,6 +57,8 @@ public interface TcpAdmin {
 		ADMIN_PACKET_SERVER_CMD_NAMES,       ///< The server sends out the names of the DoCommands to the admins.
 		ADMIN_PACKET_SERVER_CMD_LOGGING,     ///< The server gives the admin copies of incoming command packets.
 		ADMIN_PACKET_SERVER_GAMESCRIPT,      ///< The server gives the admin information from the GameScript in JSON.
+		ADMIN_PACKET_SERVER_RCON_END,        ///< The server indicates that the remote console command has completed.
+		ADMIN_PACKET_SERVER_PONG,            ///< The server replies to a ping request from the admin.
 
 		INVALID_ADMIN_PACKET;
 
