@@ -11,7 +11,7 @@ import com.openttd.network.core.Configuration;
 
 public class OpenttdAdmin {
 	private final Configuration configuration;
-	private NetworkAdmin networkClient;
+	private NetworkAdmin networkAdmin;
 	private GSExecutor executor;
 	private EventDispatcher eventDispatcher;
 	private Game game;
@@ -26,7 +26,7 @@ public class OpenttdAdmin {
 
 	// Client state
 	public boolean isConnected() {
-		return networkClient != null && networkClient.isAlive();
+		return networkAdmin != null && networkAdmin.isAlive();
 	}
 
 	/**
@@ -38,11 +38,11 @@ public class OpenttdAdmin {
 		// New client model
 		game = new Game(eventDispatcher);
 		// New network layer
-		networkClient = new NetworkAdmin(configuration);
-		networkClient.setGame(game);
+		networkAdmin = new NetworkAdmin(configuration);
+		networkAdmin.setGame(game);
 		// Startup
 		eventDispatcher.startup();
-		networkClient.start();
+		networkAdmin.start();
 		executor.clear();
 	}
 
@@ -50,7 +50,7 @@ public class OpenttdAdmin {
 	 * Stop the client threads, disconnect it from the game's server.
 	 */
 	public void shutdown() {
-		if (networkClient != null && networkClient.isAlive()) networkClient.shutdown();
+		if (networkAdmin != null && networkAdmin.isAlive()) networkAdmin.shutdown();
 		if (eventDispatcher != null && eventDispatcher.isAlive()) eventDispatcher.shutdown();
 	}
 
@@ -60,7 +60,7 @@ public class OpenttdAdmin {
 	 * @return message sender
 	 */
 	public NetworkAdminSender getSend() {
-		return networkClient.getSend();
+		return networkAdmin.getSend();
 	}
 
 	/**
