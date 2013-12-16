@@ -11,13 +11,13 @@ import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author edlefou
+ * Unit Test
+ * @author erenard
  */
 public class OpenTTDAdminTest {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(OpenTTDAdminTest.class);
-	private Configuration configuration;
+	private final Configuration configuration;
 	
 	public OpenTTDAdminTest() {
 		configuration = new Configuration();

@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 public class PingAdminTest {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(PingAdminTest.class);
-	private OpenttdPingAdmin openttdAdmin;
-	private Set<Long> pingIds = new HashSet<Long>();
-	private Set<String> rconCmds = new HashSet<String>();
+	private final OpenttdPingAdmin openttdAdmin;
+	private final Set<Long> pingIds = new HashSet<Long>();
+	private final Set<String> rconCmds = new HashSet<String>();
 	private class OpenttdPingAdmin extends OpenttdAdmin implements PongEventListener, RConEndEventListener {
 		public OpenttdPingAdmin(Configuration configuration) {
 			super(configuration);

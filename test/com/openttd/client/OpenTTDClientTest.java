@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class OpenTTDClientTest {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(OpenTTDClientTest.class);
-	private Configuration configuration;
+	private final Configuration configuration;
 	
 	public OpenTTDClientTest() {
 		configuration = new Configuration();
