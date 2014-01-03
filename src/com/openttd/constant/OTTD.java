@@ -12,7 +12,7 @@ public class OTTD {
 
 	/**
 	 * Goal types that can be given to a goal.
-	 * @author edlefou
+	 * @author erenard
 	 * see script_goal.hpp
 	 */
 	public enum GoalType {

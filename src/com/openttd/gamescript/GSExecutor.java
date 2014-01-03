@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.openttd.admin.OpenttdAdmin;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
-import com.openttd.network.admin.NetworkAdmin;
 import com.openttd.network.admin.NetworkAdminSender;
 
 import java.util.concurrent.ConcurrentHashMap;

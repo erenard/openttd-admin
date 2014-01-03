@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author edlefou
+ * @author erenard
  */
 public class OpenTTDClientTest {
 

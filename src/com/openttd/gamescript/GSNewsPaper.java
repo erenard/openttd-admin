@@ -13,7 +13,7 @@ public class GSNewsPaper extends GSRequest<Boolean> {
 	/**
 	 * Enumeration for the news types that a script can create news for.
 	 * see news_type.h and script_news.hpp
-	 * @author edlefou
+	 * @author erenard
 	 */
 	public enum NewsType {
 		/* Arbitrary selection of NewsTypes which might make sense for scripts */

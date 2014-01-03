@@ -4,6 +4,7 @@ import com.openttd.admin.event.PongEvent;
 import com.openttd.admin.event.PongEventListener;
 import com.openttd.admin.event.RConEndEvent;
 import com.openttd.admin.event.RConEndEventListener;
+import com.openttd.demo.CLIUtil;
 import com.openttd.network.core.Configuration;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Test RCon and Ping/Pong
- * @author edlefou
+ * @author erenard
  */
 public class PingAdminTest {
 
@@ -45,7 +46,7 @@ public class PingAdminTest {
 		for(Long pingId : pingIds) openttdAdmin.getSend().ping(pingId);
 		int tries = 10;
 		while(tries-- > 0 && !pingIds.isEmpty())
-			wait(1);
+			CLIUtil.wait(1);
 		assert pingIds.isEmpty();
 	}
 
@@ -54,7 +55,7 @@ public class PingAdminTest {
 		for(String rconCmd : rconCmds) openttdAdmin.getSend().rcon(rconCmd);
 		int tries = 10;
 		while(tries-- > 0 && !rconCmds.isEmpty())
-			wait(1);
+			CLIUtil.wait(1);
 		assert rconCmds.isEmpty();
 	}
 
@@ -75,20 +76,12 @@ public class PingAdminTest {
 	@Before
 	public void setUp() {
 		openttdAdmin.startup();
-		wait(1);
+		CLIUtil.wait(1);
 	}
 	
 	@After
 	public void tearDown() {
 		openttdAdmin.shutdown();
-		wait(1);
-	}
-	
-	private void wait(int s) {
-		try {
-			Thread.sleep(s * 1000);
-		} catch (InterruptedException ex) {
-			log.error(ex.getLocalizedMessage(), ex);
-		}
+		CLIUtil.wait(1);
 	}
 }

@@ -49,18 +49,7 @@ public class OpenttdAdminConsole extends OpenttdAdmin implements DateEventListen
 	 */
 	public static void main(String[] args) {
 		Configuration configuration = new Configuration();
-		
-		try {
-			String url = args[0];
-			configuration.host = url.split(":")[0];
-			configuration.adminPort = new Integer(url.split(":")[1]);
-			configuration.password = args[1];
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-			log.error("Usage: java -jar openttd-admin.jar localhost:3977 admin_password");
-			log.error("See openttd.cfg to set your server's admin_password first !");
-			System.exit(0);
-		}
+		CLIUtil.parseArguments(args, configuration);
 
 		OpenttdAdminConsole simpleAdmin = new OpenttdAdminConsole(configuration);
 		simpleAdmin.addListener(DateEvent.class, simpleAdmin);

@@ -6,7 +6,7 @@ public interface GameScript {
 	public static final String ID = "i";
 	/**
 	 * Command list, must be identical in AdminCmd/main.nut.
-	 * @author edlefou
+	 * @author erenard
 	 */
 	public enum GSCommand {
 		countIndustry,

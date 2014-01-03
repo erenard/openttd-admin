@@ -9,7 +9,7 @@ import com.openttd.network.core.Configuration;
 
 /**
  *
- * @author edlefou
+ * @author erenard
  */
 public class OpenttdClient {
 	private final Configuration configuration;
