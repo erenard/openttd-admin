@@ -1,5 +1,7 @@
 /.classpath
 /.project
+/build.xml
+/manifest.mf
 /openttd-admin.jar
 /bin
 /build/
