@@ -87,4 +87,17 @@ public class NetworkAdminEvent {
 	public PacketServerType getPacketServerType() {
 		return packetServerType;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(packetServerType.toString());
+		sb.append(" clientId:").append(clientId)
+		.append(" pingId:").append(pingId)
+		.append(" companyId:").append(companyId)
+		.append(" color:").append(color)
+		.append(" origin:").append(origin)
+		.append(" message:").append(message)
+		.append(" date:").append(date);
+		return sb.toString();
+	}
 }

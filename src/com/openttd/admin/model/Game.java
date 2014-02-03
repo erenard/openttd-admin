@@ -24,6 +24,8 @@ import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
 import static com.openttd.network.constant.TcpAdmin.PacketServerType.ADMIN_PACKET_SERVER_GAMESCRIPT;
 import com.openttd.util.Convert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Game is the state of the openttd's game.
@@ -33,6 +35,8 @@ import com.openttd.util.Convert;
  *    into functionnal events (CompanyEvent, ClientEvent...)
  */
 public class Game {
+	
+	private static final Logger log = LoggerFactory.getLogger(Game.class);
 
 	private final EventDispatcher eventDispatcher;
 
@@ -102,6 +106,7 @@ public class Game {
 	}
 
 	public void updateAdmin(NetworkAdminEvent event, NetworkModel networkModel, NetworkAdminSender send) {
+		log.debug("Game.updateAdmin " + event);
 		switch (event.getPacketServerType()) {
 			case ADMIN_PACKET_SERVER_CHAT: {
 				eventDispatcher.dispatch(new ChatEvent(this, event.getClientId(), event.getMessage()));
