@@ -100,7 +100,7 @@ public class NetworkAdmin extends Thread {
 	 * Update the server's protocols,
 	 * Dispatch a game related event.
 	 *
-	 * See tcp_admin.h for updates, search "Receive_SERVER_"
+	 * See network_admin.cpp for updates, search "Send::"
 	 * @param packet
 	 * @throws NetworkException
 	 */

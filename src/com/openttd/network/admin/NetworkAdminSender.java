@@ -83,7 +83,7 @@ public class NetworkAdminSender extends NetworkSender {
 	 * - the client ID for #ADMIN_UPDATE_CLIENT_INFO. Use UINT32_MAX to show all clients.
 	 * - the company ID for #ADMIN_UPDATE_COMPANY_INFO. Use UINT32_MAX to show all companies.
 	 */
-	void poll(AdminUpdateType adminUpdateType, long data) {
+	public void poll(AdminUpdateType adminUpdateType, long data) {
 		if (!protocol.hasProtocol(adminUpdateType, AdminUpdateFrequency.ADMIN_FREQUENCY_POLL)) {
 			log.error("The server does not support " + PacketAdminType.ADMIN_PACKET_ADMIN_POLL + " for " + adminUpdateType);
 			return;

@@ -43,9 +43,9 @@ public class NetworkClientSender extends NetworkSender {
 		queue.offer(Packet.packetToSend(PacketGameType.PACKET_CLIENT_NEWGRFS_CHECKED));
 	}
 
-	public void gamePassword(Configuration configuration) {
+	public void gamePassword(String password) {
 		Packet toSend = Packet.packetToSend(PacketGameType.PACKET_CLIENT_GAME_PASSWORD);
-		toSend.writeString(configuration.password);
+		toSend.writeString(password);
 		queue.offer(toSend);
 	}
 
@@ -83,6 +83,7 @@ public class NetworkClientSender extends NetworkSender {
 		packet.writeUint8((short) type.ordinal());
 		packet.writeUint32(dest);
 		packet.writeString(message);
+		//TODO implement this
 		//packet.writeUint64(data);
 		queue.offer(packet);
 	}
@@ -95,8 +96,9 @@ public class NetworkClientSender extends NetworkSender {
 	 * Execute a command on the servers console:
 	 * string Command to be executed.
 	 */
-	public void rcon(String command) {
+	public void rcon(String command, String password) {
 		Packet packet = Packet.packetToSend(PacketGameType.PACKET_CLIENT_RCON);
+		packet.writeString(password);
 		packet.writeString(command);
 		queue.offer(packet);
 	}
