@@ -11,16 +11,16 @@ public class CompanyEvent implements Event<CompanyEventListener> {
 	};
 
 	private final Game openttd;
-	private final int companyId;
+	private final short companyId;
 	private final Action action;
 
 	public CompanyEvent(Game openttd, short companyId, Action action) {
 		this.openttd = openttd;
-		this.companyId = (int) companyId;
+		this.companyId = companyId;
 		this.action = action;
 	}
 
-	public int getCompanyId() {
+	public short getCompanyId() {
 		return companyId;
 	}
 
