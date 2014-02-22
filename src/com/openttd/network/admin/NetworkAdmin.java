@@ -216,6 +216,12 @@ public class NetworkAdmin extends Thread {
 			company.setUsePassword(packet.readBool8());
 			company.setInauguratedYear(packet.readUint32());
 			company.setAi(packet.readBool8());
+			company.setBankruptcy(packet.readUint8());
+			short[] shareOwners = new short[4];
+			for (short i = 0; i < 4; i++) {
+				shareOwners[i] = packet.readUint8();
+			}
+			company.setShareOwners(shareOwners);
 			break;
 		}
 		/**

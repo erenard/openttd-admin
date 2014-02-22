@@ -232,7 +232,7 @@ public class Company implements Cloneable {
 	@Override
 	public String toString() {
 		return id + ":" + name + ", " + inauguratedYear + ", password:" + usePassword + "\t" + money + "\t" + income + "\t" + lastValue
-				+ "\t" + lastPerformance;
+				+ "\t" + lastPerformance + "\t" + bankruptcy;
 	}
 
 }
