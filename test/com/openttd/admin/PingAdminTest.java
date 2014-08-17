@@ -6,6 +6,7 @@ import com.openttd.admin.event.RConEndEvent;
 import com.openttd.admin.event.RConEndEventListener;
 import com.openttd.demo.CLIUtil;
 import com.openttd.network.core.Configuration;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.After;
@@ -21,8 +22,8 @@ public class PingAdminTest {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(PingAdminTest.class);
 	private final OpenttdPingAdmin openttdAdmin;
-	private final Set<Long> pingIds = new HashSet<Long>();
-	private final Set<String> rconCmds = new HashSet<String>();
+	private final Set<Long> pingIds = new HashSet<>();
+	private final Set<String> rconCmds = new HashSet<>();
 	private class OpenttdPingAdmin extends OpenttdAdmin implements PongEventListener, RConEndEventListener {
 		public OpenttdPingAdmin(Configuration configuration) {
 			super(configuration);
@@ -59,9 +60,10 @@ public class PingAdminTest {
 		assert rconCmds.isEmpty();
 	}
 
-	public PingAdminTest() {
+	
+	public PingAdminTest() throws IOException {
 		Configuration configuration = new Configuration();
-		configuration.password = "plop";
+		configuration.password = CLIUtil.readTestProperties().getProperty("password");
 		
 		openttdAdmin = new OpenttdPingAdmin(configuration);
 		openttdAdmin.addListener(PongEvent.class, openttdAdmin);

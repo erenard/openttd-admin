@@ -6,7 +6,9 @@ import com.openttd.admin.event.ClientEvent;
 import com.openttd.admin.event.CompanyEvent;
 import com.openttd.admin.event.DateEvent;
 import com.openttd.admin.event.GameScriptEvent;
+import com.openttd.demo.CLIUtil;
 import com.openttd.network.core.Configuration;
+import java.io.IOException;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +21,9 @@ public class OpenTTDAdminTest {
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(OpenTTDAdminTest.class);
 	private final Configuration configuration;
 	
-	public OpenTTDAdminTest() {
+	public OpenTTDAdminTest() throws IOException {
 		configuration = new Configuration();
-		configuration.password = "plop";
+		configuration.password = CLIUtil.readTestProperties().getProperty("password");
 	}
 	
 	@Test

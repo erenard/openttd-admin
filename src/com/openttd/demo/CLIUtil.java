@@ -1,6 +1,9 @@
 package com.openttd.demo;
 
 import com.openttd.network.core.Configuration;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Dummy class, makes samples easiers to read.
@@ -28,4 +31,9 @@ public class CLIUtil {
 		}
 	}
 
+	public static Properties readTestProperties() throws IOException {
+		Properties properties = new Properties();
+		properties.load(new FileReader("./test/test.properties"));
+		return properties;
+	}
 }
