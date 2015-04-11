@@ -6,8 +6,9 @@ public class Configuration {
 	public Integer clientPort = 3979;
 	public String password = "";
 	public String name = "openttd";
-	public String openttdVersion = "1.4.2";
 	/* See rev.cpp.in and .ottdrev */
-	private long revision = 26740;
-	public long openttdNewgrfVersion = 1 << 28 | 4 << 24 | 2 << 20 | 1 << 19 | (revision & ((1 << 19) - 1));
+	private final int version[] = {1, 5, 0};
+	public final String openttdVersion = version[0] + "." + version[1] + "." + version[2];
+	private final long revision = 27217;
+	public final long openttdNewgrfVersion = version[0] << 28 | version[1] << 24 | version[2] << 20 | 1 << 19 | (revision & ((1 << 19) - 1));
 }
