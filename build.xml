@@ -1,0 +1,32 @@
+<project name="openttd-admin" default="dist" basedir=".">
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+
+  <target name="init" depends="clean">
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="compile" depends="init"
+        description="compile the source">
+    <!-- Compile the java code from ${src} into ${build} -->
+    <javac srcdir="${src}" destdir="${build}">
+      <classpath>
+        <fileset dir="lib">
+          <include name="**"/>
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="dist" depends="compile"
+        description="generate the distribution">
+    <jar jarfile="openttd-admin.jar" basedir="${build}"/>
+  </target>
+
+  <target name="clean"
+        description="clean up">
+    <delete dir="${build}"/>
+    <delete file="openttd-admin.jar"/>
+  </target>
+</project>
