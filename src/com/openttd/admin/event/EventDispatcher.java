@@ -39,7 +39,7 @@ public class EventDispatcher implements Runnable {
 		try {
 			lock.writeLock().lock();
 			if(!listenersByEventClass.containsKey(eventClass)) {
-				listenersByEventClass.put(eventClass, new ArrayList());
+				listenersByEventClass.put(eventClass, new ArrayList<EventListener>());
 			}
 			Collection<EventListener> listeners = listenersByEventClass.get(eventClass);
 			listeners.add(listener);
@@ -52,7 +52,7 @@ public class EventDispatcher implements Runnable {
 		try {
 			lock.writeLock().lock();
 			if(!listenersByEventClass.containsKey(eventClass)) {
-				listenersByEventClass.put(eventClass, new ArrayList());
+				listenersByEventClass.put(eventClass, new ArrayList<EventListener>());
 			}
 			Collection<EventListener> listeners = listenersByEventClass.get(eventClass);
 			listeners.remove(listener);

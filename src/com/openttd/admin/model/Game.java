@@ -22,7 +22,6 @@ import com.openttd.network.admin.NetworkAdminSender;
 import com.openttd.network.admin.NetworkModel;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateType;
-import static com.openttd.network.constant.TcpAdmin.PacketServerType.ADMIN_PACKET_SERVER_GAMESCRIPT;
 import com.openttd.util.Convert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

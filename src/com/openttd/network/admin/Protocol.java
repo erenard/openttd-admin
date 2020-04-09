@@ -43,6 +43,7 @@ public class Protocol {
 				}
 			}
 		}
+		formatter.close();
 		return stringBuffer.toString();
 	}
 }

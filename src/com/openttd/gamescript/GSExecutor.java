@@ -8,11 +8,9 @@ import com.openttd.network.admin.NetworkAdminSender;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import org.slf4j.LoggerFactory;
 
 public class GSExecutor implements GameScriptEventListener {
 
-	private static final org.slf4j.Logger log = LoggerFactory.getLogger(GSExecutor.class);
 	private final OpenttdAdmin admin;
 	private static int nextRequestId = 0;
 	private final Gson gson = new Gson();

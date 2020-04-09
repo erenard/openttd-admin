@@ -32,7 +32,7 @@ public class NetworkModel implements Cloneable {
 		return companyById.get(companyId);
 	}
 
-	public void deleteCompany(int companyId) {
+	public void deleteCompany(short companyId) {
 		companyById.remove(companyId);
 	}
 

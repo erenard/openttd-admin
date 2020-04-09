@@ -62,7 +62,7 @@ public class GameScript extends OpenttdAdmin implements DateEventListener, GameS
 		try {
 			String url = args[0];
 			configuration.host = url.split(":")[0];
-			configuration.adminPort = new Integer(url.split(":")[1]);
+			configuration.adminPort = Integer.parseInt(url.split(":")[1]);
 			configuration.password = args[1];
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

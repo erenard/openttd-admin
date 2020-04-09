@@ -13,7 +13,7 @@ public class CLIUtil {
 		try {
 			String url = args[0];
 			configuration.host = url.split(":")[0];
-			configuration.adminPort = new Integer(url.split(":")[1]);
+			configuration.adminPort = Integer.parseInt(url.split(":")[1]);
 			configuration.password = args[1];
 		} catch (Exception e) {
 			e.printStackTrace();

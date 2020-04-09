@@ -1,10 +1,5 @@
 package com.openttd.network.client;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Network client's state
  */
