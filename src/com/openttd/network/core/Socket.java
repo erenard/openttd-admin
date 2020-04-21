@@ -55,6 +55,11 @@ public class Socket {
 
 	ByteBuffer data = null;
 
+	/**
+	 * Packet-ize the network byte stream
+	 * @return packets
+	 * @throws IOException
+	 */
 	public List<Packet> receive() throws IOException {
 		List<Packet> packets = new ArrayList<Packet>();
 		if (data == null) {
@@ -68,7 +73,7 @@ public class Socket {
 	private ByteBuffer receiveMore(ByteChannel channel, ByteBuffer data, List<Packet> packets) throws IOException {
 		channel.read(data);
 		int dataLength = data.position();
-		if (dataLength <= 0) { throw new IOException("Connection lost"); }
+		if (dataLength <= 0) { throw new IOException("Connection lost, received data length: " + dataLength); }
 
 		Packet dataReader = Packet.packetToReceive(data);
 		data.rewind();

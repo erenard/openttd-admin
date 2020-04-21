@@ -481,6 +481,7 @@ public class NetworkAdmin extends Thread {
 			 * Notification about the server shutting down.
 			 */
 		case ADMIN_PACKET_SERVER_SHUTDOWN: {
+			// TODO properly shutdown
 			throw new NetworkException(packetType.toString());
 		}
 		/**
