@@ -1,5 +1,6 @@
 package com.openttd.network.constant;
 
+
 /**
  * See network_type.h for updates
  */
@@ -64,7 +65,16 @@ public interface NetworkType {
 		NETWORK_ERROR_TIMEOUT_MAP,
 		NETWORK_ERROR_TIMEOUT_JOIN,
 
-		NETWORK_ERROR_END,
+		NETWORK_ERROR_END;
+		
+		public static NetworkErrorCode valueOf(int order) {
+			for (NetworkErrorCode value : values()) {
+				if (value.ordinal() == order) {
+					return value;
+				}
+			}
+			return null;
+		}
 	};
 
 }

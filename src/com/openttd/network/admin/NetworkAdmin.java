@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openttd.admin.model.Game;
+import com.openttd.network.constant.NetworkType.NetworkErrorCode;
 import com.openttd.network.constant.TcpAdmin.PacketServerType;
 import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
@@ -416,7 +417,9 @@ public class NetworkAdmin extends Thread {
 		 * uint8 NetworkErrorCode the error caused.
 		 */
 		case ADMIN_PACKET_SERVER_ERROR: {
-			throw new NetworkException(packet.readUint8());
+			short errorId = packet.readUint8();
+			log.error(NetworkErrorCode.valueOf(errorId).toString());
+			break;
 		}
 		/**
 		 * Notification about a newgame.

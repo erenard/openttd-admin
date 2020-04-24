@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openttd.network.admin.NetworkException;
+import com.openttd.network.constant.NetworkType.NetworkErrorCode;
 import com.openttd.network.constant.TcpGame.PacketGameType;
 import com.openttd.network.core.Configuration;
 import com.openttd.network.core.Packet;
@@ -164,6 +165,7 @@ public class NetworkClient extends Thread {
 		}
 		case PACKET_SERVER_ERROR: {
 			short errorId = packet.readUint8();
+			log.error(NetworkErrorCode.valueOf(errorId).toString());
 			break;
 		}
 		case PACKET_SERVER_CHECK_NEWGRFS: {
@@ -282,6 +284,8 @@ public class NetworkClient extends Thread {
 			char passworded = packet.readUint16();
 			break;
 		}
+		default:
+			break;
 		}
 	}
 
