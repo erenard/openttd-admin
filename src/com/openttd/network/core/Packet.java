@@ -11,6 +11,8 @@ import com.openttd.network.constant.PacketType;
 import com.openttd.network.constant.PacketUdpType;
 import com.openttd.network.constant.TcpAdmin.PacketAdminType;
 import com.openttd.network.constant.TcpGame.PacketGameType;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class Packet {
 	private static final Logger log = LoggerFactory.getLogger(Packet.class);
@@ -175,11 +177,11 @@ public class Packet {
 		buffer.put((byte) v);
 	}
 
-	public void writeString(String s) {
-		for (int i = 0; i < s.length(); i++) {
-			buffer.put((byte) s.charAt(i));
+    public void writeString(String s) {
+        byte[] bytes = (s + '\0').getBytes(StandardCharsets.UTF_8);
+		for (int i = 0; i < bytes.length; i++) {
+			buffer.put(bytes[i]);
 		}
-		buffer.put((byte) '\0');
 	}
 
 	public void writeBool8(boolean b) {

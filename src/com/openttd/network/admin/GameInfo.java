@@ -11,7 +11,7 @@ public class GameInfo implements Cloneable {
 	private String serverRevision;
 	private boolean serverDedicated;
 	// Map Info (Welcome)
-	private String mapName;
+	private String mapName; // Always "", deprecated
 	private long mapSeed;
 	private short mapSet;
 	private long startDate;

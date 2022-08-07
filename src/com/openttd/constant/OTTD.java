@@ -17,11 +17,12 @@ public class OTTD {
 	 */
 	public enum GoalType {
 		/* Note: these values represent part of the in-game GoalType enum */
-		GT_NONE,     ///< Destination is not linked.
-		GT_TILE,     ///< Destination is a tile.
-		GT_INDUSTRY, ///< Destination is an industry.
-		GT_TOWN,     ///< Destination is a town.
-		GT_COMPANY,  ///< Destination is a company.
+		GT_NONE,       ///< Destination is not linked.
+		GT_TILE,       ///< Destination is a tile.
+		GT_INDUSTRY,   ///< Destination is an industry.
+		GT_TOWN,       ///< Destination is a town.
+		GT_COMPANY,    ///< Destination is a company.
+		GT_STORY_PAGE, ///< Destination is a story page.
 	};
 
 	/**

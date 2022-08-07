@@ -10,6 +10,7 @@ import com.google.gson.JsonPrimitive;
 import com.openttd.constant.OTTD;
 import com.openttd.network.constant.GameScript;
 import com.openttd.network.constant.GameScript.GSCommand;
+import com.openttd.network.constant.GameVersion;
 import com.openttd.network.constant.NetworkType.DestType;
 import com.openttd.network.constant.NetworkType.NetworkAction;
 import com.openttd.network.constant.TcpAdmin.AdminUpdateFrequency;
@@ -37,16 +38,49 @@ public class NetworkAdminSender extends NetworkSender {
 	}
 	
 	/**
-	 * Join the admin network:
-	 * string Password the server is expecting for this network.
-	 * string Name of the application being used to connect.
-	 * string Version string of the application being used to connect.
+	 * Execute a command on the servers console:
+	 * @param command Command to be executed.
+	 */
+	public void rcon(String command) {
+		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_RCON);
+		packet.writeString(command);
+		queue.offer(packet);
+	}
+
+	/**
+	 * Send a gamescript
+	 * @return false if packet was too long
+	 */
+	public boolean gameScript(String json) {
+		if(json == null || json.length() > Packet.MTU - 3) {
+			log.error(json + " is " + json.length() + " long, max: " + (Packet.MTU - 3));
+			return false;
+		}
+		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
+		packet.writeString(json);
+		queue.offer(packet);
+		return true;
+	}
+
+	/**
+	 * Ping the server
+	 * @param pingId
+	 */
+	public void ping(long pingId) {
+		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_PING);
+		packet.writeUint32(pingId);
+		queue.offer(packet);
+	}
+
+	/**
+	 * Join the admin network
+     * @param configuration password, name and version
 	 */
 	void join(Configuration configuration) {
 		Packet toSend = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_JOIN);
-		toSend.writeString(configuration.password);
+        toSend.writeString(configuration.password);
 		toSend.writeString(configuration.name);
-		toSend.writeString(configuration.openttdVersion);
+		toSend.writeString(GameVersion.OPENTTD);
 		queue.offer(toSend);
 	}
 
@@ -58,9 +92,9 @@ public class NetworkAdminSender extends NetworkSender {
 	}
 
 	/**
-	 * Register updates to be sent at certain frequencies (as announced in the PROTOCOL packet):
-	 * uint16 Update type (see #AdminUpdateType).
-	 * uint16 Update frequency (see #AdminUpdateFrequency), setting #ADMIN_FREQUENCY_POLL is always ignored.
+	 * Register updates to be sent at certain frequencies (as announced in the PROTOCOL packet)
+     * @param adminUpdateType Update type
+     * @param adminUpdateFrequency Update frequency, setting #ADMIN_FREQUENCY_POLL is always ignored
 	 */
 	public void updateFrequency(AdminUpdateType adminUpdateType, AdminUpdateFrequency adminUpdateFrequency) {
 		if (!protocol.hasProtocol(adminUpdateType, adminUpdateFrequency)) {
@@ -76,10 +110,10 @@ public class NetworkAdminSender extends NetworkSender {
 	}
 
 	/**
-	 * Poll the server for certain updates, an invalid poll (e.g. not existent id) gets silently dropped:
-	 * uint8 #AdminUpdateType the server should answer for, only if #AdminUpdateFrequency #ADMIN_FREQUENCY_POLL is advertised in the
+	 * Poll the server for certain updates, an invalid poll (e.g. not existent id) gets silently dropped
+     * @param adminUpdateType the server should answer for, only if #AdminUpdateFrequency #ADMIN_FREQUENCY_POLL is advertised in the
 	 * PROTOCOL packet.
-	 * uint32 ID relevant to the packet type, e.g.
+     * @param data ID relevant to the packet type, e.g.
 	 * - the client ID for #ADMIN_UPDATE_CLIENT_INFO. Use UINT32_MAX to show all clients.
 	 * - the company ID for #ADMIN_UPDATE_COMPANY_INFO. Use UINT32_MAX to show all companies.
 	 */
@@ -96,11 +130,11 @@ public class NetworkAdminSender extends NetworkSender {
 	}
 
 	/**
-	 * Send chat as the server:
-	 * uint8 Action such as NETWORK_ACTION_CHAT_CLIENT (see #NetworkAction).
-	 * uint8 Destination type such as DESTTYPE_BROADCAST (see #DestType).
-	 * uint32 ID of the destination such as company or client id.
-	 * string Message.
+	 * Send chat as the server
+     * @param action Action such as NETWORK_ACTION_CHAT_CLIENT (see #NetworkAction).
+     * @param type Destination type such as DESTTYPE_BROADCAST (see #DestType).
+     * @param dest ID of the destination such as company or client id.
+     * @param message Message.
 	 */
 	public void chat(NetworkAction action, DestType type, long dest, String message) {
 		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_CHAT);
@@ -112,13 +146,19 @@ public class NetworkAdminSender extends NetworkSender {
 	}
 
 	/**
-	 * Execute a command on the servers console:
-	 * string Command to be executed.
+	 * Send chat as an external source
+     * @param source Source identifier.
+     * @param colour Message colour.
+     * @param user User name.
+     * @param message Message.
 	 */
-	public void rcon(String command) {
-		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_RCON);
-		packet.writeString(command);
-		queue.offer(packet);
+	public void externalChat(String source, char colour, String user, String message) {
+		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_EXTERNAL_CHAT);
+        packet.writeString(source);
+        packet.writeUint16(colour);
+        packet.writeString(user);
+        packet.writeString(message);
+        queue.offer(packet);
 	}
 
 	/* Utility methods */
@@ -177,31 +217,6 @@ public class NetworkAdminSender extends NetworkSender {
 	 */
 	public void chatBroadcast(String message) {
 		this.chat(NetworkAction.NETWORK_ACTION_SERVER_MESSAGE, DestType.DESTTYPE_BROADCAST, 0, message);
-	}
-
-	/**
-	 * Send a gamescript
-	 * @return false if packet was too long
-	 */
-	public boolean gameScript(String json) {
-		if(json == null || json.length() > Packet.MTU - 3) {
-			log.error(json + " is " + json.length() + " long, max: " + (Packet.MTU - 3));
-			return false;
-		}
-		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_GAMESCRIPT);
-		packet.writeString(json);
-		queue.offer(packet);
-		return true;
-	}
-
-	/**
-	 * Ping the server
-	 * @param pingId
-	 */
-	public void ping(long pingId) {
-		Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_PING);
-		packet.writeUint32(pingId);
-		queue.offer(packet);
 	}
 
 	/**

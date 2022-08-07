@@ -126,37 +126,11 @@ public class NetworkClient extends Thread {
 		}
 		switch (packetType) {
 		case PACKET_SERVER_FULL:
+            /* We try to join a server which is full */
 			break;
 		case PACKET_SERVER_BANNED:
+            /* We try to join a server where we are banned */
 			break;
-		case PACKET_SERVER_COMPANY_INFO: {
-			short companyInfoVersion = packet.readUint8();
-			if(packet.readBool8()) {
-				short companyId = packet.readUint8();
-				String name = packet.readString();
-				long inauguratedYear = packet.readUint32();
-				BigInteger value = packet.readUint64();
-				BigInteger money = packet.readUint64();
-				BigInteger income = packet.readUint64();
-				int performance = packet.readUint16();
-				boolean hasPassword = packet.readBool8();
-				int[] vehicules = new int[5];
-				vehicules[0] = packet.readUint16();
-				vehicules[1] = packet.readUint16();
-				vehicules[2] = packet.readUint16();
-				vehicules[3] = packet.readUint16();
-				vehicules[4] = packet.readUint16();
-				int[] stations = new int[5];
-				stations[0] = packet.readUint16();
-				stations[1] = packet.readUint16();
-				stations[2] = packet.readUint16();
-				stations[3] = packet.readUint16();
-				stations[4] = packet.readUint16();
-				boolean isAi = packet.readBool8();
-				String clients = packet.readString();
-				break;
-			}
-		}
 		case PACKET_SERVER_CLIENT_INFO: {
 			long clientId = packet.readUint32();
 			short companyId = packet.readUint8();
@@ -172,7 +146,7 @@ public class NetworkClient extends Thread {
 			short grfCount = packet.readUint8();
 			for(int grfIndex = 0; grfIndex < grfCount; grfIndex++) {
 				long grfId = packet.readUint32();
-				//TODO incomplete
+				//TODO incomplete, see game_info.cpp:377
 				long md5 = packet.readUint32();
 			}
 			send.newGRFsOk();
@@ -255,6 +229,13 @@ public class NetworkClient extends Thread {
 			BigInteger data = packet.readUint64();
 			break;
 		}
+        case PACKET_SERVER_EXTERNAL_CHAT: {
+            String source = packet.readString();
+            char colour = packet.readUint16();
+            String user = packet.readString();
+            String message = packet.readString();
+            break;
+        }
 		case PACKET_SERVER_ERROR_QUIT:
 		case PACKET_SERVER_QUIT:
 		case PACKET_SERVER_JOIN:
@@ -277,7 +258,7 @@ public class NetworkClient extends Thread {
 		}
 		case PACKET_SERVER_CONFIG_UPDATE: {
 			short maxCompagnies = packet.readUint8();
-			short maxSpectators = packet.readUint8();
+			String serverName = packet.readString();
 			break;
 		}
 		case PACKET_SERVER_COMPANY_UPDATE: {

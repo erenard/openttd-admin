@@ -1,5 +1,6 @@
 package com.openttd.network.constant;
 
+import java.util.Arrays;
 
 /**
  * See network_type.h for updates
@@ -14,8 +15,14 @@ public interface NetworkType {
 		NETWORK_VEH_BUS,
 		NETWORK_VEH_PLANE,
 		NETWORK_VEH_SHIP,
-		NETWORK_VEH_END
-	};
+		NETWORK_VEH_END;
+        
+        public static int length() {
+            return Arrays
+            .asList(NetworkVehicleType.values())
+            .indexOf(NetworkVehicleType.NETWORK_VEH_END);
+        }
+};
 
 	public enum DestType {
 		DESTTYPE_BROADCAST, // /< Send message/notice to all clients (All)
@@ -37,33 +44,35 @@ public interface NetworkType {
 		NETWORK_ACTION_COMPANY_JOIN,
 		NETWORK_ACTION_COMPANY_NEW,
 		NETWORK_ACTION_KICKED,
+    	NETWORK_ACTION_EXTERNAL_CHAT,
 	};
 
 	public enum NetworkErrorCode {
-		NETWORK_ERROR_GENERAL, // Try to use this one like never
+        NETWORK_ERROR_GENERAL, // Try to use this one like never
 
-		/* Signals from clients */
-		NETWORK_ERROR_DESYNC,
-		NETWORK_ERROR_SAVEGAME_FAILED,
-		NETWORK_ERROR_CONNECTION_LOST,
-		NETWORK_ERROR_ILLEGAL_PACKET,
-		NETWORK_ERROR_NEWGRF_MISMATCH,
+        /* Signals from clients */
+        NETWORK_ERROR_DESYNC,
+        NETWORK_ERROR_SAVEGAME_FAILED,
+        NETWORK_ERROR_CONNECTION_LOST,
+        NETWORK_ERROR_ILLEGAL_PACKET,
+        NETWORK_ERROR_NEWGRF_MISMATCH,
 
-		/* Signals from servers */
-		NETWORK_ERROR_NOT_AUTHORIZED,
-		NETWORK_ERROR_NOT_EXPECTED,
-		NETWORK_ERROR_WRONG_REVISION,
-		NETWORK_ERROR_NAME_IN_USE,
-		NETWORK_ERROR_WRONG_PASSWORD,
-		NETWORK_ERROR_COMPANY_MISMATCH, // Happens in CLIENT_COMMAND
-		NETWORK_ERROR_KICKED,
-		NETWORK_ERROR_CHEATER,
-		NETWORK_ERROR_FULL,
-		NETWORK_ERROR_TOO_MANY_COMMANDS,
-		NETWORK_ERROR_TIMEOUT_PASSWORD,
-		NETWORK_ERROR_TIMEOUT_COMPUTER,
-		NETWORK_ERROR_TIMEOUT_MAP,
-		NETWORK_ERROR_TIMEOUT_JOIN,
+        /* Signals from servers */
+        NETWORK_ERROR_NOT_AUTHORIZED,
+        NETWORK_ERROR_NOT_EXPECTED,
+        NETWORK_ERROR_WRONG_REVISION,
+        NETWORK_ERROR_NAME_IN_USE,
+        NETWORK_ERROR_WRONG_PASSWORD,
+        NETWORK_ERROR_COMPANY_MISMATCH, // Happens in CLIENT_COMMAND
+        NETWORK_ERROR_KICKED,
+        NETWORK_ERROR_CHEATER,
+        NETWORK_ERROR_FULL,
+        NETWORK_ERROR_TOO_MANY_COMMANDS,
+        NETWORK_ERROR_TIMEOUT_PASSWORD,
+        NETWORK_ERROR_TIMEOUT_COMPUTER,
+        NETWORK_ERROR_TIMEOUT_MAP,
+        NETWORK_ERROR_TIMEOUT_JOIN,
+        NETWORK_ERROR_INVALID_CLIENT_NAME,
 
 		NETWORK_ERROR_END;
 		

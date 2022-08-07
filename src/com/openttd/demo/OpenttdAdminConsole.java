@@ -49,7 +49,7 @@ public class OpenttdAdminConsole extends OpenttdAdmin implements DateEventListen
 	 */
 	public static void main(String[] args) {
 		Configuration configuration = new Configuration();
-		CLIUtil.parseArguments(args, configuration);
+        configuration.password = args[0];
 
 		OpenttdAdminConsole simpleAdmin = new OpenttdAdminConsole(configuration);
 		simpleAdmin.addListener(DateEvent.class, simpleAdmin);

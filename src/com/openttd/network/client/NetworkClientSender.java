@@ -1,9 +1,9 @@
 package com.openttd.network.client;
 
+import com.openttd.network.constant.GameVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.openttd.network.constant.NetworkInternal.NetworkLanguage;
 import com.openttd.network.constant.NetworkType.DestType;
 import com.openttd.network.constant.NetworkType.NetworkAction;
 import com.openttd.network.constant.TcpGame.PacketGameType;
@@ -22,19 +22,14 @@ public class NetworkClientSender extends NetworkSender {
 		super(socket);
 	}
 
-	/** Query the server for company information. */
-	public void companyInformationQuery() {
-		queue.offer(Packet.packetToSend(PacketGameType.PACKET_CLIENT_COMPANY_INFO));
-	}
-
 	/** Tell the server we would like to join. */
 	void join(Configuration configuration) {
 		Packet toSend = Packet.packetToSend(PacketGameType.PACKET_CLIENT_JOIN);
-		toSend.writeString(configuration.openttdVersion);
-		toSend.writeUint32(configuration.openttdNewgrfVersion);
-		toSend.writeString(configuration.name);
+		toSend.writeString(GameVersion.OPENTTD);
+		toSend.writeUint32(GameVersion.NEWGRF);
+		toSend.writeString(configuration.name); // Client name
 		toSend.writeUint8((short) 255); // PlayAs
-		toSend.writeUint8((short) NetworkLanguage.NETLANG_ANY.ordinal()); // Language
+		toSend.writeUint8((short) 0); // Used to be language
 		queue.offer(toSend);
 	}
 

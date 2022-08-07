@@ -10,7 +10,7 @@ public class Client implements Cloneable {
 
 	private String ip;
 	private String name;
-	private short language;
+	private short language; // Always 0, deprecated
 	private long joinDate;
 	private short companyId;
 
