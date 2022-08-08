@@ -10,7 +10,6 @@ public class Client implements Cloneable {
 
 	private String ip;
 	private String name;
-	private short language; // Always 0, deprecated
 	private long joinDate;
 	private short companyId;
 
@@ -25,7 +24,6 @@ public class Client implements Cloneable {
 		clone.setCompanyId(companyId);
 		clone.setIp(ip);
 		clone.setJoinDate(joinDate);
-		clone.setLanguage(language);
 		clone.setName(name);
 		return clone;
 	}
@@ -44,16 +42,6 @@ public class Client implements Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-    @Deprecated
-	public short getLanguage() {
-		return language;
-	}
-
-    @Deprecated
-	public void setLanguage(short language) {
-		this.language = language;
 	}
 
 	public long getJoinDate() {

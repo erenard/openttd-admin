@@ -157,7 +157,7 @@ public class NetworkAdmin extends Thread {
 			gameInfo.setServerRevision(packet.readString());
 			gameInfo.setServerDedicated(packet.readBool8());
 
-			gameInfo.setMapName(packet.readString()); // Always ""
+			packet.readString(); // Always ""
 			gameInfo.setMapSeed(packet.readUint32());
 			gameInfo.setMapSet(packet.readUint8());
 
@@ -217,7 +217,7 @@ public class NetworkAdmin extends Thread {
 			Client client = networkModel.retreiveClient(clientId);
 			client.setIp(packet.readString());
 			client.setName(packet.readString());
-			client.setLanguage(packet.readUint8()); // Always 0
+			packet.readUint8(); // Always 0
 			client.setJoinDate(packet.readUint32());
 			client.setCompanyId(packet.readUint8());
 			break;

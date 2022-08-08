@@ -11,13 +11,12 @@ public class GameInfo implements Cloneable {
 	private String serverRevision;
 	private boolean serverDedicated;
 	// Map Info (Welcome)
-	private String mapName; // Always "", deprecated
 	private long mapSeed;
 	private short mapSet;
 	private long startDate;
 	private int mapWidth;
 	private int mapHeight;
-	// Unused
+	// Game Date
 	private long currentDate;
 
 	public int getVersion() {
@@ -50,16 +49,6 @@ public class GameInfo implements Cloneable {
 
 	public void setServerDedicated(boolean serverDedicated) {
 		this.serverDedicated = serverDedicated;
-	}
-
-    @Deprecated
-	public String getMapName() {
-		return mapName;
-	}
-
-    @Deprecated
-	public void setMapName(String mapName) {
-		this.mapName = mapName;
 	}
 
 	public short getMapSet() {
@@ -121,7 +110,6 @@ public class GameInfo implements Cloneable {
 		// Map
 		clone.mapSeed = mapSeed;
 		clone.mapSet = mapSet;
-		clone.mapName = mapName;
 		clone.mapWidth = mapWidth;
 		clone.mapHeight = mapHeight;
 		// Game
@@ -136,7 +124,7 @@ public class GameInfo implements Cloneable {
 		PrintWriter pw = new PrintWriter(writer);
 		pw.println("GameInfo v" + version + ".");
 		pw.println("Server:" + serverName + ", " + serverRevision + ", dedicated:" + serverDedicated + ".");
-		pw.println("Map:" + mapName + ", Set:" + mapSet + ", " + mapWidth + "x" + mapHeight + ".");
+		pw.println("Map:" + mapSet + ", " + mapWidth + "x" + mapHeight + ".");
 		pw.println("Game:" + currentDate + ", started:" + startDate + ".");
 		pw.flush();
 		return writer.getBuffer().toString();

@@ -8,7 +8,7 @@
 	</appender>
 	
 	<category name="com.openttd.network" additivity="false">
-		<priority value="debug" />
+		<priority value="info" />
 		<appender-ref ref="stdout" />
 	</category>
 	
