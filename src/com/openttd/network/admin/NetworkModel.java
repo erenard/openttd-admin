@@ -1,5 +1,6 @@
 package com.openttd.network.admin;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,7 +24,7 @@ public class NetworkModel implements Cloneable {
 		this.gameInfo = gameInfo;
 	}
 
-	private Map<Short, Company> companyById = new HashMap<Short, Company>();
+	private final Map<Short, Company> companyById = new HashMap();
 
 	public Company retreiveCompany(short companyId) {
 		if (!companyById.containsKey(companyId)) {
@@ -32,17 +33,25 @@ public class NetworkModel implements Cloneable {
 		return companyById.get(companyId);
 	}
 
+	public Collection<Company> retreiveCompanies() {
+		return companyById.values();
+	}
+
 	public void deleteCompany(short companyId) {
 		companyById.remove(companyId);
 	}
 
-	private Map<Long, Client> clientById = new HashMap<Long, Client>();
+	private final Map<Long, Client> clientById = new HashMap();
 
 	public Client retreiveClient(long clientId) {
 		if (!clientById.containsKey(clientId)) {
 			clientById.put(clientId, new Client(clientId));
 		}
 		return clientById.get(clientId);
+	}
+
+	public Collection<Client> retreiveClients() {
+		return clientById.values();
 	}
 
 	public void deleteClient(long clientId) {

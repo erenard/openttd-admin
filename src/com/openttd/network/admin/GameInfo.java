@@ -52,10 +52,12 @@ public class GameInfo implements Cloneable {
 		this.serverDedicated = serverDedicated;
 	}
 
+    @Deprecated
 	public String getMapName() {
 		return mapName;
 	}
 
+    @Deprecated
 	public void setMapName(String mapName) {
 		this.mapName = mapName;
 	}

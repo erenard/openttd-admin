@@ -46,10 +46,12 @@ public class Client implements Cloneable {
 		this.name = name;
 	}
 
+    @Deprecated
 	public short getLanguage() {
 		return language;
 	}
 
+    @Deprecated
 	public void setLanguage(short language) {
 		this.language = language;
 	}
