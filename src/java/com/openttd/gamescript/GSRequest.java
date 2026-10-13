@@ -4,38 +4,38 @@ import com.google.gson.JsonObject;
 
 public abstract class GSRequest<T> {
 
-    private String id;
-    private GSResponse response;
+	private String id;
+	private GSResponse response;
 
-    String getId() {
-        return this.id;
-    }
+	String getId() {
+		return this.id;
+	}
 
-    void setId(String id) {
-        this.id = id;
-    }
+	void setId(String id) {
+		this.id = id;
+	}
 
-    public boolean hasResponse() {
-        return response != null;
-    }
+	public boolean hasResponse() {
+		return response != null;
+	}
 
-    public T getResult() throws GSException {
-        if (response.exception != null) {
-            throw new GSException(response.exception);
-        }
-        return fromJson(response.data);
-    }
+	public T getResult() throws GSException {
+		if (response.exception != null) {
+			throw new GSException(response.exception);
+		}
+		return fromJson(response.data);
+	}
 
-    void setResponse(GSResponse response) {
-        this.response = response;
-    }
+	void setResponse(GSResponse response) {
+		this.response = response;
+	}
 
-    protected abstract JsonObject toJson();
+	protected abstract JsonObject toJson();
 
-    protected abstract T fromJson(String json);
+	protected abstract T fromJson(String json);
 
-    @Override
-    public String toString() {
-        return this.toJson().toString();
-    }
+	@Override
+	public String toString() {
+		return this.toJson().toString();
+	}
 }

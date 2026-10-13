@@ -3,65 +3,101 @@
  *
  * This generated file contains a sample Java library project to get you started.
  * For more details take a look at the 'Building Java & JVM projects' chapter in the Gradle
- * User Manual available at https://docs.gradle.org/7.5/userguide/building_java_projects.html
+ * User Manual available at https://docs.gradle.org/9.7.1/userguide/building_java_projects.html
  */
 
+
 plugins {
-    // Apply the java-library plugin for API and implementation separation.
-    id 'java-library'
+	// Apply the java-library plugin for API and implementation separation.
+	id 'java-library'
+	id("com.diffplug.spotless") version "8.10.4"
+}
+
+tasks.wrapper {
+	gradleVersion = "9.9.0-milestone-2"
+	distributionType = Wrapper.DistributionType.ALL
 }
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
-    }
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(27)
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
+}
+
+spotless {
+	format 'misc', {
+		// define the files to apply `misc` to
+		target '*.gradle', '.gitattributes', '.gitignore'
+
+		// define the steps to apply to those files
+		trimTrailingWhitespace()
+		leadingSpacesToTabs()
+		endWithNewline()
+	}
+	java {
+		target("src/**/*.java")
+		shortenFullyQualifiedTypes()
+		importOrder()
+		expandWildcardImports()
+		trimTrailingWhitespace()
+		leadingSpacesToTabs()
+		endWithNewline()
+
+		cleanthat()
+	}
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
-    mavenCentral()
+	// Use Maven Central for resolving dependencies.
+	mavenCentral()
 }
 
 dependencies {
-    // Use JUnit Jupiter for testing.
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+	// Use JUnit Jupiter for testing.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api 'com.google.code.gson:gson:2.2.2'
-    api 'log4j:log4j:1.2.17'
-    api 'org.slf4j:slf4j-api:1.6.6'
-    api 'org.slf4j:slf4j-log4j12:1.6.6'
+	// This dependency is exported to consumers, that is to say found on their compile classpath.
+	api 'com.google.code.gson:gson:2.8.9'
+	api 'org.apache.logging.log4j:log4j-core:2.26.1'
+	api 'org.slf4j:slf4j-api:2.0.18'
+	api 'org.slf4j:slf4j-reload4j:2.0.18'
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:31.0.1-jre'
+	// This dependency is used internally, and not exposed to consumers on their own compile classpath.
+	implementation 'com.google.guava:guava:32.0.1-jre'
 }
 
 tasks.named('test') {
-    // Use JUnit Platform for unit tests.
-    useJUnitPlatform()
+	// Use JUnit Platform for unit tests.
+	useJUnitPlatform()
 }
 
-task buildGameScript(type: Exec, dependsOn: 'compileJava') {
-    workingDir "src/squirrel"
-    commandLine 'python', 'make_tar.py'
+tasks.register('buildGameScript', Exec) {
+	dependsOn 'compileJava'
+	workingDir "src/squirrel"
+	commandLine 'python3', 'make_tar.py'
+}
+
+dependencies {
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 sourceSets {
-    main {
-         java {
-            srcDirs = ['src/java']
-         }
-         resources {
-            srcDirs = ['src/squirrel']
-         }
-    }
+	main {
+		java {
+			srcDirs = ['src/java']
+		}
+		resources {
+			srcDirs = ['src/squirrel']
+		}
+	}
 
-    test {
-        java {
-            srcDirs = ['test/java']
-        }
-        resources {
-            srcDirs = ['test/resources', 'openttd']
-        }
-    }
+	test {
+		java {
+			srcDirs = ['test/java']
+		}
+		resources {
+			srcDirs = ['test/resources', 'openttd']
+		}
+	}
 }

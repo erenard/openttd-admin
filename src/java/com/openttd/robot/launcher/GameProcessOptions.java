@@ -6,26 +6,26 @@ import java.util.List;
 
 public class GameProcessOptions {
 
-    private final File openttdPath;
-    private final List<String> options;
+	private final File openttdPath;
+	private final List<String> options;
 
-    public GameProcessOptions(String openttdPath, String openttdCommand) {
-        this.openttdPath = new File(openttdPath);
-        options = new ArrayList<>();
-        options.add(openttdCommand);
-        options.add("-D");
-        options.add("-d 1");
-    }
+	public GameProcessOptions(String openttdPath, String openttdCommand) {
+		this.openttdPath = new File(openttdPath);
+		options = new ArrayList<>();
+		options.add(openttdCommand);
+		options.add("-D");
+		options.add("-d 1");
+	}
 
-    public void addOption(String option) {
-        options.add(option);
-    }
+	public void addOption(String option) {
+		options.add(option);
+	}
 
-    public File getOpenttdPath() {
-        return openttdPath;
-    }
+	public File getOpenttdPath() {
+		return openttdPath;
+	}
 
-    public List<String> getOptions() {
-        return options;
-    }
+	public List<String> getOptions() {
+		return options;
+	}
 }

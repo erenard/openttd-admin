@@ -9,17 +9,17 @@ import java.util.Properties;
  */
 public class TestUtils {
 
-    public static void wait(int s) {
-        try {
-            Thread.sleep(s * 1000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-    }
+	public static void wait(int s) {
+		try {
+			Thread.sleep(s * 1000);
+		} catch (InterruptedException ex) {
+			ex.printStackTrace();
+		}
+	}
 
-    public static Properties readSecrets() throws IOException {
-        Properties properties = new Properties();
-        properties.load(new FileReader("./openttd/secrets.cfg"));
-        return properties;
-    }
+	public static Properties readSecrets() throws IOException {
+		Properties properties = new Properties();
+		properties.load(new FileReader("./openttd/secrets.cfg"));
+		return properties;
+	}
 }

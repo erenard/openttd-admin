@@ -1,18 +1,52 @@
+.gradle
+# Ignore Gradle build output directory
+build/
+openttd/*
+/openttd-admin.jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+.idea/*
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Kotlin ###
+.kotlin
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 /.classpath
 /.project
 /manifest.mf
-/openttd-admin.jar
-/bin
-/build/
-/nb-build.xml
-/nbproject/
-/dist/
 /bin-test/
+
+### NetBeans ###
+/nbproject/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 /nbbuild.xml
+/nb-build.xml
 
-# Ignore Gradle project-specific cache directory
-.gradle
+### VS Code ###
+.vscode/
 
-# Ignore Gradle build output directory
-build
-openttd/*
+### Mac OS ###
+.DS_Store
+local.properties

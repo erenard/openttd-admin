@@ -17,41 +17,41 @@ import java.util.Collection;
  */
 public class TestUtil {
 
-    public static void fakeExternalUserService() {
-        //Fake user identification
-        ExternalServices.getInstance().setExternalUserService((String token) -> {
-            ExternalUser externalUser = new ExternalUser();
-            externalUser.setName(token);
-            if (token.startsWith("admin")) {
-                externalUser.setAdmin(true);
-            }
-            return externalUser;
-        });
-        //Fake game service
-        ExternalServices.getInstance().setExternalGameService(new ExternalServices.ExternalGameService() {
-            @Override
-            public void exposeGame(long scenarioId, GameInfo gameInfo) {
-                System.out.println(gameInfo);
-            }
+	public static void fakeExternalUserService() {
+		//Fake user identification
+		ExternalServices.getInstance().setExternalUserService((String token) -> {
+			ExternalUser externalUser = new ExternalUser();
+			externalUser.setName(token);
+			if (token.startsWith("admin")) {
+				externalUser.setAdmin(true);
+			}
+			return externalUser;
+		});
+		//Fake game service
+		ExternalServices.getInstance().setExternalGameService(new ExternalServices.ExternalGameService() {
+			@Override
+			public void exposeGame(long scenarioId, GameInfo gameInfo) {
+				System.out.println(gameInfo);
+			}
 
-            @Override
-            public void saveGame(long scenarioId, Collection<GamePlayer> gamePlayers) {
-                System.out.println(scenarioId);
-                for (GamePlayer gamePlayer : gamePlayers) {
-                    System.out.println(gamePlayer.toString());
-                }
-            }
+			@Override
+			public void saveGame(long scenarioId, Collection<GamePlayer> gamePlayers) {
+				System.out.println(scenarioId);
+				for (GamePlayer gamePlayer : gamePlayers) {
+					System.out.println(gamePlayer.toString());
+				}
+			}
 
-            @Override
-            public void endGame(long scenarioId) {
-                System.exit(0);
-            }
+			@Override
+			public void endGame(long scenarioId) {
+				System.exit(0);
+			}
 
-            @Override
-            public GameInfo getGame(long scenarioId) {
-                return null;
-            }
-        });
-    }
+			@Override
+			public GameInfo getGame(long scenarioId) {
+				return null;
+			}
+		});
+	}
 
 }

@@ -1,9 +1,9 @@
 package com.openttd.gamescript;
 
 public class GSResponse {
-    //Json fields
+	// Json fields
 
-    String id;
-    String data;
-    String exception;
+	String id;
+	String data;
+	String exception;
 }

@@ -4,100 +4,100 @@ import com.openttd.network.constant.TcpAdmin.PacketServerType;
 
 public class NetworkAdminEvent {
 
-    private final PacketServerType packetServerType;
-    private long clientId;
-    private long pingId;
-    private short companyId;
-    private char color;
-    private String origin;
-    private String message;
-    private long date;
+	private final PacketServerType packetServerType;
+	private long clientId;
+	private long pingId;
+	private short companyId;
+	private char color;
+	private String origin;
+	private String message;
+	private long date;
 
-    public NetworkAdminEvent(PacketServerType packetServerType) {
-        this.packetServerType = packetServerType;
-    }
+	public NetworkAdminEvent(PacketServerType packetServerType) {
+		this.packetServerType = packetServerType;
+	}
 
-    void setClientEvent(PacketServerType packetServerType, long clientId) {
-        this.clientId = clientId;
-    }
+	void setClientEvent(PacketServerType packetServerType, long clientId) {
+		this.clientId = clientId;
+	}
 
-    void setCompanyEvent(PacketServerType packetServerType, short companyId) {
-        this.companyId = companyId;
-    }
+	void setCompanyEvent(PacketServerType packetServerType, short companyId) {
+		this.companyId = companyId;
+	}
 
-    void setRConEvent(PacketServerType packetServerType, char color, String message) {
-        this.color = color;
-        this.message = message;
-    }
+	void setRConEvent(PacketServerType packetServerType, char color, String message) {
+		this.color = color;
+		this.message = message;
+	}
 
-    void setRConEndEvent(PacketServerType packetType, String rcon) {
-        this.message = rcon;
-    }
+	void setRConEndEvent(PacketServerType packetType, String rcon) {
+		this.message = rcon;
+	}
 
-    void setDateEvent(PacketServerType packetServerType, long date) {
-        this.date = date;
-    }
+	void setDateEvent(PacketServerType packetServerType, long date) {
+		this.date = date;
+	}
 
-    void setChatEvent(PacketServerType packetServerType, long clientId, String message) {
-        this.clientId = clientId;
-        this.message = message;
-    }
+	void setChatEvent(PacketServerType packetServerType, long clientId, String message) {
+		this.clientId = clientId;
+		this.message = message;
+	}
 
-    void setGameScriptEvent(PacketServerType packetServerType, String json) {
-        this.message = json;
-    }
+	void setGameScriptEvent(PacketServerType packetServerType, String json) {
+		this.message = json;
+	}
 
-    void setConsoleEvent(String origin, String message) {
-        this.origin = origin;
-        this.message = message;
-    }
+	void setConsoleEvent(String origin, String message) {
+		this.origin = origin;
+		this.message = message;
+	}
 
-    void setPongEvent(long pingId) {
-        this.pingId = pingId;
-    }
+	void setPongEvent(long pingId) {
+		this.pingId = pingId;
+	}
 
-    public long getClientId() {
-        return clientId;
-    }
+	public long getClientId() {
+		return clientId;
+	}
 
-    public short getCompanyId() {
-        return companyId;
-    }
+	public short getCompanyId() {
+		return companyId;
+	}
 
-    public long getPingId() {
-        return pingId;
-    }
+	public long getPingId() {
+		return pingId;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public String getMessage() {
+		return message;
+	}
 
-    public long getDate() {
-        return date;
-    }
+	public long getDate() {
+		return date;
+	}
 
-    public char getColor() {
-        return color;
-    }
+	public char getColor() {
+		return color;
+	}
 
-    public String getOrigin() {
-        return origin;
-    }
+	public String getOrigin() {
+		return origin;
+	}
 
-    public PacketServerType getPacketServerType() {
-        return packetServerType;
-    }
+	public PacketServerType getPacketServerType() {
+		return packetServerType;
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder(packetServerType.toString());
-        sb.append(" clientId:").append(clientId)
-                .append(" pingId:").append(pingId)
-                .append(" companyId:").append(companyId)
-                .append(" color:").append(color)
-                .append(" origin:").append(origin)
-                .append(" message:").append(message)
-                .append(" date:").append(date);
-        return sb.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder(packetServerType.toString());
+		sb.append(" clientId:").append(clientId)
+				.append(" pingId:").append(pingId)
+				.append(" companyId:").append(companyId)
+				.append(" color:").append(color)
+				.append(" origin:").append(origin)
+				.append(" message:").append(message)
+				.append(" date:").append(date);
+		return sb.toString();
+	}
 }

@@ -1,50 +1,51 @@
 package com.openttd.robot;
 
 import com.openttd.network.admin.GameInfo;
-import java.util.Collection;
-
 import com.openttd.robot.model.ExternalUser;
 import com.openttd.robot.model.GamePlayer;
+import java.util.Collection;
 
 public class ExternalServices {
 
-    private static final ExternalServices instance = new ExternalServices();
+	private static final ExternalServices instance = new ExternalServices();
 
-    private ExternalServices() {
-    }
+	private ExternalServices() {}
 
-    public static ExternalServices getInstance() {
-        return instance;
-    }
+	public static ExternalServices getInstance() {
+		return instance;
+	}
 
-    public interface ExternalGameService {
-        GameInfo getGame(long scenarioId);
-        void exposeGame(long scenarioId, GameInfo gameState);
-        void saveGame(long scenarionId, Collection<GamePlayer> gamePlayers);
-        void endGame(long scenarioId);
-    }
+	public interface ExternalGameService {
+		GameInfo getGame(long scenarioId);
 
-    public interface ExternalUserService {
+		void exposeGame(long scenarioId, GameInfo gameState);
 
-        ExternalUser identifyUser(String token);
-    }
+		void saveGame(long scenarionId, Collection<GamePlayer> gamePlayers);
 
-    private ExternalGameService externalGameService;
-    private ExternalUserService externalUserService;
+		void endGame(long scenarioId);
+	}
 
-    public ExternalGameService getExternalGameService() {
-        return externalGameService;
-    }
+	public interface ExternalUserService {
 
-    public void setExternalGameService(ExternalGameService externalGameService) {
-        this.externalGameService = externalGameService;
-    }
+		ExternalUser identifyUser(String token);
+	}
 
-    public ExternalUserService getExternalUserService() {
-        return externalUserService;
-    }
+	private ExternalGameService externalGameService;
+	private ExternalUserService externalUserService;
 
-    public void setExternalUserService(ExternalUserService externalUserService) {
-        this.externalUserService = externalUserService;
-    }
+	public ExternalGameService getExternalGameService() {
+		return externalGameService;
+	}
+
+	public void setExternalGameService(ExternalGameService externalGameService) {
+		this.externalGameService = externalGameService;
+	}
+
+	public ExternalUserService getExternalUserService() {
+		return externalUserService;
+	}
+
+	public void setExternalUserService(ExternalUserService externalUserService) {
+		this.externalUserService = externalUserService;
+	}
 }

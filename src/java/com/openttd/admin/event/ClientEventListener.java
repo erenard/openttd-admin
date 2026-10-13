@@ -2,5 +2,5 @@ package com.openttd.admin.event;
 
 public interface ClientEventListener extends EventListener {
 
-    void onClientEvent(ClientEvent clientEvent);
+	void onClientEvent(ClientEvent clientEvent);
 }
