@@ -3,7 +3,7 @@ package com.openttd.network.constant;
 public interface GameVersion {
 
     static final int MAJOR_VERSION = 15;
-    static final int MINOR_VERSION = 1;
+    static final int MINOR_VERSION = 3;
     /* See .version */
     static final String OPENTTD = MAJOR_VERSION + "." + MINOR_VERSION;
     /* See rev.cpp.in */
