@@ -1,18 +1,9 @@
-/.classpath
-/.project
-/manifest.mf
+# Root-level jar produced by copying build/libs/openttd-admin.jar for ../openttd-robot
 /openttd-admin.jar
-/bin
-/build/
-/nb-build.xml
-/nbproject/
-/dist/
-/bin-test/
-/nbbuild.xml
 
-# Ignore Gradle project-specific cache directory
+# Gradle project-specific cache and build output
 .gradle
-
-# Ignore Gradle build output directory
 build
+
+# OpenTTD's config/personal dir; only the two .cfg files are tracked
 openttd/*

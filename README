@@ -1,1 +1,11 @@
-Usage: java -jar openttd-admin.jar -cp slf4j-api-1.6.6.jar localhost:3977 admin_password
+Build: `gradle jar` → `build/libs/openttd-admin.jar` (no dependencies inside; see
+`../openttd-robot/lib` for the runtime jars).
+
+Usage, against a running dedicated server (admin port 3977):
+
+```
+java -cp ".:build/libs/openttd-admin.jar:/home/eric/www/openttd-robot/lib/gson-2.2.2.jar:/home/eric/www/openttd-robot/lib/slf4j-api-1.6.6.jar:/home/eric/www/openttd-robot/lib/slf4j-log4j12-1.6.6.jar:/home/eric/www/openttd-robot/lib/log4j-1.2.17.jar" \
+  com.openttd.demo.OpenttdAdminConsole <admin_password>
+```
+
+The leading `.` is required: log4j 1.2 reads `log4j.xml` from the classpath, which is the repo root.
