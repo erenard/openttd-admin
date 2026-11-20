@@ -39,6 +39,26 @@ dependencies {
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
+    // The server-backed tests are a separate ladder: they need a running
+    // OpenTTD server, see the integrationTest task and AGENTS.md.
+    filter.excludeTestsMatching('*IntegrationTest')
+}
+
+// Admin protocol against a real dedicated server. Prerequisites:
+//   mkdir -p openttd/game && gradle buildGameScript
+//   openttd -D -d 9,console=1,sprite=0,grf=0,sl=0 -c openttd/openttd.cfg
+tasks.register('integrationTest', Test) {
+    description = 'Runs the *IntegrationTest suite against a real OpenTTD server.'
+    group = 'verification'
+    useJUnitPlatform()
+    dependsOn 'testClasses'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    filter.includeTestsMatching('*IntegrationTest')
+    // OpenttdClientIntegrationTest joins the game port with a stale
+    // TcpGame.PacketGameType, which makes the server crash (NETWORK_ERROR_WRONG_REVISION
+    // leads to NOT_REACHED), so it stays out of this ladder.
+    filter.excludeTestsMatching('com.openttd.client.OpenttdClientIntegrationTest')
 }
 
 task buildGameScript(type: Exec, dependsOn: 'compileJava') {

@@ -26,24 +26,46 @@ port (3979). It is not an app — it is consumed as a jar by `../openttd-robot` 
 
 ## Tests
 
-`gradle test` needs a running OpenTTD server plus the gamescript. Two prerequisites, both verified:
+Two ladders. Neither runs the other: `test` excludes `*IntegrationTest`,
+`integrationTest` includes only those (see `build.gradle`).
 
-1. `mkdir -p openttd/game && gradle buildGameScript` → installs `openttd/game/AdminCmd-v1.tar`.
-   Without it `testGameScript` fails (`expected: <2> but was: <0>`); OpenTTD logs
-   "The GameScript by the name 'AdminCmd' was no longer found". The script's `cp -Ra lang`
-   error is harmless (no `lang` dir).
-2. Start a dedicated server from the repo root *before* the tests:
-   `openttd -D -d 9,console=1,sprite=0,grf=0,sl=0 -c openttd/openttd.cfg`
-   (the repo root is OpenTTD's search path, so `openttd/` must exist).
-   `OpenttdServerWrapper` only spawns its own server when port 3977 is free and never waits for
-   the admin listener, so the first `OpenttdAdmin.startup()` hits "Connection refused" and
-   `getSend()` is null → `assertNotNull(send)` fails. A pre-started server makes the suite green
-   and also satisfies `OpenttdClientTest`, which does not extend the wrapper and needs port 3979
-   (otherwise `shutdown()` NPEs on a sender that was never created).
+- `gradle test` — 108 offline protocol tests, no OpenTTD process.
+  `test/java/com/openttd/server/FakeAdminServer.java` frames packets the way
+  `src/network/core/packet.cpp` does and `AdminHarness` wires it to an `OpenttdAdmin`;
+  `PacketWriter`/`UpstreamAdminProtocol` build server->admin packets from the 15.3
+  `Packet::Send_*` signatures, `UpstreamCalendar` mirrors `CalendarConvertDateToYMD`.
+  Covers every `PacketServerType` id, the sender's byte-for-byte commands, the event
+  mapping in `Game`, `Protocol`, `Convert`, `GSExecutor`.
+- `gradle integrationTest` — 25 tests against a real dedicated server, including the
+  three pre-existing ones (`OpenttdAdminIntegrationTest`). Two prerequisites, both verified:
+  1. `mkdir -p openttd/game && gradle buildGameScript` → installs `openttd/game/AdminCmd-v1.tar`.
+     Without it the gamescript RPC tests fail; OpenTTD logs
+     "The GameScript by the name 'AdminCmd' was no longer found". The script's `cp -Ra lang`
+     error is harmless (no `lang` dir). Re-run it after editing `src/squirrel/*.nut`.
+  2. `openttd -D -d 9,console=1,sprite=0,grf=0,sl=0 -c openttd/openttd.cfg` from the repo root
+     *before* the tests (the repo root is OpenTTD's search path, so `openttd/` must exist).
+     `OpenttdServerWrapper` spawns its own server only when 3977 is free, and
+     `awaitAdminPort()` then waits for the listener; the server still needs a few seconds to
+     generate its map, so pre-starting stays the reliable option.
 
-Single test: `gradle test --tests 'com.openttd.admin.OpenttdAdminTest.testPingPong'`.
+`com.openttd.client.OpenttdClientIntegrationTest` is excluded from `integrationTest`: its
+`TcpGame.PacketGameType` is stale for 15.3, so the join is refused with
+`NETWORK_ERROR_WRONG_REVISION` and `Receive_CLIENT_AUTH_RESPONSE` hits `NOT_REACHED` — the
+dedicated server crashes (`openttd/crash*.json.log`). Fix the enum before putting it back.
+
+Single test: `gradle test --tests 'com.openttd.network.admin.NetworkAdminServerPacketsTest'`,
+`gradle integrationTest --tests 'com.openttd.admin.OpenttdAdminProtocolIntegrationTest'`.
 
 Tests read `./openttd/secrets.cfg` (`admin_password`) relative to the repo root via `TestUtils`.
+`openttd/openttd.cfg` must keep `allow_insecure_admin_login = true` and
+`server_admin_chat = true`, or the join/chat tests fail.
+
+Protocol facts the tests pin (read the 15.3 tag, not the master checkout):
+`CLIENT_ID_SERVER = 1` (`network_type.h`), so a dedicated server has exactly client #1 and
+id 0 is `INVALID_CLIENT_ID`; an admin's own chat is never echoed back (`NetworkAdminChat`
+returns on `from_admin`); only DATE/CLIENT_INFO/COMPANY_INFO/COMPANY_ECONOMY/COMPANY_STATS/
+CMD_NAMES are pollable, and `NetworkAdminSender.updateFrequency` falls back to an advertised
+frequency instead of letting the server close the connection.
 
 ## Layout
 
@@ -52,8 +74,9 @@ Tests read `./openttd/secrets.cfg` (`admin_password`) relative to the repo root 
   — the code comments point there ("See network_admin.cpp for updates"). That checkout is upstream
   master (16.0-dev), not the binary in use, so read the matching tag: `git show 15.3:src/network/…`.
 - `network/admin/NetworkAdmin` + `NetworkAdminSender` are listener/sender threads that reconnect
-  every 5 s. `getSend()` returns null until a connection succeeds, and `shutdown()` assumes it is
-  non-null.
+  every 5 s. `getSend()` returns null until a connection succeeds; `shutdown()` tolerates a null
+  sender, closes the socket and interrupts the reconnect sleep, so it returns in milliseconds
+  instead of waiting for `socket.receive()` / `Thread.sleep(5000)` to unblock.
 - `admin/OpenttdAdmin` is the facade: `EventDispatcher` + `admin/model/Game` translate protocol
   packets into functional events (`CompanyEvent`, `ClientEvent`, …). `gamescript/GSExecutor`
   does JSON RPC into the AdminCmd gamescript, correlating replies by request id.

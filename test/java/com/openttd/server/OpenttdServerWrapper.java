@@ -4,14 +4,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
+import java.net.Socket;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+
+import com.openttd.TestUtils;
 
 /**
  *
  * @author eric
  */
 public class OpenttdServerWrapper {
+
+    /** The admin port the tests connect to, see openttd/openttd.cfg. */
+    private static final int ADMIN_PORT = 3977;
 
     private static OpenttdDedicatedServer openttdServer;
 
@@ -32,6 +38,25 @@ public class OpenttdServerWrapper {
         if (!checkAdminPort()) {
             openttdServer = new OpenttdDedicatedServer();
         }
+        awaitAdminPort();
+    }
+
+    /**
+     * Wait until the dedicated server accepts admin connections. A server that
+     * was just spawned needs a few seconds to generate its map, and
+     * NetworkAdmin only retries every 5 s, so joining before the listener is up
+     * makes the first test fail with "Connection refused".
+     *
+     * @throws AssertionError if no server listens on ADMIN_PORT
+     */
+    private static void awaitAdminPort() {
+        TestUtils.await(() -> {
+            try (Socket socket = new Socket("localhost", ADMIN_PORT)) {
+                return true;
+            } catch (IOException refused) {
+                return false;
+            }
+        }, 30, "an admin listener on port " + ADMIN_PORT);
     }
 
     @AfterAll

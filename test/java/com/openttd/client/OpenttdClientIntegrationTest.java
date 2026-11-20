@@ -11,12 +11,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author erenard
  */
-public class OpenttdClientTest {
+public class OpenttdClientIntegrationTest {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(OpenttdClientTest.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(OpenttdClientIntegrationTest.class);
     private final Configuration configuration;
 
-    public OpenttdClientTest() throws IOException {
+    public OpenttdClientIntegrationTest() throws IOException {
         configuration = new Configuration();
         configuration.name = "Client test name";
     }

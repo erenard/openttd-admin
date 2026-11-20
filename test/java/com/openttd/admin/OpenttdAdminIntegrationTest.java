@@ -13,6 +13,7 @@ import com.openttd.TestUtils;
 import com.openttd.admin.event.GameScriptEvent;
 import com.openttd.admin.event.GameScriptEventListener;
 import com.openttd.gamescript.GSNewsPaper;
+import com.openttd.network.admin.GameInfo;
 import com.openttd.network.core.Configuration;
 import com.openttd.server.OpenttdServerWrapper;
 
@@ -21,7 +22,7 @@ import com.openttd.server.OpenttdServerWrapper;
  *
  * @author erenard
  */
-public class OpenttdAdminTest extends OpenttdServerWrapper {
+public class OpenttdAdminIntegrationTest extends OpenttdServerWrapper {
 
     private final Collection<PongEvent> pongEvents = new ArrayList<>();
     private final Collection<RConEndEvent> rConEndEvents = new ArrayList<>();
@@ -29,7 +30,7 @@ public class OpenttdAdminTest extends OpenttdServerWrapper {
 
     private final OpenttdTestAdmin openttdAdmin;
 
-    public OpenttdAdminTest() throws IOException {
+    public OpenttdAdminIntegrationTest() throws IOException {
         Configuration configuration = new Configuration();
         configuration.password = TestUtils.readSecrets().getProperty("admin_password");
         openttdAdmin = new OpenttdTestAdmin(configuration);
@@ -63,10 +64,19 @@ public class OpenttdAdminTest extends OpenttdServerWrapper {
     @BeforeEach
     public void setUp() {
         openttdAdmin.startup();
+        // The join is asynchronous: asserting before the WELCOME packet arrives
+        // would make getSend() null and every test fail.
+        TestUtils.await(() -> {
+            try {
+                GameInfo gameInfo = openttdAdmin.getGame().getGameInfo();
+                return gameInfo != null && gameInfo.getServerName() != null;
+            } catch (NullPointerException notConnectedYet) {
+                return false;
+            }
+        }, 20, "the WELCOME packet");
         pongEvents.clear();
         rConEndEvents.clear();
         gameScriptEvents.clear();
-        TestUtils.wait(1);
     }
 
     @AfterEach
@@ -81,7 +91,7 @@ public class OpenttdAdminTest extends OpenttdServerWrapper {
         for (long i = 0; i < 5; i++) {
             send.ping(i);
         }
-        TestUtils.wait(1);
+        TestUtils.awaitSize(pongEvents, 5, 10, "five PongEvents");
         assertEquals(5, pongEvents.size());
     }
 
@@ -91,9 +101,8 @@ public class OpenttdAdminTest extends OpenttdServerWrapper {
         assertNotNull(send);
         for (long i = 0; i < 5; i++) {
             send.rcon("say message " + i);
-            TestUtils.wait(1);
+            TestUtils.awaitSize(rConEndEvents, (int) i + 1, 10, "the RConEndEvent of 'say message " + i + "'");
         }
-        TestUtils.wait(1);
         assertEquals(5, rConEndEvents.size());
     }
 
@@ -103,10 +112,10 @@ public class OpenttdAdminTest extends OpenttdServerWrapper {
         assertNotNull(gs);
         GSNewsPaper broadcast = new GSNewsPaper(GSNewsPaper.NewsType.NT_GENERAL, "News Broadcasting");
         gs.send(broadcast);
-        TestUtils.wait(1);
+        TestUtils.awaitSize(gameScriptEvents, 1, 15, "the broadcast news reply");
         GSNewsPaper newsPaperCompany0 = new GSNewsPaper((short) 0, GSNewsPaper.NewsType.NT_GENERAL, "News for company 0");
         gs.send(newsPaperCompany0);
-        TestUtils.wait(1);
+        TestUtils.awaitSize(gameScriptEvents, 2, 15, "the company news reply");
         assertEquals(2, gameScriptEvents.size());
     }
 }
