@@ -31,6 +31,28 @@ public class Protocol {
         return value != null && (value & adminUpdateFrequency.mask) != 0;
     }
 
+    /**
+     * First frequency the server advertises for an update type. ADMIN_FREQUENCY_POLL
+     * is advertised only for the types the server can actually poll, so this is
+     * never ADMIN_FREQUENCY_POLL for ADMIN_UPDATE_CHAT, ADMIN_UPDATE_CONSOLE,
+     * ADMIN_UPDATE_CMD_LOGGING or ADMIN_UPDATE_GAMESCRIPT.
+     *
+     * @param adminUpdateType update type
+     * @return first advertised frequency, null if the server advertises none
+     */
+    public AdminUpdateFrequency firstSupported(AdminUpdateType adminUpdateType) {
+        Integer value = protocols.get(adminUpdateType);
+        if (value == null) {
+            return null;
+        }
+        for (AdminUpdateFrequency adminUpdateFrequency : AdminUpdateFrequency.values()) {
+            if ((value & adminUpdateFrequency.mask) != 0) {
+                return adminUpdateFrequency;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         StringBuffer stringBuffer = new StringBuffer();

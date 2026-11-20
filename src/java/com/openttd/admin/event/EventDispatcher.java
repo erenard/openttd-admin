@@ -92,6 +92,10 @@ public class EventDispatcher implements Runnable {
                     }
                 }
             } catch (InterruptedException e) {
+                // shutdown() interrupts this thread to wake the poll().
+                if (!this.running) {
+                    break;
+                }
                 log.error(e.getMessage(), e);
             }
         }
@@ -112,11 +116,15 @@ public class EventDispatcher implements Runnable {
         log.debug("shutdown...");
         running = false;
         eventMessages.clear();
-        try {
-            thread.join(5000);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
+        if (thread != null) {
+            // run() blocks in poll(5 s), so it has to be woken to stop at once.
             thread.interrupt();
+            try {
+                thread.join(5000);
+            } catch (InterruptedException e) {
+                log.error(e.getMessage(), e);
+                thread.interrupt();
+            }
         }
         log.debug("stopped");
     }

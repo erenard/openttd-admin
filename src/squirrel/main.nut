@@ -62,14 +62,18 @@ function MainClass::ExecuteCommand(id, cmd, args) {
 				data = GSGoal.New(args[0], args[1], args[2], args[3]);
 			break;
 			case GSCommand.removeGoal:
+				local goalId = args[0];
 				if (GSGoal.IsValidGoal(goalId)) {
-					data = GSGoal.Remove(args[0]);
+					data = GSGoal.Remove(goalId);
 				}
 			break;
 			case GSCommand.removeAllGoal:
 				for (local goalId = 0; goalId < 255; goalId += 1) {
 					if (GSGoal.IsValidGoal(goalId)) {
-						data = data | GSGoal.Remove(goalId);
+						// Squirrel has no bitwise operator between two bools
+						// ("bitwise op between 'bool' and 'bool'"), so use the
+						// logical operator here.
+						data = data || GSGoal.Remove(goalId);
 					}
 				}
 			break;

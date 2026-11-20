@@ -45,6 +45,7 @@ public class OpenttdAdmin {
         // New network layer
         networkAdmin = new NetworkAdmin(configuration);
         networkAdmin.setGame(game);
+        networkAdmin.setGSExecutor(executor);
         // Startup
         eventDispatcher.startup();
         networkAdmin.start();
@@ -61,6 +62,15 @@ public class OpenttdAdmin {
         if (eventDispatcher != null && eventDispatcher.isAlive()) {
             eventDispatcher.shutdown();
         }
+    }
+
+    /**
+     * Obtain the game model built from the server's packets.
+     *
+     * @return game model, null before startup()
+     */
+    public Game getGame() {
+        return game;
     }
 
     /**

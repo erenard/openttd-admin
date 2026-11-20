@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.openttd.admin.model.Game;
+import com.openttd.gamescript.GSExecutor;
 import com.openttd.network.constant.NetworkType.NetworkErrorCode;
 import com.openttd.network.constant.NetworkType.NetworkVehicleType;
 import com.openttd.network.constant.TcpAdmin.PacketServerType;
@@ -25,6 +26,8 @@ public class NetworkAdmin extends Thread {
 
     private final Configuration configuration;
 
+    private GSExecutor gamescript;
+
     public NetworkAdmin(Configuration configuration) {
         this.configuration = configuration;
     }
@@ -35,6 +38,8 @@ public class NetworkAdmin extends Thread {
     private NetworkModel networkModel;
     // Network speak thread
     private NetworkAdminSender send;
+    // Current connection, closed on shutdown to unblock socket.receive()
+    private Socket socket;
     // Client game model
     private Game game;
 
@@ -42,7 +47,16 @@ public class NetworkAdmin extends Thread {
         // Stop the client
         this.running = false;
         // Interrupt the networking threads
-        send.quit();
+        if (send != null) {
+            send.quit();
+            send.shutdown();
+        }
+        // receive() blocks this thread, so the socket has to be closed here.
+        if (socket != null) {
+            socket.close();
+        }
+        // Wakes the reconnect sleep, so shutdown() does not wait 5 s.
+        this.interrupt();
         try {
             this.join(5000);
         } catch (InterruptedException e) {
@@ -61,7 +75,9 @@ public class NetworkAdmin extends Thread {
             try {
                 log.debug("connecting...");
                 socket = Socket.newTcpSocket(configuration.host, configuration.adminPort);
+                this.socket = socket;
                 send = new NetworkAdminSender(socket);
+                send.setGSExecutor(gamescript);
                 send.startup();
                 networkModel = new NetworkModel();
                 send.join(configuration);
@@ -85,6 +101,7 @@ public class NetworkAdmin extends Thread {
                 log.error(e.getMessage(), e);
             } finally {
                 log.debug("disconneting...");
+                this.socket = null;
                 if (send != null) {
                     send.shutdown();
                 }
@@ -92,12 +109,17 @@ public class NetworkAdmin extends Thread {
                     socket.close();
                 }
             }
+            if (!this.running) {
+                break;
+            }
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
+                // Shutdown: stop reconnecting.
+                break;
             }
         }
+        log.debug("stopped");
     }
 
     /**
@@ -138,6 +160,9 @@ public class NetworkAdmin extends Thread {
                     protocol.putProtocol(packet.readUint16(), packet.readUint16());
                 }
                 send.setProtocol(protocol);
+                // The admin protocol version belongs to the game model: it is
+                // what tells a consumer which packets this connection carries.
+                networkModel.getGameInfo().setVersion(protocol.getVersion());
                 log.debug(protocol.toString());
                 break;
             }
@@ -150,6 +175,9 @@ public class NetworkAdmin extends Thread {
              */
             case ADMIN_PACKET_SERVER_WELCOME: {
                 GameInfo gameInfo = new GameInfo();
+                // PROTOCOL arrives before WELCOME, and WELCOME replaces the model's
+                // GameInfo, so carry the protocol version over.
+                gameInfo.setVersion(networkModel.getGameInfo().getVersion());
 
                 gameInfo.setServerName(packet.readString());
                 gameInfo.setServerRevision(packet.readString());
@@ -248,7 +276,7 @@ public class NetworkAdmin extends Thread {
             case ADMIN_PACKET_SERVER_CLIENT_ERROR: {
                 long clientId = packet.readUint32();
                 short error = packet.readUint8();
-                event.setClientEvent(packetType, clientId);
+                event.setClientErrorEvent(packetType, clientId, error);
 
                 networkModel.deleteClient(clientId);
                 break;
@@ -321,7 +349,7 @@ public class NetworkAdmin extends Thread {
             case ADMIN_PACKET_SERVER_COMPANY_REMOVE: {
                 short companyId = packet.readUint8();
                 short reason = packet.readUint8();
-                event.setCompanyEvent(packetType, companyId);
+                event.setCompanyRemoveEvent(packetType, companyId, reason);
                 networkModel.deleteCompany(companyId);
                 break;
             }
@@ -457,6 +485,7 @@ public class NetworkAdmin extends Thread {
                 while (packet.readBool8()) {
                     int cmdId = packet.readUint16();
                     String cmdName = packet.readString();
+                    networkModel.putCommandName(cmdId, cmdName);
                 }
                 break;
             }
@@ -468,12 +497,29 @@ public class NetworkAdmin extends Thread {
              * OpenTTD. Data provided in this packet is for logging purposes
              * only. uint32 ID of the client sending the command. uint8 ID of
              * the company (0..MAX_COMPANIES-1). uint16 ID of the command.
-             * uint32 P1 (variable data passed to the command). uint32 P2
-             * (variable data passed to the command). uint32 Tile where this is
-             * taking place. string Text passed to the command. uint32 Frame of
-             * execution.
+             * <var> command specific buffer with encoded parameters of variable
+             * length. uint32 Frame of execution.
              */
             case ADMIN_PACKET_SERVER_CMD_LOGGING: {
+                long clientId = packet.readUint32();
+                int companyId = packet.readUint8();
+                int commandId = packet.readUint16();
+                // The command buffer has a variable length, the uint32 frame of
+                // execution is the last four bytes of the packet.
+                byte[] data = packet.readBytes(packet.remaining() - 4);
+                long frame = packet.readUint32();
+                log.debug("Command " + commandId + " of client " + clientId + " (company " + companyId
+                        + ", frame " + frame + ", " + data.length + " bytes of data)");
+                break;
+            }
+            /**
+             * Legacy layout of ADMIN_PACKET_SERVER_CMD_LOGGING, as sent by
+             * NETWORK_GAME_ADMIN_VERSION 1. uint32 ID of the client sending the
+             * command. uint8 ID of the company. uint16 ID of the command. uint32
+             * P1. uint32 P2. uint32 Tile where this is taking place. string Text
+             * passed to the command. uint32 Frame of execution.
+             */
+            case ADMIN_PACKET_SERVER_CMD_LOGGING_OLD: {
                 long clientId = packet.readUint32();
                 int companyId = packet.readUint8();
                 int commandId = packet.readUint16();
@@ -482,7 +528,37 @@ public class NetworkAdmin extends Thread {
                 long tile = packet.readUint32();
                 String text = packet.readString();
                 long frame = packet.readUint32();
+                log.debug("Command " + commandId + " of client " + clientId + " (company " + companyId
+                        + ", p1 " + p1 + ", p2 " + p2 + ", tile " + tile + ", text \"" + text
+                        + "\", frame " + frame + ")");
                 break;
+            }
+            /**
+             * The server gives the admin the used authentication method and
+             * required parameters: uint8 method, then the key exchange material
+             * (32 bytes public key + 24 bytes nonce for the X25519 methods).
+             * Secure admin authentication is not implemented, see
+             * NetworkAdminSender.join(); a server that requires it answers the
+             * plain ADMIN_PACKET_ADMIN_JOIN with ADMIN_PACKET_SERVER_ERROR
+             * instead, so this packet never arrives.
+             */
+            case ADMIN_PACKET_SERVER_AUTH_REQUEST: {
+                short method = packet.readUint8();
+                byte[] parameters = packet.readBytes(packet.remaining());
+                log.error("The server requested secure admin authentication (method " + method + ", "
+                        + parameters.length + " bytes), which is not implemented.");
+                throw new NetworkException(packetType.toString());
+            }
+            /**
+             * Authentication completed: 24 bytes nonce, and every packet from
+             * here on is encrypted. Not implemented, see
+             * ADMIN_PACKET_SERVER_AUTH_REQUEST.
+             */
+            case ADMIN_PACKET_SERVER_ENABLE_ENCRYPTION: {
+                byte[] nonce = packet.readBytes(packet.remaining());
+                log.error("The server enabled admin encryption (" + nonce.length
+                        + " bytes of nonce), which is not implemented.");
+                throw new NetworkException(packetType.toString());
             }
             /**
              * The source IP address is banned (connection gets closed).
@@ -506,5 +582,15 @@ public class NetworkAdmin extends Thread {
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    /**
+     * Gamescript executor handed to the sending thread, so goal commands carry
+     * a request id their reply can be correlated with.
+     *
+     * @param gamescript
+     */
+    public void setGSExecutor(GSExecutor gamescript) {
+        this.gamescript = gamescript;
     }
 }

@@ -1,5 +1,6 @@
 package com.openttd.network.core;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -113,21 +114,12 @@ public class Packet {
 
     public BigInteger readUint64() {
         byte buf[] = readBytes(8);
-        int byte1 = (0x000000FF & ((int) buf[7]));
-        int byte2 = (0x000000FF & ((int) buf[6]));
-        int byte3 = (0x000000FF & ((int) buf[5]));
-        int byte4 = (0x000000FF & ((int) buf[4]));
-        long firstInt32 = ((long) (byte1 << 24 | byte2 << 16 | byte3 << 8 | byte4)) & 0xFFFFFFFFL;
-        int byte5 = (0x000000FF & ((int) buf[3]));
-        int byte6 = (0x000000FF & ((int) buf[2]));
-        int byte7 = (0x000000FF & ((int) buf[1]));
-        int byte8 = (0x000000FF & ((int) buf[0]));
-        long secondInt32 = ((long) (byte5 << 24 | byte6 << 16 | byte7 << 8 | byte8)) & 0xFFFFFFFFL;
-
-        BigInteger i1 = new BigInteger("" + firstInt32);
-        BigInteger i2 = new BigInteger("" + secondInt32);
-        // 2^32 - 1 = 4294967295
-        return i1.multiply(new BigInteger("4294967295")).add(i2);
+        // Little endian: buf[0] is the least significant byte.
+        BigInteger value = BigInteger.ZERO;
+        for (int i = buf.length - 1; i >= 0; i--) {
+            value = value.shiftLeft(8).add(BigInteger.valueOf(buf[i] & 0xFF));
+        }
+        return value;
     }
 
     public long readUint32() {
@@ -152,14 +144,25 @@ public class Packet {
         return (short) firstByte;
     }
 
+    /**
+     * Bytes left in this packet, i.e. its wire length minus what has already
+     * been read. Only meaningful after prepareToRead(), which reads the length
+     * header; the buffer itself is MTU sized and zero padded past the packet.
+     *
+     * @return remaining payload bytes
+     */
+    public int remaining() {
+        return length - buffer.position();
+    }
+
     public String readString() {
-        StringBuilder newString = new StringBuilder();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         byte c = buffer.get();
         while (c != 0) {
-            newString.append((char) c);
+            bytes.write(c);
             c = buffer.get();
         }
-        return newString.toString();
+        return new String(bytes.toByteArray(), StandardCharsets.UTF_8);
     }
 
     public boolean readBool8() {

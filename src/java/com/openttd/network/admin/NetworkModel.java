@@ -60,6 +60,20 @@ public class NetworkModel implements Cloneable {
         clientById.remove(clientId);
     }
 
+    /**
+     * DoCommand names announced by ADMIN_PACKET_SERVER_CMD_NAMES. Not stable
+     * across OpenTTD versions, used for logging purposes only.
+     */
+    private final Map<Integer, String> commandNameById = new HashMap();
+
+    public void putCommandName(int commandId, String name) {
+        commandNameById.put(commandId, name);
+    }
+
+    public Map<Integer, String> retreiveCommandNames() {
+        return commandNameById;
+    }
+
     private Lock lock = new ReentrantLock();
 
     public void lock() {
@@ -91,6 +105,7 @@ public class NetworkModel implements Cloneable {
         for (Entry<Long, Client> entry : clientById.entrySet()) {
             clone.clientById.put(entry.getKey(), (Client) entry.getValue().clone());
         }
+        clone.commandNameById.putAll(commandNameById);
         return clone;
     }
 

@@ -6,7 +6,7 @@ package com.openttd.network.constant;
 public interface TcpAdmin {
 
     public enum PacketAdminType implements PacketType {
-        ADMIN_PACKET_ADMIN_JOIN, ///< The admin announces and authenticates itself to the server.
+        ADMIN_PACKET_ADMIN_JOIN, ///< The admin announces and authenticates itself to the server using an unsecured password.
         ADMIN_PACKET_ADMIN_QUIT, ///< The admin tells the server that it is quitting.
         ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY, ///< The admin tells the server the update frequency of a particular piece of information.
         ADMIN_PACKET_ADMIN_POLL, ///< The admin explicitly polls for a piece of information.
@@ -14,7 +14,9 @@ public interface TcpAdmin {
         ADMIN_PACKET_ADMIN_RCON, ///< The admin sends a remote console command.
         ADMIN_PACKET_ADMIN_GAMESCRIPT, ///< The admin sends a JSON string for the GameScript.
         ADMIN_PACKET_ADMIN_PING, ///< The admin sends a ping to the server, expecting a ping-reply (PONG) packet.
-        ADMIN_PACKET_ADMIN_EXTERNAL_CHAT;    ///< The admin sends a chat message from external source.
+        ADMIN_PACKET_ADMIN_EXTERNAL_CHAT, ///< The admin sends a chat message from external source.
+        ADMIN_PACKET_ADMIN_JOIN_SECURE, ///< The admin announces and starts a secure authentication handshake. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
+        ADMIN_PACKET_ADMIN_AUTH_RESPONSE;    ///< The admin responds to the authentication request. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
 
         public static PacketAdminType valueOf(int order) {
             for (PacketAdminType value : values()) {
@@ -56,10 +58,17 @@ public interface TcpAdmin {
         ADMIN_PACKET_SERVER_RCON, ///< The server's reply to a remove console command.
         ADMIN_PACKET_SERVER_CONSOLE, ///< The server gives the admin the data that got printed to its console.
         ADMIN_PACKET_SERVER_CMD_NAMES, ///< The server sends out the names of the DoCommands to the admins.
-        ADMIN_PACKET_SERVER_CMD_LOGGING, ///< The server gives the admin copies of incoming command packets.
+        /**
+         * Used to be the type ID of ADMIN_PACKET_SERVER_CMD_LOGGING in
+         * NETWORK_GAME_ADMIN_VERSION 1. Kept so legacy layouts stay decodable.
+         */
+        ADMIN_PACKET_SERVER_CMD_LOGGING_OLD,
         ADMIN_PACKET_SERVER_GAMESCRIPT, ///< The server gives the admin information from the GameScript in JSON.
         ADMIN_PACKET_SERVER_RCON_END, ///< The server indicates that the remote console command has completed.
         ADMIN_PACKET_SERVER_PONG, ///< The server replies to a ping request from the admin.
+        ADMIN_PACKET_SERVER_CMD_LOGGING, ///< The server gives the admin copies of incoming command packets.
+        ADMIN_PACKET_SERVER_AUTH_REQUEST, ///< The server gives the admin the used authentication method and required parameters. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
+        ADMIN_PACKET_SERVER_ENABLE_ENCRYPTION, ///< The server tells that authentication completed and requests encryption with the keys of the last ADMIN_PACKET_ADMIN_AUTH_RESPONSE. Not implemented.
 
         INVALID_ADMIN_PACKET;
 
@@ -131,6 +140,15 @@ public interface TcpAdmin {
         ADMIN_CRR_MANUAL, ///< The company is manually removed.
         ADMIN_CRR_AUTOCLEAN, ///< The company is removed due to autoclean.
         ADMIN_CRR_BANKRUPT, ///< The company went belly-up.
-        ADMIN_CRR_END		 ///< Sentinel for end.
+        ADMIN_CRR_END;        ///< Sentinel for end.
+
+        public static AdminCompanyRemoveReason valueOf(int order) {
+            for (AdminCompanyRemoveReason value : values()) {
+                if (value.ordinal() == order) {
+                    return value;
+                }
+            }
+            return ADMIN_CRR_END;
+        }
     };
 }

@@ -3,12 +3,11 @@ package com.openttd.network.admin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.openttd.constant.OTTD;
-import com.openttd.network.constant.GameScript;
+import com.openttd.gamescript.GSExecutor;
+import com.openttd.gamescript.GSJsonRequest;
 import com.openttd.network.constant.GameScript.GSCommand;
 import com.openttd.network.constant.GameVersion;
 import com.openttd.network.constant.NetworkType.DestType;
@@ -29,6 +28,7 @@ public class NetworkAdminSender extends NetworkSender {
     private static final Logger log = LoggerFactory.getLogger(NetworkAdminSender.class);
 
     private Protocol protocol;
+    private GSExecutor gamescript;
 
     public NetworkAdminSender(Socket socket) {
         super(socket);
@@ -36,6 +36,17 @@ public class NetworkAdminSender extends NetworkSender {
 
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
+    }
+
+    /**
+     * Executor correlating gamescript requests with their replies. Without it,
+     * goal commands are sent without a request id and their replies cannot be
+     * matched.
+     *
+     * @param gamescript gamescript executor
+     */
+    public void setGSExecutor(GSExecutor gamescript) {
+        this.gamescript = gamescript;
     }
 
     /**
@@ -107,10 +118,21 @@ public class NetworkAdminSender extends NetworkSender {
      * #ADMIN_FREQUENCY_POLL is always ignored
      */
     public void updateFrequency(AdminUpdateType adminUpdateType, AdminUpdateFrequency adminUpdateFrequency) {
+        if (protocol == null) {
+            log.error("Protocol not received yet, " + adminUpdateType + " not sent.");
+            return;
+        }
         if (!protocol.hasProtocol(adminUpdateType, adminUpdateFrequency)) {
-            log.error("The server does not support " + adminUpdateFrequency + " for " + adminUpdateType);
-            log.error(AdminUpdateFrequency.ADMIN_FREQUENCY_POLL + " used instead.");
-            adminUpdateFrequency = AdminUpdateFrequency.ADMIN_FREQUENCY_POLL;
+            // ADMIN_FREQUENCY_POLL is not advertised for every update type (not
+            // for chat, console, command logging or gamescript), and the server
+            // closes the connection on a frequency it does not know.
+            AdminUpdateFrequency advertised = protocol.firstSupported(adminUpdateType);
+            if (advertised == null) {
+                log.error("The server does not support " + adminUpdateType + " at all, " + adminUpdateFrequency + " not sent.");
+                return;
+            }
+            log.error("The server does not support " + adminUpdateFrequency + " for " + adminUpdateType + ", " + advertised + " used instead.");
+            adminUpdateFrequency = advertised;
         }
 
         Packet packet = Packet.packetToSend(PacketAdminType.ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY);
@@ -259,11 +281,7 @@ public class NetworkAdminSender extends NetworkSender {
         arguments.add(new JsonPrimitive(text));
         arguments.add(new JsonPrimitive(goalType.ordinal()));
         arguments.add(new JsonPrimitive(destinationId));
-        JsonObject json = new JsonObject();
-        json.add(GameScript.CMD, new JsonPrimitive(GSCommand.addGoal.ordinal()));
-        json.add(GameScript.ARGS, arguments);
-        Gson gson = new Gson();
-        gameScript(gson.toJson(json));
+        sendGameScriptCommand(GSCommand.addGoal, arguments);
     }
 
     /**
@@ -285,37 +303,44 @@ public class NetworkAdminSender extends NetworkSender {
     public void removeGoal(int goalId) {
         JsonArray arguments = new JsonArray();
         arguments.add(new JsonPrimitive(goalId));
-        JsonObject json = new JsonObject();
-        json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeGoal.ordinal()));
-        json.add(GameScript.ARGS, arguments);
-        Gson gson = new Gson();
-        gameScript(gson.toJson(json));
+        sendGameScriptCommand(GSCommand.removeGoal, arguments);
     }
 
     /**
      * Clear the goal list.
      */
     public void removeAllGoal() {
-        JsonObject json = new JsonObject();
-        json.add(GameScript.CMD, new JsonPrimitive(GSCommand.removeAllGoal.ordinal()));
-        json.add(GameScript.ARGS, new JsonPrimitive(0));
-        Gson gson = new Gson();
-        gameScript(gson.toJson(json));
+        sendGameScriptCommand(GSCommand.removeAllGoal, new JsonArray());
     }
 
     /**
      * Set a cargo goal for a town.
+     *
+     * @param townId
+     * @param townEffect
+     * @param goal
      */
     public void setTownCargoGoal(int townId, OTTD.TownEffect townEffect, int goal) {
         JsonArray arguments = new JsonArray();
         arguments.add(new JsonPrimitive(townId));
         arguments.add(new JsonPrimitive(townEffect.ordinal()));
         arguments.add(new JsonPrimitive(goal));
-        JsonObject json = new JsonObject();
-        json.add(GameScript.CMD, new JsonPrimitive(GSCommand.setTownCargoGoal.ordinal()));
-        json.add(GameScript.ARGS, arguments);
-        Gson gson = new Gson();
-        gameScript(gson.toJson(json));
+        sendGameScriptCommand(GSCommand.setTownCargoGoal, arguments);
+    }
+
+    /**
+     * Send a gamescript command with a request id, so that GSExecutor can
+     * correlate the reply: AdminCmd requires "i", "c" and "a".
+     *
+     * @param command
+     * @param arguments
+     */
+    private void sendGameScriptCommand(GSCommand command, JsonArray arguments) {
+        if (gamescript == null) {
+            log.error("No gamescript executor, " + command + " not sent.");
+            return;
+        }
+        gamescript.send(new GSJsonRequest(command, arguments));
     }
 
     @Override

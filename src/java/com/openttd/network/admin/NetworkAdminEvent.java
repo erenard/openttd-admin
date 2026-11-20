@@ -1,5 +1,7 @@
 package com.openttd.network.admin;
 
+import com.openttd.network.constant.NetworkType.NetworkErrorCode;
+import com.openttd.network.constant.TcpAdmin.AdminCompanyRemoveReason;
 import com.openttd.network.constant.TcpAdmin.PacketServerType;
 
 public class NetworkAdminEvent {
@@ -12,6 +14,8 @@ public class NetworkAdminEvent {
     private String origin;
     private String message;
     private long date;
+    private AdminCompanyRemoveReason companyRemoveReason;
+    private NetworkErrorCode clientError;
 
     public NetworkAdminEvent(PacketServerType packetServerType) {
         this.packetServerType = packetServerType;
@@ -56,6 +60,16 @@ public class NetworkAdminEvent {
         this.pingId = pingId;
     }
 
+    void setCompanyRemoveEvent(PacketServerType packetType, short companyId, short reason) {
+        this.companyId = companyId;
+        this.companyRemoveReason = AdminCompanyRemoveReason.valueOf(reason);
+    }
+
+    void setClientErrorEvent(PacketServerType packetType, long clientId, short error) {
+        this.clientId = clientId;
+        this.clientError = NetworkErrorCode.valueOf(error);
+    }
+
     public long getClientId() {
         return clientId;
     }
@@ -88,6 +102,14 @@ public class NetworkAdminEvent {
         return packetServerType;
     }
 
+    public AdminCompanyRemoveReason getCompanyRemoveReason() {
+        return companyRemoveReason;
+    }
+
+    public NetworkErrorCode getClientError() {
+        return clientError;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(packetServerType.toString());
@@ -97,7 +119,9 @@ public class NetworkAdminEvent {
                 .append(" color:").append(color)
                 .append(" origin:").append(origin)
                 .append(" message:").append(message)
-                .append(" date:").append(date);
+                .append(" date:").append(date)
+                .append(" companyRemoveReason:").append(companyRemoveReason)
+                .append(" clientError:").append(clientError);
         return sb.toString();
     }
 }

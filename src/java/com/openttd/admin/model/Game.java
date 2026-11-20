@@ -3,6 +3,7 @@ package com.openttd.admin.model;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Map;
 
 import com.openttd.admin.event.ChatEvent;
 import com.openttd.admin.event.ClientEvent;
@@ -77,6 +78,16 @@ public class Game {
         return networkModel.retreiveCompanies();
     }
 
+    /**
+     * DoCommand names announced by the server, for logging purposes only: the
+     * ids and names are not stable across OpenTTD versions.
+     *
+     * @return command id to name
+     */
+    public Map<Integer, String> getCommandNames() {
+        return networkModel.retreiveCommandNames();
+    }
+
     public void updateAdmin(NetworkAdminEvent event, NetworkModel networkModel, NetworkAdminSender send) {
         log.debug("Game.updateAdmin " + event);
         this.networkModel = networkModel;
@@ -135,7 +146,8 @@ public class Game {
             }
             case ADMIN_PACKET_SERVER_COMPANY_INFO:
             case ADMIN_PACKET_SERVER_COMPANY_UPDATE:
-            case ADMIN_PACKET_SERVER_COMPANY_ECONOMY: {
+            case ADMIN_PACKET_SERVER_COMPANY_ECONOMY:
+            case ADMIN_PACKET_SERVER_COMPANY_STATS: {
                 short companyId = event.getCompanyId();
                 eventDispatcher.dispatch(new CompanyEvent(this, companyId, CompanyEvent.Action.UPDATE));
                 break;
@@ -151,6 +163,7 @@ public class Game {
                 break;
             case ADMIN_PACKET_SERVER_RCON_END: {
                 eventDispatcher.dispatch(new RConEndEvent(this, event.getMessage()));
+                break;
             }
             case ADMIN_PACKET_SERVER_CONSOLE: {
                 eventDispatcher.dispatch(new ConsoleEvent(this, event.getOrigin(), event.getMessage()));

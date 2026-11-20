@@ -9,7 +9,12 @@ import com.openttd.network.admin.NetworkAdminSender;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class GSExecutor implements GameScriptEventListener {
+
+    private static final Logger log = LoggerFactory.getLogger(GSExecutor.class);
 
     private final OpenttdAdmin admin;
     private static int nextRequestId = 0;
@@ -39,6 +44,17 @@ public class GSExecutor implements GameScriptEventListener {
     public void onGameScriptEvent(GameScriptEvent gameScriptEvent) {
         String jsonString = gameScriptEvent.getMessage();
         GSResponse response = gson.fromJson(jsonString, GSResponse.class);
-        this.requestById.remove(response.id).setResponse(response);
+        // AdminCmd replies with {id, data} or {id, exception}, and with
+        // {exception} alone for malformed requests.
+        if (response == null || response.id == null) {
+            log.warn("Ignoring gamescript reply without a request id: " + jsonString);
+            return;
+        }
+        GSRequest request = requestById.remove(response.id);
+        if (request == null) {
+            log.warn("Ignoring gamescript reply without a pending request: " + jsonString);
+            return;
+        }
+        request.setResponse(response);
     }
 }

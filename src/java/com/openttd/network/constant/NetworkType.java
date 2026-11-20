@@ -75,6 +75,8 @@ public interface NetworkType {
         NETWORK_ERROR_TIMEOUT_MAP,
         NETWORK_ERROR_TIMEOUT_JOIN,
         NETWORK_ERROR_INVALID_CLIENT_NAME,
+        NETWORK_ERROR_NOT_ON_ALLOW_LIST,
+        NETWORK_ERROR_NO_AUTHENTICATION_METHOD_AVAILABLE,
         NETWORK_ERROR_END;
 
         public static NetworkErrorCode valueOf(int order) {
