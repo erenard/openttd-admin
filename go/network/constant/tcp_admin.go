@@ -309,6 +309,11 @@ const (
 	ADMIN_FREQUENCY_AUTOMATIC AdminUpdateFrequency = 0x40 // The admin gets information about this when it changes.
 )
 
+// ADMIN_FREQUENCY_NONE stands in for the null Java's firstSupported returns when
+// the server advertises no frequency for an update type. Its mask is 0, so it
+// never matches a bit.
+const ADMIN_FREQUENCY_NONE AdminUpdateFrequency = 0
+
 // Mask is the bit this frequency contributes to an update type's mask.
 func (f AdminUpdateFrequency) Mask() int { return int(f) }
 
@@ -322,6 +327,29 @@ func AdminUpdateFrequencyValues() []AdminUpdateFrequency {
 		ADMIN_FREQUENCY_QUARTERLY,
 		ADMIN_FREQUENCY_ANUALLY,
 		ADMIN_FREQUENCY_AUTOMATIC,
+	}
+}
+
+// AdminUpdateFrequencyName is the enum constant's name. The masks are powers of
+// two, so this is a switch rather than an index into the values list.
+func AdminUpdateFrequencyName(f AdminUpdateFrequency) string {
+	switch f {
+	case ADMIN_FREQUENCY_POLL:
+		return "ADMIN_FREQUENCY_POLL"
+	case ADMIN_FREQUENCY_DAILY:
+		return "ADMIN_FREQUENCY_DAILY"
+	case ADMIN_FREQUENCY_WEEKLY:
+		return "ADMIN_FREQUENCY_WEEKLY"
+	case ADMIN_FREQUENCY_MONTHLY:
+		return "ADMIN_FREQUENCY_MONTHLY"
+	case ADMIN_FREQUENCY_QUARTERLY:
+		return "ADMIN_FREQUENCY_QUARTERLY"
+	case ADMIN_FREQUENCY_ANUALLY:
+		return "ADMIN_FREQUENCY_ANUALLY"
+	case ADMIN_FREQUENCY_AUTOMATIC:
+		return "ADMIN_FREQUENCY_AUTOMATIC"
+	default:
+		return "ADMIN_FREQUENCY_UNKNOWN"
 	}
 }
 
@@ -353,5 +381,23 @@ func AdminCompanyRemoveReasonValues() []AdminCompanyRemoveReason {
 		ADMIN_CRR_BANKRUPT,
 		ADMIN_CRR_END,
 	}
+}
+
+// adminCompanyRemoveReasonNames is the source text of each
+// AdminCompanyRemoveReasonValues() entry.
+var adminCompanyRemoveReasonNames = []string{
+	"ADMIN_CRR_MANUAL",
+	"ADMIN_CRR_AUTOCLEAN",
+	"ADMIN_CRR_BANKRUPT",
+	"ADMIN_CRR_END",
+}
+
+// AdminCompanyRemoveReasonName is the enum constant's name, i.e. what
+// NetworkAdminEvent.toString() prints for the reason a company was removed.
+func AdminCompanyRemoveReasonName(r AdminCompanyRemoveReason) string {
+	if r < 0 || int(r) >= len(adminCompanyRemoveReasonNames) {
+		return "ADMIN_CRR_END"
+	}
+	return adminCompanyRemoveReasonNames[int(r)]
 }
 

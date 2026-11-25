@@ -110,6 +110,47 @@ func NetworkErrorCodeOf(order int) NetworkErrorCode {
 	return NetworkErrorCode(order)
 }
 
+// networkErrorCodes is the source text of each NetworkErrorCodeValues() entry.
+// Java's String.valueOf(enum) prints it; the Go port has no enum names, so the
+// error log lines and NetworkException's message ask for them by index.
+var networkErrorCodes = []string{
+	"NETWORK_ERROR_GENERAL",
+	"NETWORK_ERROR_DESYNC",
+	"NETWORK_ERROR_SAVEGAME_FAILED",
+	"NETWORK_ERROR_CONNECTION_LOST",
+	"NETWORK_ERROR_ILLEGAL_PACKET",
+	"NETWORK_ERROR_NEWGRF_MISMATCH",
+	"NETWORK_ERROR_NOT_AUTHORIZED",
+	"NETWORK_ERROR_NOT_EXPECTED",
+	"NETWORK_ERROR_WRONG_REVISION",
+	"NETWORK_ERROR_NAME_IN_USE",
+	"NETWORK_ERROR_WRONG_PASSWORD",
+	"NETWORK_ERROR_COMPANY_MISMATCH",
+	"NETWORK_ERROR_KICKED",
+	"NETWORK_ERROR_CHEATER",
+	"NETWORK_ERROR_FULL",
+	"NETWORK_ERROR_TOO_MANY_COMMANDS",
+	"NETWORK_ERROR_TIMEOUT_PASSWORD",
+	"NETWORK_ERROR_TIMEOUT_COMPUTER",
+	"NETWORK_ERROR_TIMEOUT_MAP",
+	"NETWORK_ERROR_TIMEOUT_JOIN",
+	"NETWORK_ERROR_INVALID_CLIENT_NAME",
+	"NETWORK_ERROR_NOT_ON_ALLOW_LIST",
+	"NETWORK_ERROR_NO_AUTHENTICATION_METHOD_AVAILABLE",
+	"NETWORK_ERROR_END",
+}
+
+// NetworkErrorCodeName is the enum constant's name, i.e. what the log lines
+// NetworkAdmin and NetworkClient print for an error id. Java prints "null" for
+// an id outside the enum (valueOf returns null, then toString() throws); the
+// Go port prints the sentinel's name instead.
+func NetworkErrorCodeName(e NetworkErrorCode) string {
+	if e < 0 || int(e) >= len(networkErrorCodes) {
+		return "NETWORK_ERROR_NONE"
+	}
+	return networkErrorCodes[int(e)]
+}
+
 // DestTypeValues is DestType.values().
 func DestTypeValues() []DestType {
 	return []DestType{DESTTYPE_BROADCAST, DESTTYPE_TEAM, DESTTYPE_CLIENT}
