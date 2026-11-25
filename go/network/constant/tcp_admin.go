@@ -63,6 +63,32 @@ func PacketAdminTypeOf(order int) PacketAdminType {
 	return PacketAdminType(order)
 }
 
+// packetAdminTypeNames is the source text of each PacketAdminTypeValues() entry.
+// Java's String.valueOf(enum) prints it; the Go port has no enum names, so the
+// harness asks for them by index.
+var packetAdminTypeNames = []string{
+	"ADMIN_PACKET_ADMIN_JOIN",
+	"ADMIN_PACKET_ADMIN_QUIT",
+	"ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY",
+	"ADMIN_PACKET_ADMIN_POLL",
+	"ADMIN_PACKET_ADMIN_CHAT",
+	"ADMIN_PACKET_ADMIN_RCON",
+	"ADMIN_PACKET_ADMIN_GAMESCRIPT",
+	"ADMIN_PACKET_ADMIN_PING",
+	"ADMIN_PACKET_ADMIN_EXTERNAL_CHAT",
+	"ADMIN_PACKET_ADMIN_JOIN_SECURE",
+	"ADMIN_PACKET_ADMIN_AUTH_RESPONSE",
+}
+
+// PacketAdminTypeName is the enum constant's name, i.e. what the harness's
+// failure messages and toString() print in Java.
+func PacketAdminTypeName(t PacketAdminType) string {
+	if t < 0 || int(t) >= len(packetAdminTypeNames) {
+		return "ADMIN_PACKET_ADMIN_NONE"
+	}
+	return packetAdminTypeNames[int(t)]
+}
+
 // PacketServerType: ADMIN_PACKET_SERVER_* in tcp_admin.h, wire id = ordinal +
 // SERVER_PACKET_START_VALUE.
 type PacketServerType int
@@ -159,6 +185,49 @@ func PacketServerTypeOf(order int) PacketServerType {
 	return INVALID_ADMIN_PACKET
 }
 
+// packetServerTypeNames is the source text of each PacketServerTypeValues() entry.
+var packetServerTypeNames = []string{
+	"ADMIN_PACKET_SERVER_FULL",
+	"ADMIN_PACKET_SERVER_BANNED",
+	"ADMIN_PACKET_SERVER_ERROR",
+	"ADMIN_PACKET_SERVER_PROTOCOL",
+	"ADMIN_PACKET_SERVER_WELCOME",
+	"ADMIN_PACKET_SERVER_NEWGAME",
+	"ADMIN_PACKET_SERVER_SHUTDOWN",
+	"ADMIN_PACKET_SERVER_DATE",
+	"ADMIN_PACKET_SERVER_CLIENT_JOIN",
+	"ADMIN_PACKET_SERVER_CLIENT_INFO",
+	"ADMIN_PACKET_SERVER_CLIENT_UPDATE",
+	"ADMIN_PACKET_SERVER_CLIENT_QUIT",
+	"ADMIN_PACKET_SERVER_CLIENT_ERROR",
+	"ADMIN_PACKET_SERVER_COMPANY_NEW",
+	"ADMIN_PACKET_SERVER_COMPANY_INFO",
+	"ADMIN_PACKET_SERVER_COMPANY_UPDATE",
+	"ADMIN_PACKET_SERVER_COMPANY_REMOVE",
+	"ADMIN_PACKET_SERVER_COMPANY_ECONOMY",
+	"ADMIN_PACKET_SERVER_COMPANY_STATS",
+	"ADMIN_PACKET_SERVER_CHAT",
+	"ADMIN_PACKET_SERVER_RCON",
+	"ADMIN_PACKET_SERVER_CONSOLE",
+	"ADMIN_PACKET_SERVER_CMD_NAMES",
+	"ADMIN_PACKET_SERVER_CMD_LOGGING_OLD",
+	"ADMIN_PACKET_SERVER_GAMESCRIPT",
+	"ADMIN_PACKET_SERVER_RCON_END",
+	"ADMIN_PACKET_SERVER_PONG",
+	"ADMIN_PACKET_SERVER_CMD_LOGGING",
+	"ADMIN_PACKET_SERVER_AUTH_REQUEST",
+	"ADMIN_PACKET_SERVER_ENABLE_ENCRYPTION",
+	"INVALID_ADMIN_PACKET",
+}
+
+// PacketServerTypeName is the enum constant's name.
+func PacketServerTypeName(t PacketServerType) string {
+	if t < 0 || int(t) >= len(packetServerTypeNames) {
+		return "INVALID_ADMIN_PACKET"
+	}
+	return packetServerTypeNames[int(t)]
+}
+
 // AdminUpdateType: update types an admin can register a frequency for.
 type AdminUpdateType int
 
@@ -201,6 +270,29 @@ func AdminUpdateTypeValues() []AdminUpdateType {
 		ADMIN_UPDATE_GAMESCRIPT,
 		ADMIN_UPDATE_END,
 	}
+}
+
+// adminUpdateTypeNames is the source text of each AdminUpdateTypeValues() entry.
+var adminUpdateTypeNames = []string{
+	"ADMIN_UPDATE_DATE",
+	"ADMIN_UPDATE_CLIENT_INFO",
+	"ADMIN_UPDATE_COMPANY_INFO",
+	"ADMIN_UPDATE_COMPANY_ECONOMY",
+	"ADMIN_UPDATE_COMPANY_STATS",
+	"ADMIN_UPDATE_CHAT",
+	"ADMIN_UPDATE_CONSOLE",
+	"ADMIN_UPDATE_CMD_NAMES",
+	"ADMIN_UPDATE_CMD_LOGGING",
+	"ADMIN_UPDATE_GAMESCRIPT",
+	"ADMIN_UPDATE_END",
+}
+
+// AdminUpdateTypeName is the enum constant's name.
+func AdminUpdateTypeName(t AdminUpdateType) string {
+	if t < 0 || int(t) >= len(adminUpdateTypeNames) {
+		return "ADMIN_UPDATE_END"
+	}
+	return adminUpdateTypeNames[int(t)]
 }
 
 // AdminUpdateFrequency: update frequencies an admin can register. The value is
