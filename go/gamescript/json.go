@@ -164,6 +164,56 @@ func RawFields(text string) map[string]string {
 	return fields
 }
 
+// JsonListItems reads the items of a JSON array, each as the text that element
+// has (a quoted string unescaped, a number or bool as its literal). The tests
+// use it to check the arguments a gamescript command carried, which is what
+// gson's getAsJsonArray().get(i).getAsInt() does in Java. Returns nil when the
+// text is not an array.
+func JsonListItems(text string) []string {
+	var n = len(text)
+	var i = 0
+	for (i < n && isSpace(text[i])) {
+		i = i + 1
+	}
+	if i >= n || text[i] != 91 {
+		var items []string
+		return items
+	}
+	var items []string
+	i = i + 1
+	for (true) {
+		for (i < n && isSpace(text[i])) {
+			i = i + 1
+		}
+		if i >= n {
+			return items
+		}
+		if text[i] == 93 {
+			break
+		}
+		var value, afterValue = scanValue(text, i)
+		if afterValue < 0 {
+			return items
+		}
+		items = append(items, value)
+		i = afterValue
+		for (i < n && isSpace(text[i])) {
+			i = i + 1
+		}
+		if i >= n {
+			return items
+		}
+		if text[i] == 44 {
+			i = i + 1
+		} else if text[i] == 93 {
+			break
+		} else {
+			return items
+		}
+	}
+	return items
+}
+
 // scanValue reads one JSON value and returns its text and the index just past
 // it. Strings are unescaped; an object or an array is returned verbatim, since
 // AdminCmd only ever answers with scalars and a nested value is not something

@@ -44,6 +44,12 @@ func (l *Logger) IsTraceEnabled() bool {
 	return threshold <= TRACE
 }
 
+// IsDebugEnabled gates NetworkSender's per-packet debugPacket() call, the way
+// slf4j's isDebugEnabled() does in Java.
+func (l *Logger) IsDebugEnabled() bool {
+	return threshold <= DEBUG
+}
+
 func (l *Logger) Trace(message string) {
 	if threshold <= TRACE {
 		l.write("TRACE", message)

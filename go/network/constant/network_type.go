@@ -175,6 +175,53 @@ func NetworkActionValues() []NetworkAction {
 	}
 }
 
+// DESTTYPE_NONE and NETWORK_ACTION_NONE stand in for the null Java's valueOf
+// returns for an unknown id, as they do for the other enums in this port.
+const DESTTYPE_NONE DestType = -1
+const NETWORK_ACTION_NONE NetworkAction = -1
+
+// destTypes and networkActions are the source text of each values() entry. Java's
+// String.valueOf(enum) prints it; the Go port has no enum names, so the chat
+// log lines NetworkAdmin prints for ADMIN_PACKET_SERVER_CHAT ask for them by
+// index.
+var destTypes = []string{
+	"DESTTYPE_BROADCAST",
+	"DESTTYPE_TEAM",
+	"DESTTYPE_CLIENT",
+}
+
+var networkActions = []string{
+	"NETWORK_ACTION_JOIN",
+	"NETWORK_ACTION_LEAVE",
+	"NETWORK_ACTION_SERVER_MESSAGE",
+	"NETWORK_ACTION_CHAT",
+	"NETWORK_ACTION_CHAT_COMPANY",
+	"NETWORK_ACTION_CHAT_CLIENT",
+	"NETWORK_ACTION_GIVE_MONEY",
+	"NETWORK_ACTION_NAME_CHANGE",
+	"NETWORK_ACTION_COMPANY_SPECTATOR",
+	"NETWORK_ACTION_COMPANY_JOIN",
+	"NETWORK_ACTION_COMPANY_NEW",
+	"NETWORK_ACTION_KICKED",
+	"NETWORK_ACTION_EXTERNAL_CHAT",
+}
+
+// DestTypeName is the enum constant's name.
+func DestTypeName(t DestType) string {
+	if t < 0 || int(t) >= len(destTypes) {
+		return "DESTTYPE_NONE"
+	}
+	return destTypes[int(t)]
+}
+
+// NetworkActionName is the enum constant's name.
+func NetworkActionName(a NetworkAction) string {
+	if a < 0 || int(a) >= len(networkActions) {
+		return "NETWORK_ACTION_NONE"
+	}
+	return networkActions[int(a)]
+}
+
 // NetworkErrorCodeValues is NetworkErrorCode.values(), sentinel included.
 func NetworkErrorCodeValues() []NetworkErrorCode {
 	return []NetworkErrorCode{

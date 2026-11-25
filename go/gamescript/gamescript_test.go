@@ -22,8 +22,9 @@ type FakeSender struct {
 	packets []string
 }
 
-func (s *FakeSender) GameScript(json string) {
+func (s *FakeSender) GameScript(json string) bool {
 	s.packets = append(s.packets, json)
+	return true
 }
 
 // FakeAdmin is the OpenttdAdmin half: getSend(), null until connected.

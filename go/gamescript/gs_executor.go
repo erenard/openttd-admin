@@ -17,9 +17,10 @@ import "com.openttd/util"
 var log = util.GetLogger("GSExecutor")
 
 // Sender is the part of NetworkAdminSender GSExecutor sends through:
-// gameScript(String json).
+// gameScript(String json), whose false return means the payload did not fit
+// the packet.
 type Sender interface {
-	GameScript(json string)
+	GameScript(json string) bool
 }
 
 // SenderProvider is the part of OpenttdAdmin it reads that sender from: getSend(),
