@@ -46,7 +46,7 @@ type DedicatedServer struct {
 	stateLock sync.Mutex
 	running   bool
 	// stopped is the port's stand-in for the reader thread having joined.
-	stopped   bool
+	stopped bool
 }
 
 // NewDedicatedServer is the inner class's constructor: `openttd -D -d
@@ -96,7 +96,7 @@ func NewDedicatedServer(searchPath string) (*DedicatedServer, error) {
 // rest of it start the next iteration.
 func ReadConsole(server *DedicatedServer, output *os.File) {
 	var reader = bufio.NewReader(output)
-	for (server.IsRunning()) {
+	for server.IsRunning() {
 		var line, err = reader.ReadString('\n')
 		if line != "" {
 			var text = strings.ReplaceAll(line, "\r", "")
