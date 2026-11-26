@@ -14,15 +14,20 @@ type Level int
 const (
 	TRACE Level = 0
 	DEBUG Level = 1
-	INFO Level = 2
-	WARN Level = 3
+	INFO  Level = 2
+	WARN  Level = 3
 	ERROR Level = 4
-	OFF Level = 5
+	OFF   Level = 5
 )
 
 // threshold is the most verbose level that gets printed. The Java apps set the
 // equivalent in log4j.xml; INFO matches what the demos and tests show.
 var threshold = INFO
+
+// output is where the lines go. Java's log4j backend is configured by the
+// embedding app; the port writes to stderr, and SetOutput lets a test - or the
+// demo - capture them instead.
+var output = os.Stderr
 
 func SetLevel(level Level) {
 	threshold = level
@@ -81,5 +86,15 @@ func (l *Logger) Error(message string) {
 }
 
 func (l *Logger) write(level string, message string) {
-	fmt.Fprintln(os.Stderr, level+" "+l.name+": "+message)
+	fmt.Fprintln(output, level+" "+l.name+": "+message)
+}
+
+// SetOutput redirects the lines, which is how a test captures what the port
+// logged. GetOutput is the current target, so a test can put it back.
+func SetOutput(file *os.File) {
+	output = file
+}
+
+func GetOutput() *os.File {
+	return output
 }
