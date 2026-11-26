@@ -36,3 +36,21 @@ func PacketUdpTypeValues() []PacketUdpType {
 	}
 }
 
+// packetUdpTypeNames is the index-parallel name table: Java's enum has names,
+// this dialect's typed consts do not, and NetworkUdp logs packetUdpType.toString
+// for every packet it reads.
+var packetUdpTypeNames = []string{
+	"PACKET_UDP_CLIENT_FIND_SERVER", // Queries a game server for game information
+	"PACKET_UDP_SERVER_RESPONSE", // Reply of the game server with game information
+	"PACKET_UDP_END", // Must ALWAYS be on the end of this list!! (period)
+}
+
+// PacketUdpTypeName is PacketUdpType.toString(), the name of the constant:
+// PACKET_UDP_END out of range, like the other tables.
+func PacketUdpTypeName(t PacketUdpType) string {
+	if t < 0 || int(t) >= len(packetUdpTypeNames) {
+		return "PACKET_UDP_END"
+	}
+	return packetUdpTypeNames[int(t)]
+}
+

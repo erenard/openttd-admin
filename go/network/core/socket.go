@@ -24,6 +24,11 @@ type Buffer struct {
 type Socket struct {
 	channel net.Conn
 	data *Buffer
+
+	// udp is set only by NewUdpListener: a bound UDP socket has no default peer,
+	// so its datagrams go out with WriteTo and come in with ReadFrom, both of
+	// which need the concrete connection type.
+	udp *net.UDPConn
 }
 
 // NewTcpSocket is Socket.newTcpSocket: connect now, fail if nothing listens.
@@ -47,6 +52,28 @@ func NewUdpSocket(host string, port int) (*Socket, error) {
 		return nil, err
 	}
 	return &Socket{channel: channel}, nil
+}
+
+// NewUdpListener is not in Java: it is the socket a UDP *server* needs, bound to
+// a port instead of connected to one, which is how the master server answers a
+// PACKET_UDP_CLIENT_FIND_SERVER (see udp.h, NetworkUDPSocketHandler::Listen). Port
+// 0 asks the kernel for a free one and the number it got comes back, so a test
+// can point a NetworkUdp at it the way the TCP harnesses use an ephemeral port.
+func NewUdpListener(host string, port int) (*Socket, int, error) {
+	var address, addressError = net.ResolveUDPAddr("udp", net.JoinHostPort(host, strconv.Itoa(port)))
+	if addressError != nil {
+		return nil, 0, addressError
+	}
+	var listener, listenError = net.ListenUDP("udp", address)
+	if listenError != nil {
+		return nil, 0, listenError
+	}
+	var local = listener.LocalAddr()
+	var bound = local.(*net.UDPAddr)
+	if bound == nil {
+		return nil, 0, errors.New("Could not determine the bound UDP port")
+	}
+	return &Socket{channel: listener, udp: listener}, bound.Port, nil
 }
 
 // SendEmptyPacket is sendEmptyPacket: a packet with nothing but its header.
@@ -78,6 +105,32 @@ func (s *Socket) Receive() ([]*Packet, error) {
 	}
 	s.data = data
 	return packets, nil
+}
+
+// ReceiveFrom is the UDP twin of Receive, used by a socket from NewUdpListener:
+// one datagram is one whole packet, so there is no framing state to carry over,
+// and the address it came from comes back too, because a bound socket has no
+// default peer to answer (udp.cpp's Receive_CLIENT_FIND_SERVER sends its reply
+// to client_addr).
+func (s *Socket) ReceiveFrom() (*Packet, net.Addr, error) {
+	var buffer = make([]byte, MTU)
+	var count, address, err = s.udp.ReadFrom(buffer)
+	if err != nil {
+		return nil, address, err
+	}
+	var packet = NewForReceive(buffer[0:count])
+	packet.PrepareToRead()
+	return packet, address, nil
+}
+
+// SendTo is Send for a bound UDP socket: the packet goes to one address. Like
+// Send, a failed write is logged rather than raised.
+func (s *Socket) SendTo(packet *Packet, address net.Addr) {
+	packet.PrepareToSend()
+	var _, err = s.udp.WriteTo(packet.ToBytes(), address)
+	if err != nil {
+		log.Error(Message(err))
+	}
 }
 
 // receiveMore is receiveMore: one read, then cut as many packets out of the
