@@ -15,6 +15,18 @@ const OPENTTD_TO_JAVA_OFFSET = -62167392000000
 // OPENTTD_TO_JAVA_MULTIPLIER is one day in millis.
 const OPENTTD_TO_JAVA_MULTIPLIER = 24 * 60 * 60 * 1000
 
+// java.util.Calendar's DAY_OF_WEEK constants: SUNDAY is 1, so the demos'
+// `date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY` reads MONDAY as 2.
+const (
+	SUNDAY    = 1
+	MONDAY    = 2
+	TUESDAY   = 3
+	WEDNESDAY = 4
+	THURSDAY  = 5
+	FRIDAY    = 6
+	SATURDAY  = 7
+)
+
 // java.util.Calendar's month field: JANUARY is 0.
 const (
 	JANUARY   = 0
@@ -128,6 +140,15 @@ func (c Calendar) WeekOfYear() int {
 		}
 	}
 	return week
+}
+
+// DayOfWeek is get(DAY_OF_WEEK): 1 for a Sunday, 2 for a Monday, ... Java reads
+// the field off a Calendar in the default locale; the game date has no timezone,
+// so the port computes it from the civil date instead, which agrees because the
+// Java epoch day is a Thursday in both.
+func (c Calendar) DayOfWeek() int {
+	var ordinal = daysFromCivil(c.civilYear, c.Month+1, c.DayOfMonth)
+	return int(mod(ordinal+4, 7)) + 1
 }
 
 // shift is Calendar.add(YEAR, n) and Calendar.add(MONTH, n) for the fields the

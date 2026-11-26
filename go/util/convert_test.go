@@ -170,3 +170,35 @@ func TestWeekTrimesterMonthOfYear(t *testing.T) {
 			util.DayToCalendar(31).MonthOfYear(), util.DayToCalendar(31).Trimester())
 	}
 }
+
+// TestDayOfWeek: the demos greet their players on Mondays, which is
+// `date.get(DAY_OF_WEEK) == Calendar.MONDAY`. Java reads the field off a
+// Calendar in the default locale; the port computes it from the civil date,
+// which agrees because the Java epoch day is a Thursday in both.
+func TestDayOfWeek(t *testing.T) {
+	// 1 January of year 0 is a Saturday, so the second day of the game is the
+	// first Monday of it - the day the demos greet on.
+	if util.DayToCalendar(0).DayOfWeek() != util.SATURDAY {
+		t.Errorf("day 0 weekday = %d", util.DayToCalendar(0).DayOfWeek())
+	}
+	if util.DayToCalendar(2).DayOfWeek() != util.MONDAY {
+		t.Errorf("day 2 weekday = %d", util.DayToCalendar(2).DayOfWeek())
+	}
+	// Anchored on real dates: 1951-01-01 and 2000-01-01 are a Monday and a
+	// Saturday, and 712588 and 730485 are those days of the game's counter.
+	if util.DayToCalendar(712588).DayOfWeek() != util.MONDAY {
+		t.Errorf("1951-01-01 weekday = %d", util.DayToCalendar(712588).DayOfWeek())
+	}
+	if util.DayToCalendar(712595).DayOfWeek() != util.MONDAY {
+		t.Errorf("1951-01-08 weekday = %d", util.DayToCalendar(712595).DayOfWeek())
+	}
+	if util.DayToCalendar(730485).DayOfWeek() != util.SATURDAY {
+		t.Errorf("2000-01-01 weekday = %d", util.DayToCalendar(730485).DayOfWeek())
+	}
+	// A week is seven days, so the weekday cycles with the date.
+	for day := 0; day < 7; day++ {
+		if util.DayToCalendar(int64(day)).DayOfWeek() != util.DayToCalendar(int64(day+7)).DayOfWeek() {
+			t.Errorf("day %d and day %d differ", day, day+7)
+		}
+	}
+}
