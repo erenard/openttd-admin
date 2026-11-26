@@ -261,6 +261,8 @@ func (a *NetworkAdmin) handlePacket(packet *core.Packet) *NetworkException {
 		gameInfo.SetMapHeight(packet.ReadUint16())
 		networkModel.SetGameInfo(gameInfo)
 	case constant.ADMIN_PACKET_SERVER_NEWGAME:
+		// Java's `break;`: nothing to do. Go's cases do not fall through, so
+		// SHUTDOWN below is unaffected by this empty body.
 	case constant.ADMIN_PACKET_SERVER_SHUTDOWN:
 		// TODO properly shutdown
 		failure = NewException(constant.PacketServerTypeName(packetType))

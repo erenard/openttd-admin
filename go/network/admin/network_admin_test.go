@@ -10,6 +10,7 @@
 
 package admin_test
 
+import "strconv"
 import "testing"
 import "sync"
 import "com.openttd"
@@ -62,9 +63,12 @@ func (r *Recorder) LastEvent(packetType constant.PacketServerType) *admin.Networ
 }
 
 // LastModel is the most recent model copy, i.e. the state after the last packet.
+// LastModel is the snapshot the most recent event carried. It answers with an
+// empty model rather than nil, so an await condition that runs before the first
+// packet arrives cannot dereference nothing.
 func (r *Recorder) LastModel() *admin.NetworkModel {
 	r.lock.Lock()
-	var model *admin.NetworkModel
+	var model = admin.NewNetworkModel()
 	if len(r.models) > 0 {
 		model = r.models[len(r.models)-1]
 	}
@@ -226,6 +230,9 @@ func TestClientPackets(t *testing.T) {
 	if clients[0].GetJoinDate() != int64(1950*365+1) || clients[0].GetCompany() != 255 {
 		t.Errorf("client join date or company: %s", clients[0].ToString())
 	}
+	if a.recorder.LastModel().GetGameInfo().GetClientsCount() != 1 {
+		t.Errorf("expected the game info to count one client")
+	}
 
 	// CLIENT_JOIN: uint32 id, and it arrives after CLIENT_INFO.
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_CLIENT_JOIN).WriteUint32(uint32(7)))
@@ -247,11 +254,39 @@ func TestClientPackets(t *testing.T) {
 		t.Errorf("expected the client to play as company 1")
 	}
 
+	// CLIENT_ERROR: uint32 id, uint8 NetworkErrorCode. The client is dropped as
+	// on a quit, and only the one the packet names.
+	a.send(server.New(constant.ADMIN_PACKET_SERVER_CLIENT_INFO).
+		WriteUint32(uint32(9)).
+		WriteString("127.0.0.1").
+		WriteString("Cheater").
+		WriteUint8(0).
+		WriteUint32(uint32(1950*365+1)).
+		WriteUint8(255))
+	openttd.Await(func() bool { return len(a.recorder.LastModel().RetreiveClients()) == 2 }, 5, "a second client")
+	a.send(server.New(constant.ADMIN_PACKET_SERVER_CLIENT_ERROR).
+		WriteUint32(uint32(9)).
+		WriteUint8(int(constant.NETWORK_ERROR_CHEATER)))
+	openttd.Await(func() bool { return len(a.recorder.LastModel().RetreiveClients()) == 1 }, 5, "a client error packet")
+	if a.recorder.LastModel().RetreiveClients()[0].GetId() != 7 {
+		t.Errorf("expected the client error to drop only the client it names")
+	}
+	if a.recorder.LastModel().GetGameInfo().GetClientsCount() != 1 {
+		t.Errorf("expected the game info to count one client after the error")
+	}
+	var errored = a.recorder.LastEvent(constant.ADMIN_PACKET_SERVER_CLIENT_ERROR)
+	if errored.GetClientId() != int64(9) || errored.GetClientError() != constant.NETWORK_ERROR_CHEATER {
+		t.Errorf("client error event: %s", errored.ToString())
+	}
+
 	// CLIENT_QUIT: uint32 id.
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_CLIENT_QUIT).WriteUint32(uint32(7)))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_CLIENT_QUIT, 5, "a client quit packet")
 	if len(a.recorder.LastModel().RetreiveClients()) != 0 {
 		t.Errorf("expected the client to be gone from the model")
+	}
+	if a.recorder.LastModel().GetGameInfo().GetClientsCount() != 0 {
+		t.Errorf("expected the game info to count no client after the quit")
 	}
 	a.assertStillConnected(t)
 	a.close()
@@ -295,10 +330,17 @@ func TestCompanyPackets(t *testing.T) {
 	if len(owners) != 4 || owners[0] != 7 || owners[3] != 10 {
 		t.Errorf("expected four share owners 7,8,9,10, got %d,%d,%d,%d", owners[0], owners[1], owners[2], owners[3])
 	}
+	if a.recorder.LastModel().GetGameInfo().GetCompaniesCount() != 1 {
+		t.Errorf("expected the game info to count one company")
+	}
 
 	// COMPANY_NEW: uint8 id, and it arrives after COMPANY_INFO.
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_COMPANY_NEW).WriteUint8(1))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_COMPANY_NEW, 5, "a company new packet")
+	var newCompany = a.recorder.LastEvent(constant.ADMIN_PACKET_SERVER_COMPANY_NEW)
+	if newCompany.GetCompany() != 1 {
+		t.Errorf("expected the new company packet to name company 1, got %d", newCompany.GetCompany())
+	}
 
 	// COMPANY_ECONOMY: int64 money, uint64 loan, int64 income, uint16 delivered,
 	// then the last and previous quarter's value, performance and delivery.
@@ -354,14 +396,30 @@ func TestCompanyPackets(t *testing.T) {
 		}
 		return list[0].GetName() == "Renamed company"
 	}, 5, "a company update packet")
+	var updated = a.recorder.LastModel().RetreiveCompanies()[0]
+	if updated.GetColor() != 5 || updated.GetBankruptcy() != 0 {
+		t.Errorf("company update colour or bankruptcy: %s", updated.ToString())
+	}
+	if updated.GetInauguratedYear() != int64(1980) {
+		t.Errorf("an update must keep the inaugural year: %d", updated.GetInauguratedYear())
+	}
+	if updated.IsAi() {
+		t.Errorf("an update must keep the ai flag: %s", updated.ToString())
+	}
 
-	// COMPANY_REMOVE: uint8 id, uint8 reason.
-	a.send(server.New(constant.ADMIN_PACKET_SERVER_COMPANY_REMOVE).
-		WriteUint8(1).
-		WriteUint8(int(constant.ADMIN_CRR_AUTOCLEAN)))
-	a.awaitEvent(constant.ADMIN_PACKET_SERVER_COMPANY_REMOVE, 5, "a company remove packet")
+	// COMPANY_REMOVE: uint8 id, uint8 reason. Every reason drops the company,
+	// and the server sends one packet per reason.
+	for i := 0; i < 3; i++ {
+		a.send(server.New(constant.ADMIN_PACKET_SERVER_COMPANY_REMOVE).
+			WriteUint8(1).
+			WriteUint8(int(constant.ADMIN_CRR_MANUAL) + i))
+	}
+	openttd.AwaitSize(func() int { return a.recorder.EventsOf(constant.ADMIN_PACKET_SERVER_COMPANY_REMOVE) }, 3, 5, "three remove events")
 	if len(a.recorder.LastModel().RetreiveCompanies()) != 0 {
 		t.Errorf("expected the company to be gone from the model")
+	}
+	if a.recorder.LastModel().GetGameInfo().GetCompaniesCount() != 0 {
+		t.Errorf("expected the game info to count no company after the removes")
 	}
 	a.assertStillConnected(t)
 	a.close()
@@ -380,16 +438,29 @@ func TestTextPackets(t *testing.T) {
 		WriteUint8(int(constant.NETWORK_ACTION_CHAT)).
 		WriteUint8(int(constant.DESTTYPE_BROADCAST)).
 		WriteUint32(uint32(7)).
-		WriteString("hello").
+		WriteString("Grüte, player two").
 		WriteUint64(uint64(0)))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_CHAT, 5, "a chat packet")
 	var chat = a.recorder.LastEvent(constant.ADMIN_PACKET_SERVER_CHAT)
-	if chat.GetClientId() != int64(7) || chat.GetMessage() != "hello" {
+	if chat.GetClientId() != int64(7) || chat.GetMessage() != "Grüte, player two" {
 		t.Errorf("chat event: %s", chat.ToString())
 	}
 
+	// A "give money" chat carries a uint64 amount after the message.
+	a.send(server.New(constant.ADMIN_PACKET_SERVER_CHAT).
+		WriteUint8(int(constant.NETWORK_ACTION_GIVE_MONEY)).
+		WriteUint8(int(constant.DESTTYPE_CLIENT)).
+		WriteUint32(uint32(7)).
+		WriteString("here is money").
+		WriteUint64(uint64(30000000000)))
+	openttd.AwaitSize(func() int { return a.recorder.EventsOf(constant.ADMIN_PACKET_SERVER_CHAT) }, 2, 5, "a give money chat")
+	var given = a.recorder.LastEvent(constant.ADMIN_PACKET_SERVER_CHAT)
+	if given.GetClientId() != int64(7) || given.GetMessage() != "here is money" {
+		t.Errorf("give money chat: %s", given.ToString())
+	}
+
 	// CONSOLE: string origin, string message. Java's setConsoleEvent does not
-	 // record the packet type, so the event keeps the origin and the message.
+	// record the packet type, so the event keeps the origin and the message.
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_CONSOLE).
 		WriteString("console").
 		WriteString("a console line"))
@@ -404,12 +475,21 @@ func TestTextPackets(t *testing.T) {
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_GAMESCRIPT, 5, "a gamescript packet")
 
 	// RCON: uint16 colour, string message.
-	a.send(server.New(constant.ADMIN_PACKET_SERVER_RCON).WriteUint16(1).WriteString("rcon output"))
-	a.awaitEvent(constant.ADMIN_PACKET_SERVER_RCON, 5, "an rcon packet")
+	a.send(server.New(constant.ADMIN_PACKET_SERVER_RCON).WriteUint16(2).WriteString("Current date: 1950-01-01"))
+	a.send(server.New(constant.ADMIN_PACKET_SERVER_RCON).WriteUint16(8).WriteString("Unknown command"))
+	openttd.AwaitSize(func() int { return a.recorder.EventsOf(constant.ADMIN_PACKET_SERVER_RCON) }, 2, 5, "two rcon packets")
+	var firstRCon = a.recorder.LastEvent(constant.ADMIN_PACKET_SERVER_RCON)
+	if firstRCon.GetColor() != 8 || firstRCon.GetMessage() != "Unknown command" {
+		t.Errorf("rcon event: %s", firstRCon.ToString())
+	}
 
-	// RCON_END: string the command as requested.
+	// RCON_END: string the command as requested. It has no origin, so it must
+	// not fall through into CONSOLE and invent a console event.
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_RCON_END).WriteString("set_time 1"))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_RCON_END, 5, "an rcon end packet")
+	if a.recorder.EventsOf(constant.ADMIN_PACKET_SERVER_CONSOLE) != 1 {
+		t.Errorf("RCON_END must not produce a console event")
+	}
 	a.assertStillConnected(t)
 	a.close()
 }
@@ -421,17 +501,22 @@ func TestCmdNames(t *testing.T) {
 	if a == nil {
 		return
 	}
-	var packet = server.New(constant.ADMIN_PACKET_SERVER_CMD_NAMES)
-	packet.WriteBool8(true).WriteUint16(4).WriteString("AddBridge")
-	packet.WriteBool8(true).WriteUint16(5).WriteString("AddLevelCrossing")
-	packet.WriteBool8(false)
-	a.send(packet)
-	a.awaitEvent(constant.ADMIN_PACKET_SERVER_CMD_NAMES, 5, "a cmd names packet")
+	// SendCmdNames splits into several packets when the MTU is reached, so the
+// decoder must handle consecutive packets and keep the ids it already read.
+	for packetIndex := 0; packetIndex < 2; packetIndex++ {
+		var packet = server.New(constant.ADMIN_PACKET_SERVER_CMD_NAMES)
+		for commandId := packetIndex * 3; commandId < packetIndex * 3 + 3; commandId++ {
+			packet.WriteBool8(true).WriteUint16(commandId).WriteString("CMD_" + strconv.Itoa(commandId))
+		}
+		packet.WriteBool8(false)
+		a.send(packet)
+	}
+	openttd.Await(func() bool { return len(a.recorder.LastModel().RetreiveCommandNames()) == 6 }, 5, "six command names")
 	var names = a.recorder.LastModel().RetreiveCommandNames()
-	var first, hasFirst = names[4]
-	var second, hasSecond = names[5]
-	if !hasFirst || first != "AddBridge" || !hasSecond || second != "AddLevelCrossing" {
-		t.Errorf("expected two command names, got %d", len(names))
+	var first, hasFirst = names[0]
+	var last, hasLast = names[5]
+	if !hasFirst || first != "CMD_0" || !hasLast || last != "CMD_5" {
+		t.Errorf("expected CMD_0 and CMD_5, got %d names", len(names))
 	}
 	a.assertStillConnected(t)
 	a.close()

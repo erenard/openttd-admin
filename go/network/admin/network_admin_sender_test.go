@@ -11,8 +11,9 @@
 // two cases are testable here instead of being unreachable, and they are asserted
 // at the end of the file.
 //
-// The Java test drives everything through AdminHarness, which needs the OpenttdAdmin
-// facade (a later stage of this port); server.SenderHarness is the stand-in.
+// Like the Java test, this drives everything through AdminHarness: the facade
+// builds the sender, and NetworkAdmin decodes the PROTOCOL packet, so the sender
+// under test has the protocol a real connection would have.
 
 package admin_test
 
@@ -27,8 +28,8 @@ import "com.openttd/server"
 // newHarness is setUp(): a fresh connection per test, as Java's @BeforeEach
 // builds one. nil means the harness could not connect, which no test can
 // recover from.
-func newHarness(t *testing.T) *server.SenderHarness {
-	var harness, harnessError = server.NewSenderHarness()
+func newHarness(t *testing.T) *server.AdminHarness {
+	var harness, harnessError = server.NewAdminHarness()
 	if harnessError != nil {
 		t.Errorf("AdminHarness: %s", core.Message(harnessError))
 		return nil
@@ -701,9 +702,20 @@ func TestSetTownCargoGoal(t *testing.T) {
 	}
 }
 
-// Deviation: Java's updateFrequency() throws NullPointerException before the
-// PROTOCOL packet arrives; the port logs the unsupported-frequency error and
-// sends nothing, which the server would reject anyway.
+// settle waits for the sender's queue to drain after the harness's WELCOME
+// handler queued its own UPDATE_FREQUENCY and POLL packets, so the two tests
+// below can measure a delta instead of racing that batch.
+func settle(harness *server.AdminHarness) {
+	var send = harness.GetSend()
+	openttd.Await(func() bool { return send.GetQueue().Size() == 0 }, 10, "the WELCOME packets to be sent")
+	openttd.Wait(1)
+}
+
+// Deviation: Java's updateFrequency() throws NullPointerException when the
+// protocol is unknown; the port logs the unsupported-frequency error and
+// sends nothing, which the server would reject anyway. The harness has already
+// answered WELCOME, which queues its own UPDATE_FREQUENCY packets, so the
+// assertion is a delta, not a zero.
 func TestUpdateFrequencyWithoutProtocol(t *testing.T) {
 	var harness = newHarness(t)
 	if harness == nil {
@@ -713,16 +725,19 @@ func TestUpdateFrequencyWithoutProtocol(t *testing.T) {
 	var srv = harness.GetServer()
 	var send = harness.GetSend()
 
+	settle(harness)
+	var before = len(srv.Packets(constant.ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY))
 	send.SetProtocol(nil)
 	send.UpdateFrequency(constant.ADMIN_UPDATE_DATE, constant.ADMIN_FREQUENCY_POLL)
 	openttd.Wait(1)
-	if len(srv.Packets(constant.ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY)) != 0 {
-		t.Errorf("nothing must be sent before the PROTOCOL packet")
+	if len(srv.Packets(constant.ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY)) != before {
+		t.Errorf("an unsupported frequency must send nothing")
 	}
 }
 
 // Deviation: same for poll(), where Java's caller would have seen a NullPointerException
-// on its own thread.
+// on its own thread. Again a delta: WELCOME's PollDate/PollClientInfo/... calls
+// already put POLL packets on the wire.
 func TestPollWithoutProtocol(t *testing.T) {
 	var harness = newHarness(t)
 	if harness == nil {
@@ -732,10 +747,12 @@ func TestPollWithoutProtocol(t *testing.T) {
 	var srv = harness.GetServer()
 	var send = harness.GetSend()
 
+	settle(harness)
+	var before = len(srv.Packets(constant.ADMIN_PACKET_ADMIN_POLL))
 	send.SetProtocol(nil)
 	send.Poll(constant.ADMIN_UPDATE_DATE, int64(0))
 	openttd.Wait(1)
-	if len(srv.Packets(constant.ADMIN_PACKET_ADMIN_POLL)) != 0 {
-		t.Errorf("nothing must be sent before the PROTOCOL packet")
+	if len(srv.Packets(constant.ADMIN_PACKET_ADMIN_POLL)) != before {
+		t.Errorf("polling an unsupported update must send nothing")
 	}
 }

@@ -6,12 +6,14 @@
 // in for those two types, which this port has not reached yet.
 //
 // Java's onGameScriptEvent(GameScriptEvent) is OnGameScriptReply here, taking
-// the getMessage() of that event: admin/event is a later stage, and its concrete
-// GameScriptEvent will be wrapped by an adapter when it lands.
+// the getMessage() of that event: admin/event is a later stage. Once it landed,
+// OnGameScriptEvent below is the listener method the facade registers, and it
+// simply hands the message to OnGameScriptReply.
 
 package gamescript
 
 import "strconv"
+import "com.openttd/admin/event"
 import "com.openttd/util"
 
 var log = util.GetLogger("GSExecutor")
@@ -87,4 +89,12 @@ func (e *GSExecutor) OnGameScriptReply(payload string) {
 	}
 	delete(e.requestById, response.Id)
 	request.SetResponse(response)
+}
+
+// OnGameScriptEvent is onGameScriptEvent(GameScriptEvent): the method that makes
+// the executor a GameScriptEventListener, so the facade can register it with the
+// dispatcher and the server's replies arrive here. It is a one line delegation -
+// the event carries nothing but its message.
+func (e *GSExecutor) OnGameScriptEvent(gameScriptEvent *event.GameScriptEvent) {
+	e.OnGameScriptReply(gameScriptEvent.GetMessage())
 }
