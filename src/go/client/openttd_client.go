@@ -10,7 +10,7 @@
 // methods Java has.
 //
 // This package is `client` and the network layer it wraps is `client` too
-// (go/network/client): an import binds the declared package name, so every
+// (src/go/network/client): an import binds the declared package name, so every
 // reference below to `client.` means the network layer, and the types declared
 // in this file are spelled unqualified.
 package client

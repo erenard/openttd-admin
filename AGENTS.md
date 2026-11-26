@@ -60,6 +60,15 @@ Two ladders. Neither runs the other: `test` excludes `*IntegrationTest`,
      generate its map, so pre-starting stays the reliable option. Kill it with `pgrep -x openttd`
      and `kill`, not `pkill -f 'openttd -D'` — that pattern matches the shell that started it.
 
+- The Go port has the same two ladders in `src/go` (module `com.openttd`, `go 1.27`, stdlib only).
+  Run it from that directory: `. /home/eric/www/tools/env.sh && cd src/go && go vet com.openttd/... &&
+  go test com.openttd/...`. The offline packages mirror `gradle test`; `src/go/admin/integration_test.go`
+  and `src/go/admin/protocol_integration_test.go` mirror `gradle integrationTest` and skip when nothing
+  listens on 3977 (`server.CheckAdminPort()`), so the two prerequisites above apply unchanged. The Go
+  ladder never spawns a server: `go test` has no @BeforeAll/@AfterAll pair that could own the process
+  for the whole run. `openttd.Await` panics on a timeout, which would abort the binary, so integration
+  tests wait through `awaitTrue` (`t.Errorf` + `t.FailNow()`) and callers `return` on a false result.
+
 `com.openttd.client.OpenttdClientIntegrationTest` is excluded from `integrationTest`: its
 `TcpGame.PacketGameType` is stale for 15.3, so the join is refused with
 `NETWORK_ERROR_WRONG_REVISION` and `Receive_CLIENT_AUTH_RESPONSE` hits `NOT_REACHED` — the
@@ -86,6 +95,10 @@ persists across admin connections (the game runs until the server restarts).
 
 ## Layout
 
+- `src/java` and `src/go` are the same library twice: `src/go` is the port, package for package
+  (`src/go/network/…`, `src/go/admin/…`, `src/go/robot/…`, `src/go/server/…`), with the Java tests as
+  the spec. Java stays buildable — `../strategyboard` and `../openttd-robot` consume the jar. The nine
+  Java `*Listener` interfaces have no Go counterpart; they are folded into `src/go/admin/event/*_event.go`.
 - `network/constant/*` mirror upstream enums (`TcpAdmin`, `TcpGame`, `PacketType`); when packets
   change, cross-check `/home/eric/www/OpenTTD/src/network/network_admin.cpp` / `network_client.cpp`
   — the code comments point there ("See network_admin.cpp for updates"). That checkout is upstream

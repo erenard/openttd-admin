@@ -9,7 +9,7 @@
 // that stale enum would have missed, which is what makes this harness worth
 // having.
 //
-// The types from go/network/client are spelled through the aliases in types.go:
+// The types from src/go/network/client are spelled through the aliases in types.go:
 // this file imports the facade, whose package is also called client, so it
 // cannot import the network layer as well.
 package server
