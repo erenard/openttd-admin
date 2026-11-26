@@ -25,7 +25,7 @@ var log = util.GetLogger("FakeAdminServer")
 // decode.
 type ReceivedPacket struct {
 	wireTypeId int
-	packet *core.Packet
+	packet     *core.Packet
 }
 
 func (p *ReceivedPacket) GetWireTypeId() int { return p.wireTypeId }
@@ -46,19 +46,19 @@ func (p *ReceivedPacket) GetPacket() *core.Packet {
 }
 
 func (p *ReceivedPacket) ToString() string {
-	return constant.PacketAdminTypeName(p.GetType())+" ("+strconv.Itoa(p.wireTypeId)+")"
+	return constant.PacketAdminTypeName(p.GetType()) + " (" + strconv.Itoa(p.wireTypeId) + ")"
 }
 
 type FakeAdminServer struct {
-	listener *net.TCPListener
-	port int
-	received []*ReceivedPacket
-	receivedLock sync.Mutex
-	connectionLock sync.Mutex
-	connection net.Conn
-	connectionCount int
+	listener           *net.TCPListener
+	port               int
+	received           []*ReceivedPacket
+	receivedLock       sync.Mutex
+	connectionLock     sync.Mutex
+	connection         net.Conn
+	connectionCount    int
 	clientDisconnected bool
-	running bool
+	running            bool
 }
 
 // NewFakeAdminServer is the constructor: bind an ephemeral port, then read the
@@ -157,9 +157,9 @@ func readPacket(conn net.Conn) (*ReceivedPacket, error) {
 	if headerError != nil {
 		return nil, headerError
 	}
-	var length = int(header[0]&0xFF) | int(header[1]&0xFF) << 8
+	var length = int(header[0]&0xFF) | int(header[1]&0xFF)<<8
 	if length < 3 {
-		return nil, errors.New("Illegal packet length: "+strconv.Itoa(length))
+		return nil, errors.New("Illegal packet length: " + strconv.Itoa(length))
 	}
 	var body, bodyError = readExactly(conn, length-2)
 	if bodyError != nil {
@@ -187,7 +187,7 @@ func readExactly(conn net.Conn, count int) ([]byte, error) {
 			return nil, err
 		}
 		if n <= 0 {
-			return nil, errors.New("Connection lost, received "+strconv.Itoa(read)+" of "+strconv.Itoa(count)+" bytes")
+			return nil, errors.New("Connection lost, received " + strconv.Itoa(read) + " of " + strconv.Itoa(count) + " bytes")
 		}
 		read += n
 	}
@@ -280,7 +280,7 @@ func (s *FakeAdminServer) writeLocked(packet *PacketWriter) {
 	s.connectionLock.Lock()
 	if s.connection == nil {
 		s.connectionLock.Unlock()
-		log.Warn("FakeAdminServer: connection closed before sending "+packet.ToString())
+		log.Warn("FakeAdminServer: connection closed before sending " + packet.ToString())
 		return
 	}
 	var _, err = s.connection.Write(bytes)

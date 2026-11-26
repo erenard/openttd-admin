@@ -33,23 +33,23 @@ func DaysInYear(year int) int {
 //
 // date is the game date, days since year 0.
 func YearOf(date int) int {
-	var year = 400 * (date / (DAYS_IN_YEAR * 400 + 97))
-	var remaining = date % (DAYS_IN_YEAR * 400 + 97)
+	var year = 400 * (date / (DAYS_IN_YEAR*400 + 97))
+	var remaining = date % (DAYS_IN_YEAR*400 + 97)
 
-	if remaining >= DAYS_IN_YEAR * 100 + 25 {
+	if remaining >= DAYS_IN_YEAR*100+25 {
 		year += 100
-		remaining -= DAYS_IN_YEAR * 100 + 25
-		year += 100 * (remaining / (DAYS_IN_YEAR * 100 + 24))
-		remaining = remaining % (DAYS_IN_YEAR * 100 + 24)
+		remaining -= DAYS_IN_YEAR*100 + 25
+		year += 100 * (remaining / (DAYS_IN_YEAR*100 + 24))
+		remaining = remaining % (DAYS_IN_YEAR*100 + 24)
 	}
 
-	if !IsLeapYear(year) && remaining >= DAYS_IN_YEAR * 4 {
+	if !IsLeapYear(year) && remaining >= DAYS_IN_YEAR*4 {
 		year += 4
 		remaining -= DAYS_IN_YEAR * 4
 	}
 
-	year += 4 * (remaining / (DAYS_IN_YEAR * 4 + 1))
-	remaining = remaining % (DAYS_IN_YEAR * 4 + 1)
+	year += 4 * (remaining / (DAYS_IN_YEAR*4 + 1))
+	remaining = remaining % (DAYS_IN_YEAR*4 + 1)
 
 	for remaining >= DaysInYear(year) {
 		remaining -= DaysInYear(year)

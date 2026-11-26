@@ -147,7 +147,7 @@ func TestStartupClearsTheQueue(t *testing.T) {
 // Every event prints the way its Java class does.
 func TestEventToStrings(t *testing.T) {
 	var game = &FakeOpenttd{}
-	game.day = int64(1950 * 365 + 1)
+	game.day = int64(1950*365 + 1)
 	var chat = event.NewChatEvent(game, int64(7), "hello")
 	if chat.ToString() != "7 says hello" {
 		t.Errorf("chat event %s", chat.ToString())
@@ -184,7 +184,7 @@ func TestEventToStrings(t *testing.T) {
 	// game's day counter is not 365 days a year, so this is January 1st of
 	// game year 1950, the date a new map reports in its WELCOME packet.
 	var year = 1950
-	var startOfYear = year * 365 + ((year - 1) / 4 - (year - 1) / 100 + (year - 1) / 400) + 1
+	var startOfYear = year*365 + ((year-1)/4 - (year-1)/100 + (year-1)/400) + 1
 	game.day = int64(startOfYear)
 	var date = util.DayToCalendar(int64(startOfYear))
 	var expected = "DateEvent " + strconv.Itoa(date.DayOfMonth) + "-" + strconv.Itoa(date.Month) + "-" + strconv.Itoa(date.Year)

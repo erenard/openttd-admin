@@ -30,22 +30,22 @@ type NetworkClient struct {
 	// stateLock guards running, which run() reads on its own thread while
 	// shutdown() writes it. Java leaves the plain boolean field unsynchronized.
 	stateLock sync.Mutex
-	running bool
+	running   bool
 
 	// sendLock guards send, which GetSend() hands to the application while
 	// run() replaces it on every reconnect. Java's field is volatile.
 	sendLock sync.Mutex
-	send *NetworkClientSender
+	send     *NetworkClientSender
 
 	// socket is Java's field: the current connection, closed on shutdown() to
 	// unblock a receive() that is waiting for data.
 	socketLock sync.Mutex
-	socket *core.Socket
+	socket     *core.Socket
 
 	// model is Java's "client" field: the state decoded out of the server's
 	// packets, rebuilt for every connection.
 	modelLock sync.Mutex
-	model *NetworkClientModel
+	model     *NetworkClientModel
 }
 
 // NewNetworkClient is the constructor: it keeps the configuration. The thread
@@ -53,11 +53,11 @@ type NetworkClient struct {
 func NewNetworkClient(configuration *core.Configuration) *NetworkClient {
 	return &NetworkClient{
 		configuration: configuration,
-		stateLock: sync.Mutex{},
-		sendLock: sync.Mutex{},
-		socketLock: sync.Mutex{},
-		modelLock: sync.Mutex{},
-		model: NewNetworkClientModel(),
+		stateLock:     sync.Mutex{},
+		sendLock:      sync.Mutex{},
+		socketLock:    sync.Mutex{},
+		modelLock:     sync.Mutex{},
+		model:         NewNetworkClientModel(),
 	}
 }
 
@@ -110,7 +110,7 @@ func (c *NetworkClient) setRunning(running bool) {
 // job here (see Startup).
 func (c *NetworkClient) run() {
 	clientLog.Debug("started")
-	for (c.IsRunning()) {
+	for c.IsRunning() {
 		c.attempt()
 		if !c.sleep() {
 			break
@@ -143,7 +143,7 @@ func (c *NetworkClient) attempt() {
 
 	// Java's inner loop is while (this.running). handlePacket never throws here,
 	// so the only way out of the loop is the running flag or a failed read.
-	for (c.IsRunning()) {
+	for c.IsRunning() {
 		var packets, readError = socket.Receive()
 		if readError != nil {
 			if c.IsRunning() {
@@ -178,7 +178,7 @@ func (c *NetworkClient) disconnect(socket *core.Socket) {
 // returns promptly instead of waiting out the 5 s.
 func (c *NetworkClient) sleep() bool {
 	var deadline = time.Now().Add(time.Duration(RECONNECT_DELAY_MILLIS) * time.Millisecond)
-	for (time.Now().Before(deadline)) {
+	for time.Now().Before(deadline) {
 		if !c.IsRunning() {
 			return false
 		}
@@ -191,7 +191,7 @@ func (c *NetworkClient) sleep() bool {
 // reconnect loop.
 func (c *NetworkClient) awaitStopped(timeoutMillis int) {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (time.Now().Before(deadline)) {
+	for time.Now().Before(deadline) {
 		if !c.IsRunning() {
 			return
 		}
@@ -260,7 +260,7 @@ func (c *NetworkClient) handlePacket(packet *core.Packet) {
 		// We try to join a server where we are banned.
 	case constant.PACKET_SERVER_CLIENT_INFO:
 		packet.ReadUint32() // clientId
-		packet.ReadUint8() // companyId
+		packet.ReadUint8()  // companyId
 		packet.ReadString() // name
 	case constant.PACKET_SERVER_ERROR:
 		var errorId = packet.ReadUint8()
@@ -318,11 +318,11 @@ func (c *NetworkClient) handlePacket(packet *core.Packet) {
 		}
 	case constant.PACKET_SERVER_COMMAND:
 		packet.ReadUint32() // cmdFrame
-		packet.ReadBool8() // myCmd
+		packet.ReadBool8()  // myCmd
 	case constant.PACKET_SERVER_CHAT:
-		packet.ReadUint8() // networkActionId
+		packet.ReadUint8()  // networkActionId
 		packet.ReadUint32() // client_id
-		packet.ReadBool8() // selfSend
+		packet.ReadBool8()  // selfSend
 		packet.ReadString() // message
 		packet.ReadUint64() // data
 	case constant.PACKET_SERVER_EXTERNAL_CHAT:
@@ -339,9 +339,9 @@ func (c *NetworkClient) handlePacket(packet *core.Packet) {
 		packet.ReadString() // rcon
 	case constant.PACKET_SERVER_MOVE:
 		packet.ReadUint32() // clientId
-		packet.ReadUint8() // companyId
+		packet.ReadUint8()  // companyId
 	case constant.PACKET_SERVER_CONFIG_UPDATE:
-		packet.ReadUint8() // maxCompanies
+		packet.ReadUint8()  // maxCompanies
 		packet.ReadString() // serverName
 	case constant.PACKET_SERVER_COMPANY_UPDATE:
 		packet.ReadUint16() // passworded
@@ -406,11 +406,11 @@ func HashPassword(password string, passwordServerId string, passwordGameSeed int
 	// a char and a long, then truncates to a byte, so only the low 8 bits of the
 	// shifted seed matter.
 	for i := 0; i < saltLength-1; i++ {
-		salted[i] = salted[i] ^ serverId[i] ^ byte(passwordGameSeed >> (i % 32))
+		salted[i] = salted[i] ^ serverId[i] ^ byte(passwordGameSeed>>(i%32))
 	}
 
 	// Md5 checksum; checksum.update(salted_password, 0, NETWORK_SERVER_ID_LENGTH
 	// - 1), then the 16 bytes as "%02x".
-	var digest = md5.Sum(salted[0:saltLength-1])
+	var digest = md5.Sum(salted[0 : saltLength-1])
 	return hex.EncodeToString(digest[0:])
 }

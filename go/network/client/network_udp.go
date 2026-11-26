@@ -33,9 +33,9 @@ type NetworkUdp struct {
 
 	// foundLock guards serverFound and finished, which the updater thread writes
 	// while Start() reads them. Java's serverFound field is unsynchronized.
-	foundLock sync.Mutex
+	foundLock   sync.Mutex
 	serverFound bool
-	finished bool
+	finished    bool
 }
 
 // NewNetworkUdp is the constructor: the UDP socket for host:port. Java declares
@@ -67,7 +67,7 @@ func (u *NetworkUdp) Start() {
 // awaitFinished is Thread.join().
 func (u *NetworkUdp) awaitFinished(timeoutMillis int) {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (time.Now().Before(deadline)) {
+	for time.Now().Before(deadline) {
 		if u.isFinished() {
 			return
 		}
@@ -87,7 +87,7 @@ func (u *NetworkUdp) isFinished() bool {
 // serverFound, so the inner break and the outer one agree.
 func (u *NetworkUdp) update() {
 	u.socket.SendEmptyPacket(constant.PACKET_UDP_CLIENT_FIND_SERVER)
-	for (!u.IsServerFound()) {
+	for !u.IsServerFound() {
 		var packets, readError = u.socket.Receive()
 		if readError != nil {
 			// Java's catch (IOException): log and leave run().

@@ -33,8 +33,8 @@ const SETTLE_MILLIS = 200
 // keeps it in the row and does check it, because NetworkAdminServerPacketsTest
 // asserts the action of every client and company event.
 type Expected struct {
-	kind event.EventKind
-	count int
+	kind   event.EventKind
+	count  int
 	action event.Action
 }
 
@@ -217,7 +217,7 @@ func MinimalPacket(packetType constant.PacketServerType) *server.PacketWriter {
 	case constant.ADMIN_PACKET_SERVER_WELCOME:
 		return server.WelcomePacket()
 	case constant.ADMIN_PACKET_SERVER_DATE:
-		return packet.WriteUint32(uint32(1950 * 365 + 1))
+		return packet.WriteUint32(uint32(1950*365 + 1))
 	case constant.ADMIN_PACKET_SERVER_CLIENT_JOIN, constant.ADMIN_PACKET_SERVER_CLIENT_QUIT:
 		return packet.WriteUint32(uint32(7))
 	case constant.ADMIN_PACKET_SERVER_CLIENT_INFO:

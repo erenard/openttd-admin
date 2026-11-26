@@ -19,7 +19,7 @@ import "strconv"
 // JsonField is one key and its already rendered value, in the order gson
 // would have written them.
 type JsonField struct {
-	Key string
+	Key   string
 	Value string
 }
 
@@ -108,7 +108,7 @@ func hexPair(value int) string {
 func RawFields(text string) map[string]string {
 	var n = len(text)
 	var i = 0
-	for (i < n && isSpace(text[i])) {
+	for i < n && isSpace(text[i]) {
 		i = i + 1
 	}
 	if i >= n || text[i] != 123 {
@@ -116,8 +116,8 @@ func RawFields(text string) map[string]string {
 	}
 	var fields = map[string]string{}
 	i = i + 1
-	for (true) {
-		for (i < n && isSpace(text[i])) {
+	for true {
+		for i < n && isSpace(text[i]) {
 			i = i + 1
 		}
 		if i >= n {
@@ -134,7 +134,7 @@ func RawFields(text string) map[string]string {
 			return nil
 		}
 		i = afterKey
-		for (i < n && isSpace(text[i])) {
+		for i < n && isSpace(text[i]) {
 			i = i + 1
 		}
 		if i >= n || text[i] != 58 {
@@ -147,7 +147,7 @@ func RawFields(text string) map[string]string {
 		}
 		i = afterValue
 		fields[key] = value
-		for (i < n && isSpace(text[i])) {
+		for i < n && isSpace(text[i]) {
 			i = i + 1
 		}
 		if i >= n {
@@ -172,7 +172,7 @@ func RawFields(text string) map[string]string {
 func JsonListItems(text string) []string {
 	var n = len(text)
 	var i = 0
-	for (i < n && isSpace(text[i])) {
+	for i < n && isSpace(text[i]) {
 		i = i + 1
 	}
 	if i >= n || text[i] != 91 {
@@ -181,8 +181,8 @@ func JsonListItems(text string) []string {
 	}
 	var items []string
 	i = i + 1
-	for (true) {
-		for (i < n && isSpace(text[i])) {
+	for true {
+		for i < n && isSpace(text[i]) {
 			i = i + 1
 		}
 		if i >= n {
@@ -197,7 +197,7 @@ func JsonListItems(text string) []string {
 		}
 		items = append(items, value)
 		i = afterValue
-		for (i < n && isSpace(text[i])) {
+		for i < n && isSpace(text[i]) {
 			i = i + 1
 		}
 		if i >= n {
@@ -221,7 +221,7 @@ func JsonListItems(text string) []string {
 func scanValue(text string, index int) (string, int) {
 	var n = len(text)
 	var i = index
-	for (i < n && isSpace(text[i])) {
+	for i < n && isSpace(text[i]) {
 		i = i + 1
 	}
 	if i >= n {
@@ -234,7 +234,7 @@ func scanValue(text string, index int) (string, int) {
 		var start = i
 		var depth = 0
 		var inString = false
-		for (i < n) {
+		for i < n {
 			var character = text[i]
 			if inString {
 				if character == 92 {
@@ -260,7 +260,7 @@ func scanValue(text string, index int) (string, int) {
 		return text[start:i], i
 	}
 	var start = i
-	for (i < n && text[i] != 44 && text[i] != 125 && text[i] != 93 && !isSpace(text[i])) {
+	for i < n && text[i] != 44 && text[i] != 125 && text[i] != 93 && !isSpace(text[i]) {
 		i = i + 1
 	}
 	return text[start:i], i
@@ -274,7 +274,7 @@ func scanString(text string, index int) (string, int) {
 	var n = len(text)
 	var value = ""
 	var i = index + 1
-	for (i < n) {
+	for i < n {
 		var character = text[i]
 		if character == 34 {
 			return value, i + 1
@@ -285,7 +285,7 @@ func scanString(text string, index int) (string, int) {
 				return "", -1
 			}
 			var escape = text[i]
-			if escape == 117 && i + 4 < n {
+			if escape == 117 && i+4 < n {
 				value = value + "\\u" + text[i+1:i+5]
 				i = i + 5
 			} else if escape == 34 {

@@ -41,8 +41,8 @@ func (a *FakeAdmin) GetSender() gamescript.Sender {
 
 // Fixture is the harness: a connected admin, its sender and the executor.
 type Fixture struct {
-	sender *FakeSender
-	admin *FakeAdmin
+	sender   *FakeSender
+	admin    *FakeAdmin
 	executor *gamescript.GSExecutor
 }
 

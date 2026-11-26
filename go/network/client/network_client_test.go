@@ -35,7 +35,7 @@ func newHarness(t *testing.T) *server.ClientHarness {
 // awaitPackets waits until the fake server has seen count packets of one type
 // from the client, then hands them back oldest first.
 func awaitPackets(srv *server.FakeGameServer, packetType constant.PacketGameType, count int, timeoutSeconds int) []*server.ReceivedGamePacket {
-	var name = "PACKET_"+constant.PacketGameTypeName(packetType)
+	var name = "PACKET_" + constant.PacketGameTypeName(packetType)
 	openttd.Await(func() bool { return len(srv.Packets(packetType)) >= count }, timeoutSeconds, name)
 	return srv.Packets(packetType)
 }

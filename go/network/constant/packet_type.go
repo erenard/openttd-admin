@@ -6,9 +6,9 @@ package constant
 type SubProtocol int
 
 const (
-	UDP SubProtocol = 0
+	UDP       SubProtocol = 0
 	TCP_ADMIN SubProtocol = 1
-	TCP_GAME SubProtocol = 2 // TODO Rename TCP_CLIENT
+	TCP_GAME  SubProtocol = 2 // TODO Rename TCP_CLIENT
 )
 
 // PacketType is implemented by every packet id enum (PacketAdminType,

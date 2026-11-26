@@ -7,11 +7,11 @@ package admin
 import "strconv"
 
 type Client struct {
-	id int
-	ip string
-	name string
+	id       int
+	ip       string
+	name     string
 	joinDate int64
-	company int
+	company  int
 }
 
 // NewClient is the constructor: it takes the id, everything else is filled in
@@ -21,17 +21,17 @@ func NewClient(id int) *Client {
 }
 
 // The getters, in Java's order.
-func (c *Client) GetIp() string { return c.ip }
-func (c *Client) GetName() string { return c.name }
+func (c *Client) GetIp() string      { return c.ip }
+func (c *Client) GetName() string    { return c.name }
 func (c *Client) GetJoinDate() int64 { return c.joinDate }
-func (c *Client) GetCompany() int { return c.company }
-func (c *Client) GetId() int { return c.id }
+func (c *Client) GetCompany() int    { return c.company }
+func (c *Client) GetId() int         { return c.id }
 
 // The setters.
-func (c *Client) SetIp(ip string) { c.ip = ip }
-func (c *Client) SetName(name string) { c.name = name }
+func (c *Client) SetIp(ip string)            { c.ip = ip }
+func (c *Client) SetName(name string)        { c.name = name }
 func (c *Client) SetJoinDate(joinDate int64) { c.joinDate = joinDate }
-func (c *Client) SetCompany(company int) { c.company = company }
+func (c *Client) SetCompany(company int)     { c.company = company }
 
 // ToString is toString: id + ":" + name + ", " + ip + ", " + companyId.
 func (c *Client) ToString() string {
@@ -41,10 +41,10 @@ func (c *Client) ToString() string {
 // Copy is clone.
 func (c *Client) Copy() *Client {
 	return &Client{
-		id: c.id,
-		ip: c.ip,
-		name: c.name,
+		id:       c.id,
+		ip:       c.ip,
+		name:     c.name,
 		joinDate: c.joinDate,
-		company: c.company,
+		company:  c.company,
 	}
 }

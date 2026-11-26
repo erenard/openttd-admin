@@ -52,4 +52,3 @@ func (e *NetworkException) ToString() string {
 func DescribeError(errorId int) string {
 	return constant.NetworkErrorCodeName(constant.NetworkErrorCode(errorId))
 }
-

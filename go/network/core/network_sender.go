@@ -31,8 +31,8 @@ const SEND_DELAY_MILLIS = 100
 const POLL_INTERVAL_MILLIS = 10
 
 type PacketQueue struct {
-	items []*Packet
-	lock sync.Mutex
+	items  []*Packet
+	lock   sync.Mutex
 	closed bool
 }
 
@@ -52,7 +52,7 @@ func (q *PacketQueue) Offer(packet *Packet) {
 // or the queue was closed by NetworkSender.shutdown().
 func (q *PacketQueue) Poll(timeoutMillis int) *Packet {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (true) {
+	for true {
 		q.lock.Lock()
 		if len(q.items) > 0 {
 			var packet = q.items[0]
@@ -98,23 +98,23 @@ type NetworkSender struct {
 	// while startup()/shutdown() write them on the caller's. Java leaves them
 	// unsynchronized; Go's memory model makes that a race worth locking.
 	stateLock sync.Mutex
-	running bool
+	running   bool
 	// done is what Join waits for: Run's loop has exited, i.e. Java's
 	// !thread.isAlive().
-	done bool
+	done         bool
 	isQuitPacket func(packet *Packet) bool
-	debugPacket func(packet *Packet)
+	debugPacket  func(packet *Packet)
 }
 
 // NewNetworkSender is NetworkSender(Socket socket) plus the two abstract
 // methods, which the subclass passes in.
 func NewNetworkSender(socket *Socket, isQuitPacket func(packet *Packet) bool, debugPacket func(packet *Packet)) *NetworkSender {
 	return &NetworkSender{
-		socket: socket,
-		Queue: NewPacketQueue(),
-		stateLock: sync.Mutex{},
+		socket:       socket,
+		Queue:        NewPacketQueue(),
+		stateLock:    sync.Mutex{},
 		isQuitPacket: isQuitPacket,
-		debugPacket: debugPacket,
+		debugPacket:  debugPacket,
 	}
 }
 
@@ -152,7 +152,7 @@ func (s *NetworkSender) IsRunning() bool {
 // the shutdown.
 func (s *NetworkSender) AwaitStopped(timeoutMillis int) {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (!s.IsDone() && time.Now().Before(deadline)) {
+	for !s.IsDone() && time.Now().Before(deadline) {
 		time.Sleep(POLL_INTERVAL_MILLIS * time.Millisecond)
 	}
 }
@@ -173,7 +173,7 @@ func (s *NetworkSender) GetSocket() *Socket { return s.socket }
 // quit packet. A Poll that times out yields null, which is how the loop
 // re-checks the socket.
 func Run(s *NetworkSender) {
-	for (s.IsRunning() && s.socket != nil && s.socket.IsOpen()) {
+	for s.IsRunning() && s.socket != nil && s.socket.IsOpen() {
 		var packet = s.Queue.Poll(SEND_TIMEOUT_MILLIS)
 		if packet != nil && s.socket != nil {
 			s.socket.Send(packet)

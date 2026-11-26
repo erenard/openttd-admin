@@ -14,4 +14,4 @@ const MINOR_VERSION = 3
 const OPENTTD = "15.3"
 
 // NEWGRF is the newgrf version checksum (see rev.cpp.in).
-const NEWGRF = (MAJOR_VERSION + 16) << 24 | MINOR_VERSION << 20 | 1 << 19 | 28004
+const NEWGRF = (MAJOR_VERSION+16)<<24 | MINOR_VERSION<<20 | 1<<19 | 28004

@@ -32,8 +32,8 @@ const DISPATCH_POLL_INTERVAL_MILLIS = 10
 const DISPATCH_JOIN_TIMEOUT_MILLIS = 5000
 
 type EventQueue struct {
-	items []Event
-	lock sync.Mutex
+	items  []Event
+	lock   sync.Mutex
 	closed bool
 }
 
@@ -53,7 +53,7 @@ func (q *EventQueue) Offer(dispatched Event) {
 // wait ran out or the queue was closed by shutdown().
 func (q *EventQueue) Poll(timeoutMillis int) Event {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (true) {
+	for true {
 		q.lock.Lock()
 		if len(q.items) > 0 {
 			var dispatched = q.items[0]
@@ -104,22 +104,22 @@ type EventDispatcher struct {
 	queue *EventQueue
 	// lock is Java's ReentrantReadWriteLock: addListener and removeListener hold
 	// its write lock, run() its read lock. One mutex covers both here.
-	lock sync.Mutex
+	lock      sync.Mutex
 	listeners map[EventKind][]EventListener
 	// stateLock guards the three flags below, which Run reads on the dispatcher
 	// thread while startup() and shutdown() write them on the caller's.
 	stateLock sync.Mutex
-	running bool
+	running   bool
 	// started and done together are Java's thread != null && thread.isAlive().
 	started bool
-	done bool
+	done    bool
 }
 
 // NewEventDispatcher is EventDispatcher().
 func NewEventDispatcher() *EventDispatcher {
 	return &EventDispatcher{
-		queue: NewEventQueue(),
-		lock: sync.Mutex{},
+		queue:     NewEventQueue(),
+		lock:      sync.Mutex{},
 		listeners: map[EventKind][]EventListener{},
 		stateLock: sync.Mutex{},
 	}
@@ -211,7 +211,7 @@ func (d *EventDispatcher) QueueSize() int {
 // registered for its kind. A Poll that times out yields nil, which is how the
 // loop re-checks the flag.
 func Run(d *EventDispatcher) {
-	for (d.IsRunning()) {
+	for d.IsRunning() {
 		var dispatched = d.queue.Poll(DISPATCH_TIMEOUT_MILLIS)
 		if dispatched != nil {
 			d.notifyListeners(dispatched)
@@ -265,7 +265,7 @@ func (d *EventDispatcher) setDone() {
 // to leave its loop.
 func (d *EventDispatcher) awaitStopped(timeoutMillis int) {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (d.IsAlive() && time.Now().Before(deadline)) {
+	for d.IsAlive() && time.Now().Before(deadline) {
 		time.Sleep(DISPATCH_POLL_INTERVAL_MILLIS * time.Millisecond)
 	}
 }

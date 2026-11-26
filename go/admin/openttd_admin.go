@@ -22,11 +22,11 @@ import "com.openttd/network/admin"
 import "com.openttd/network/core"
 
 type OpenttdAdmin struct {
-	configuration *core.Configuration
-	networkAdmin *admin.NetworkAdmin
-	executor *gamescript.GSExecutor
+	configuration   *core.Configuration
+	networkAdmin    *admin.NetworkAdmin
+	executor        *gamescript.GSExecutor
 	eventDispatcher *event.EventDispatcher
-	game *model.Game
+	game            *model.Game
 }
 
 // NewOpenttdAdmin is OpenttdAdmin(Configuration): the client layer only. The

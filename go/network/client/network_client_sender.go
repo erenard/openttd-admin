@@ -73,7 +73,7 @@ func (s *NetworkClientSender) Join(configuration *core.Configuration) {
 	toSend.WriteUint32(uint32(constant.NEWGRF))
 	toSend.WriteString(configuration.Name)
 	toSend.WriteUint8(255) // PlayAs
-	toSend.WriteUint8(0) // Used to be language
+	toSend.WriteUint8(0)   // Used to be language
 	s.sender.Queue.Offer(toSend)
 }
 
@@ -178,5 +178,5 @@ func (s *NetworkClientSender) IsQuitPacket(packet *core.Packet) bool {
 // DebugPacket is debugPacket(Packet packet): the base loop calls it only when
 // debug logging is on.
 func (s *NetworkClientSender) DebugPacket(packet *core.Packet) {
-	log.Debug("Snd "+constant.PacketGameTypeName(constant.PacketGameTypeOf(packet.TypeId())))
+	log.Debug("Snd " + constant.PacketGameTypeName(constant.PacketGameTypeOf(packet.TypeId())))
 }

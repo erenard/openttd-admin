@@ -427,7 +427,7 @@ func TestRconCommandLength(t *testing.T) {
 	var srv = harness.GetServer()
 
 	var longCommand = "say "
-	for (len(longCommand) < 500) {
+	for len(longCommand) < 500 {
 		longCommand = longCommand + "x"
 	}
 	harness.GetSend().Rcon(longCommand)
@@ -482,7 +482,7 @@ func TestGameScriptTooLong(t *testing.T) {
 		t.Errorf("gameScript(\"\") must be refused")
 	}
 	var json = "{\"a\":\""
-	for (len(json) <= core.MTU-3) {
+	for len(json) <= core.MTU-3 {
 		json = json + "x"
 	}
 	json = json + "\"}"

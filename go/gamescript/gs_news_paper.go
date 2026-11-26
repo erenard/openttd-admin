@@ -14,21 +14,21 @@ import "com.openttd/network/constant"
 type NewsType int
 
 const (
-	NT_ARRIVAL_COMPANY NewsType = 0 // First vehicle arrived for company.
-	NT_ARRIVAL_OTHER NewsType = 1 // First vehicle arrived for competitor.
-	NT_ACCIDENT NewsType = 2 // An accident or disaster has occurred.
-	NT_COMPANY_INFO NewsType = 3 // Company info: new companies, bankruptcies.
-	NT_INDUSTRY_OPEN NewsType = 4 // Opening of industries.
-	NT_INDUSTRY_CLOSE NewsType = 5 // Closing of industries.
-	NT_ECONOMY NewsType = 6 // Economic changes: recession, industry up/down.
-	NT_INDUSTRY_COMPANY NewsType = 7 // Production changes of an industry serviced by the local company.
-	NT_INDUSTRY_OTHER NewsType = 8 // Production changes of an industry serviced by competitors.
-	NT_INDUSTRY_NOBODY NewsType = 9 // Other industry production changes.
-	NT_ADVICE NewsType = 10 // Bits of news about the vehicles of the company.
-	NT_NEW_VEHICLES NewsType = 11 // A new vehicle has become available.
-	NT_ACCEPTANCE NewsType = 12 // A type of cargo is (no longer) accepted.
-	NT_SUBSIDIES NewsType = 13 // News about subsidies: announcements, expirations, acceptance.
-	NT_GENERAL NewsType = 14 // General news, from towns.
+	NT_ARRIVAL_COMPANY  NewsType = 0  // First vehicle arrived for company.
+	NT_ARRIVAL_OTHER    NewsType = 1  // First vehicle arrived for competitor.
+	NT_ACCIDENT         NewsType = 2  // An accident or disaster has occurred.
+	NT_COMPANY_INFO     NewsType = 3  // Company info: new companies, bankruptcies.
+	NT_INDUSTRY_OPEN    NewsType = 4  // Opening of industries.
+	NT_INDUSTRY_CLOSE   NewsType = 5  // Closing of industries.
+	NT_ECONOMY          NewsType = 6  // Economic changes: recession, industry up/down.
+	NT_INDUSTRY_COMPANY NewsType = 7  // Production changes of an industry serviced by the local company.
+	NT_INDUSTRY_OTHER   NewsType = 8  // Production changes of an industry serviced by competitors.
+	NT_INDUSTRY_NOBODY  NewsType = 9  // Other industry production changes.
+	NT_ADVICE           NewsType = 10 // Bits of news about the vehicles of the company.
+	NT_NEW_VEHICLES     NewsType = 11 // A new vehicle has become available.
+	NT_ACCEPTANCE       NewsType = 12 // A type of cargo is (no longer) accepted.
+	NT_SUBSIDIES        NewsType = 13 // News about subsidies: announcements, expirations, acceptance.
+	NT_GENERAL          NewsType = 14 // General news, from towns.
 )
 
 const NEWS_TYPE_COUNT = 15
@@ -80,10 +80,10 @@ func NewsTypeOf(order int) NewsType {
 const NEWS_TYPE_UNKNOWN NewsType = -1
 
 type GSNewsPaper struct {
-	company int
+	company  int
 	newsType NewsType
-	message string
-	id string
+	message  string
+	id       string
 	response *GSResponse
 }
 

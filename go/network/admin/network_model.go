@@ -13,20 +13,20 @@ package admin
 import "sync"
 
 type NetworkModel struct {
-	gameInfo *GameInfo
-	companies map[int]*Company
-	clients map[int]*Client
+	gameInfo     *GameInfo
+	companies    map[int]*Company
+	clients      map[int]*Client
 	commandNames map[int]string
-	lock sync.Mutex
+	lock         sync.Mutex
 }
 
 // NewNetworkModel is the constructor: Java's field initializers create the
 // GameInfo and the three maps.
 func NewNetworkModel() *NetworkModel {
 	return &NetworkModel{
-		gameInfo: NewGameInfo(),
-		companies: map[int]*Company{},
-		clients: map[int]*Client{},
+		gameInfo:     NewGameInfo(),
+		companies:    map[int]*Company{},
+		clients:      map[int]*Client{},
 		commandNames: map[int]string{},
 	}
 }
@@ -121,7 +121,7 @@ func (m *NetworkModel) RetreiveCommandNames() map[int]string {
 }
 
 // Lock and Unlock are lock and unlock: Java exposes its ReentrantLock directly.
-func (m *NetworkModel) Lock() { m.lock.Lock() }
+func (m *NetworkModel) Lock()   { m.lock.Lock() }
 func (m *NetworkModel) Unlock() { m.lock.Unlock() }
 
 // Snapshot is snapshot: the lock, a clone, then the unlock.

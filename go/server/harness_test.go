@@ -21,9 +21,9 @@ func readPacket(conn net.Conn) (*core.Packet, error) {
 	if headerError != nil {
 		return nil, headerError
 	}
-	var length = int(header[0]&0xFF) | int(header[1]&0xFF) << 8
+	var length = int(header[0]&0xFF) | int(header[1]&0xFF)<<8
 	if length < 3 {
-		return nil, errors.New("Illegal packet length: "+strconv.Itoa(length))
+		return nil, errors.New("Illegal packet length: " + strconv.Itoa(length))
 	}
 	var body, bodyError = readExactly(conn, length-2)
 	if bodyError != nil {
@@ -49,7 +49,7 @@ func readExactly(conn net.Conn, count int) ([]byte, error) {
 			return nil, err
 		}
 		if n <= 0 {
-			return nil, errors.New("Connection lost, received "+strconv.Itoa(read)+" of "+strconv.Itoa(count)+" bytes")
+			return nil, errors.New("Connection lost, received " + strconv.Itoa(read) + " of " + strconv.Itoa(count) + " bytes")
 		}
 		read += n
 	}

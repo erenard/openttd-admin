@@ -1,5 +1,5 @@
 // Wire format parity for the game port, the same rule tcp_admin_wire_format_test
-//.go pins for the admin port: the ids come from
+// .go pins for the admin port: the ids come from
 // git show 15.3:src/network/core/tcp_game.h, and the Go constants must stay in
 // upstream order because the port spells each value out instead of deriving it
 // from an ordinal. tcp_game.h adds a rule the admin port does not have: the
@@ -13,16 +13,16 @@ import "com.openttd/network/constant"
 
 func TestGamePacketIds(t *testing.T) {
 	assertWireIds(t, "PacketGameType", gameIds(), []int{
-		0, // PACKET_SERVER_FULL
-		1, // PACKET_SERVER_BANNED
-		2, // PACKET_CLIENT_JOIN
-		3, // PACKET_SERVER_ERROR
-		4, // PACKET_CLIENT_UNUSED
-		5, // PACKET_SERVER_UNUSED
-		6, // PACKET_SERVER_GAME_INFO
-		7, // PACKET_CLIENT_GAME_INFO
-		8, // PACKET_SERVER_CHECK_NEWGRFS
-		9, // PACKET_CLIENT_NEWGRFS_CHECKED
+		0,  // PACKET_SERVER_FULL
+		1,  // PACKET_SERVER_BANNED
+		2,  // PACKET_CLIENT_JOIN
+		3,  // PACKET_SERVER_ERROR
+		4,  // PACKET_CLIENT_UNUSED
+		5,  // PACKET_SERVER_UNUSED
+		6,  // PACKET_SERVER_GAME_INFO
+		7,  // PACKET_CLIENT_GAME_INFO
+		8,  // PACKET_SERVER_CHECK_NEWGRFS
+		9,  // PACKET_CLIENT_NEWGRFS_CHECKED
 		10, // PACKET_SERVER_NEED_GAME_PASSWORD
 		11, // PACKET_CLIENT_GAME_PASSWORD
 		12, // PACKET_SERVER_NEED_COMPANY_PASSWORD

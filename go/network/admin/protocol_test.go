@@ -58,7 +58,7 @@ func frequencyOf(mask int) constant.AdminUpdateFrequency {
 			return frequencies[i]
 		}
 	}
-	panic("mask "+strconv.Itoa(mask))
+	panic("mask " + strconv.Itoa(mask))
 }
 
 // splitLines is Java's String.split("\n"), which drops the empty element a
@@ -66,7 +66,7 @@ func frequencyOf(mask int) constant.AdminUpdateFrequency {
 func splitLines(text string) []string {
 	var lines = strings.Split(text, "\n")
 	if len(lines) > 0 && lines[len(lines)-1] == "" {
-		return lines[0:len(lines)-1]
+		return lines[0 : len(lines)-1]
 	}
 	return lines
 }
@@ -260,7 +260,7 @@ func bitCount(value int) int {
 	var count = 0
 	var bits = value
 	for bits != 0 {
-		bits = bits & (bits-1)
+		bits = bits & (bits - 1)
 		count += 1
 	}
 	return count

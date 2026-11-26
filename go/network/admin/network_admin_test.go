@@ -22,7 +22,7 @@ import "com.openttd/server"
 // Recorder is the Game seam: it keeps every NetworkAdminEvent and the model
 // copy NetworkAdmin handed over with it, in arrival order.
 type Recorder struct {
-	lock sync.Mutex
+	lock   sync.Mutex
 	events []*admin.NetworkAdminEvent
 	models []*admin.NetworkModel
 }
@@ -87,7 +87,7 @@ func (r *Recorder) Count() int {
 // points at it, the listening NetworkAdmin and the Recorder that sees what it
 // decoded. setUp() in the Java test builds the same thing through AdminHarness.
 type Admin struct {
-	server *server.FakeAdminServer
+	server   *server.FakeAdminServer
 	listener *admin.NetworkAdmin
 	recorder *Recorder
 }
@@ -193,7 +193,7 @@ func TestDate(t *testing.T) {
 	if a == nil {
 		return
 	}
-	var date = int64(1950*365+100)
+	var date = int64(1950*365 + 100)
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_DATE).WriteUint32(uint32(date)))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_DATE, 5, "a date packet")
 	var gameInfo = a.recorder.LastModel().GetGameInfo()
@@ -217,7 +217,7 @@ func TestClientPackets(t *testing.T) {
 		WriteString("127.0.0.1").
 		WriteString("Test client").
 		WriteUint8(0).
-		WriteUint32(uint32(1950*365+1)).
+		WriteUint32(uint32(1950*365 + 1)).
 		WriteUint8(255))
 	a.awaitEvent(constant.ADMIN_PACKET_SERVER_CLIENT_INFO, 5, "a client info packet")
 	var clients = a.recorder.LastModel().RetreiveClients()
@@ -261,7 +261,7 @@ func TestClientPackets(t *testing.T) {
 		WriteString("127.0.0.1").
 		WriteString("Cheater").
 		WriteUint8(0).
-		WriteUint32(uint32(1950*365+1)).
+		WriteUint32(uint32(1950*365 + 1)).
 		WriteUint8(255))
 	openttd.Await(func() bool { return len(a.recorder.LastModel().RetreiveClients()) == 2 }, 5, "a second client")
 	a.send(server.New(constant.ADMIN_PACKET_SERVER_CLIENT_ERROR).
@@ -291,6 +291,7 @@ func TestClientPackets(t *testing.T) {
 	a.assertStillConnected(t)
 	a.close()
 }
+
 // ADMIN_PACKET_SERVER_COMPANY_NEW / _INFO / _UPDATE / _ECONOMY / _STATS /
 // _REMOVE, the layouts of the six company packets.
 func TestCompanyPackets(t *testing.T) {
@@ -502,10 +503,10 @@ func TestCmdNames(t *testing.T) {
 		return
 	}
 	// SendCmdNames splits into several packets when the MTU is reached, so the
-// decoder must handle consecutive packets and keep the ids it already read.
+	// decoder must handle consecutive packets and keep the ids it already read.
 	for packetIndex := 0; packetIndex < 2; packetIndex++ {
 		var packet = server.New(constant.ADMIN_PACKET_SERVER_CMD_NAMES)
-		for commandId := packetIndex * 3; commandId < packetIndex * 3 + 3; commandId++ {
+		for commandId := packetIndex * 3; commandId < packetIndex*3+3; commandId++ {
 			packet.WriteBool8(true).WriteUint16(commandId).WriteString("CMD_" + strconv.Itoa(commandId))
 		}
 		packet.WriteBool8(false)

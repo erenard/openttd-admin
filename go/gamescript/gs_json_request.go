@@ -11,10 +11,10 @@ package gamescript
 import "com.openttd/network/constant"
 
 type GSJsonRequest struct {
-	command constant.GSCommand
+	command   constant.GSCommand
 	arguments []string
-	id string
-	response *GSResponse
+	id        string
+	response  *GSResponse
 }
 
 // NewGSJsonRequest is the constructor.

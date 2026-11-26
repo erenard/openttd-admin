@@ -23,9 +23,9 @@ import "com.openttd/network/core"
 const CLIENT_NAME = "openttd-client-test"
 
 type ClientHarness struct {
-	server *FakeGameServer
+	server        *FakeGameServer
 	configuration *core.Configuration
-	facade *client.OpenttdClient
+	facade        *client.OpenttdClient
 }
 
 // NewClientHarness is the constructor: a fake game server on an ephemeral port,
@@ -59,9 +59,9 @@ func NewClientHarness() (*ClientHarness, error) {
 	openttd.Await(connected, 10, "the game client to receive WELCOME")
 
 	return &ClientHarness{
-		server: gameServer,
+		server:        gameServer,
 		configuration: configuration,
-		facade: facade,
+		facade:        facade,
 	}, nil
 }
 

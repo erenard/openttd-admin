@@ -7,8 +7,8 @@ type PacketUdpType int
 
 const (
 	PACKET_UDP_CLIENT_FIND_SERVER PacketUdpType = 0 // Queries a game server for game information
-	PACKET_UDP_SERVER_RESPONSE PacketUdpType = 1 // Reply of the game server with game information
-	PACKET_UDP_END PacketUdpType = 2 // Must ALWAYS be on the end of this list!! (period)
+	PACKET_UDP_SERVER_RESPONSE    PacketUdpType = 1 // Reply of the game server with game information
+	PACKET_UDP_END                PacketUdpType = 2 // Must ALWAYS be on the end of this list!! (period)
 )
 
 // PACKET_UDP_NONE stands in for the null Java's valueOf returns for an unknown
@@ -41,8 +41,8 @@ func PacketUdpTypeValues() []PacketUdpType {
 // for every packet it reads.
 var packetUdpTypeNames = []string{
 	"PACKET_UDP_CLIENT_FIND_SERVER", // Queries a game server for game information
-	"PACKET_UDP_SERVER_RESPONSE", // Reply of the game server with game information
-	"PACKET_UDP_END", // Must ALWAYS be on the end of this list!! (period)
+	"PACKET_UDP_SERVER_RESPONSE",    // Reply of the game server with game information
+	"PACKET_UDP_END",                // Must ALWAYS be on the end of this list!! (period)
 }
 
 // PacketUdpTypeName is PacketUdpType.toString(), the name of the constant:
@@ -53,4 +53,3 @@ func PacketUdpTypeName(t PacketUdpType) string {
 	}
 	return packetUdpTypeNames[int(t)]
 }
-

@@ -12,9 +12,9 @@ type ClientEventListener interface {
 }
 
 type ClientEvent struct {
-	openttd Openttd
+	openttd  Openttd
 	clientId int
-	action Action
+	action   Action
 }
 
 // NewClientEvent is ClientEvent(Game openttd, long clientId, Action action):

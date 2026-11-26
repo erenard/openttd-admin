@@ -48,7 +48,7 @@ func (p *Protocol) HasProtocol(updateType constant.AdminUpdateType, frequency co
 	if updateType < 0 || int(updateType) >= len(p.masks) {
 		return false
 	}
-	return p.masks[int(updateType)] >= 0 && (p.masks[int(updateType)] & frequency.Mask()) != 0
+	return p.masks[int(updateType)] >= 0 && (p.masks[int(updateType)]&frequency.Mask()) != 0
 }
 
 // FirstSupported is firstSupported: the first frequency the server advertises
@@ -75,7 +75,7 @@ func (p *Protocol) FirstSupported(updateType constant.AdminUpdateType) constant.
 // type/frequency pair. Java uses a Formatter with "%-30s - %s%n"; fmt's
 // %-30s pads the same way.
 func (p *Protocol) ToString() string {
-	var text = "Protocol version '"+strconv.Itoa(p.version)+"' :\n"
+	var text = "Protocol version '" + strconv.Itoa(p.version) + "' :\n"
 	var types = constant.AdminUpdateTypeValues()
 	var frequencies = constant.AdminUpdateFrequencyValues()
 	for i := 0; i < len(types); i++ {

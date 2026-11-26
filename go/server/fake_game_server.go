@@ -38,7 +38,7 @@ const GAME_MAP_SEED = 123456789
 // decode.
 type ReceivedGamePacket struct {
 	wireTypeId int
-	packet *core.Packet
+	packet     *core.Packet
 }
 
 func (p *ReceivedGamePacket) GetWireTypeId() int { return p.wireTypeId }
@@ -59,19 +59,19 @@ func (p *ReceivedGamePacket) GetPacket() *core.Packet {
 }
 
 func (p *ReceivedGamePacket) ToString() string {
-	return constant.PacketGameTypeName(p.GetType())+" ("+strconv.Itoa(p.wireTypeId)+")"
+	return constant.PacketGameTypeName(p.GetType()) + " (" + strconv.Itoa(p.wireTypeId) + ")"
 }
 
 type FakeGameServer struct {
-	listener *net.TCPListener
-	port int
-	received []*ReceivedGamePacket
-	receivedLock sync.Mutex
-	connectionLock sync.Mutex
-	connection net.Conn
-	connectionCount int
+	listener           *net.TCPListener
+	port               int
+	received           []*ReceivedGamePacket
+	receivedLock       sync.Mutex
+	connectionLock     sync.Mutex
+	connection         net.Conn
+	connectionCount    int
 	clientDisconnected bool
-	running bool
+	running            bool
 }
 
 // NewFakeGameServer is the constructor: bind an ephemeral port, then read the
@@ -159,9 +159,9 @@ func readGamePacket(conn net.Conn) (*ReceivedGamePacket, error) {
 	if headerError != nil {
 		return nil, headerError
 	}
-	var length = int(header[0]&0xFF) | int(header[1]&0xFF) << 8
+	var length = int(header[0]&0xFF) | int(header[1]&0xFF)<<8
 	if length < 3 {
-		return nil, errors.New("Illegal packet length: "+strconv.Itoa(length))
+		return nil, errors.New("Illegal packet length: " + strconv.Itoa(length))
 	}
 	var body, bodyError = readExactly(conn, length-2)
 	if bodyError != nil {
@@ -288,7 +288,7 @@ func (s *FakeGameServer) writeLocked(packet *PacketWriter) {
 	s.connectionLock.Lock()
 	if s.connection == nil {
 		s.connectionLock.Unlock()
-		gameLog.Warn("FakeGameServer: connection closed before sending "+packet.ToString())
+		gameLog.Warn("FakeGameServer: connection closed before sending " + packet.ToString())
 		return
 	}
 	var _, err = s.connection.Write(bytes)

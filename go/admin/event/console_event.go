@@ -11,7 +11,7 @@ type ConsoleEventListener interface {
 
 type ConsoleEvent struct {
 	openttd Openttd
-	origin string
+	origin  string
 	message string
 }
 

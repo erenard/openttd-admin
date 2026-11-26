@@ -27,7 +27,7 @@ func Await(condition func() bool, timeoutSeconds int, description string) {
 		}
 		time.Sleep(POLL_MILLIS * time.Millisecond)
 	}
-	panic(errors.New("Timed out after "+strconv.Itoa(timeoutSeconds)+"s waiting for "+description))
+	panic(errors.New("Timed out after " + strconv.Itoa(timeoutSeconds) + "s waiting for " + description))
 }
 
 // AwaitSize is awaitSize(collection, size, timeoutSeconds, description). Go has

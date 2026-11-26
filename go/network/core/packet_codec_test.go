@@ -24,7 +24,7 @@ func TestHeaderLength(t *testing.T) {
 	packet.PrepareToSend()
 
 	var bytes = packet.GetBytes()
-	var length = int(bytes[0]&0xFF) | int(bytes[1]&0xFF) << 8
+	var length = int(bytes[0]&0xFF) | int(bytes[1]&0xFF)<<8
 	if length != 7 {
 		t.Errorf("header length: expected 7, got %d", length)
 	}
@@ -82,12 +82,12 @@ func TestUint64(t *testing.T) {
 	var values = []uint64{
 		uint64(0),
 		uint64(1),
-		uint64(4294967295), // 2^32 - 1
-		uint64(4294967296), // 2^32
-		uint64(4294967297), // 2^32 + 1
+		uint64(4294967295),          // 2^32 - 1
+		uint64(4294967296),          // 2^32
+		uint64(4294967297),          // 2^32 + 1
 		uint64(9223372036854775807), // 2^63 - 1
-		uint64(1) << 63, // 2^63
-		^uint64(0), // 2^64 - 1
+		uint64(1) << 63,             // 2^63
+		^uint64(0),                  // 2^64 - 1
 	}
 	for i := 0; i < len(values); i++ {
 		var value = values[i]
@@ -204,7 +204,7 @@ func TestPacketFraming(t *testing.T) {
 	var second = pongPacket.ToBytes()
 
 	// Half of the first packet only: receive() must not report it yet.
-	serverSide.Write(first[0:len(first)/2])
+	serverSide.Write(first[0 : len(first)/2])
 	var partial, partialError = client.Receive()
 	if partialError != nil {
 		t.Errorf("receive: %s", core.Message(partialError))

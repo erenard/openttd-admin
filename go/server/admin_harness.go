@@ -20,10 +20,10 @@ const PASSWORD = "test-password"
 const ADMIN_NAME = "openttd-admin-test"
 
 type AdminHarness struct {
-	server *FakeAdminServer
+	server        *FakeAdminServer
 	configuration *core.Configuration
-	admin *admin.OpenttdAdmin
-	recorder *EventRecorder
+	admin         *admin.OpenttdAdmin
+	recorder      *EventRecorder
 }
 
 // NewAdminHarness is AdminHarness().
@@ -69,10 +69,10 @@ func NewAdminHarnessWith(password string, name string) (*AdminHarness, error) {
 	openttd.Await(connected, 10, "the WELCOME packet")
 
 	return &AdminHarness{
-		server: server,
+		server:        server,
 		configuration: configuration,
-		admin: facade,
-		recorder: recorder,
+		admin:         facade,
+		recorder:      recorder,
 	}, nil
 }
 

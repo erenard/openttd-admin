@@ -11,11 +11,11 @@ package constant
 type GoalType int
 
 const (
-	GOAL_NONE GoalType = 0 // Destination is not linked.
-	GOAL_TILE GoalType = 1 // Destination is a tile.
-	GOAL_INDUSTRY GoalType = 2 // Destination is an industry.
-	GOAL_TOWN GoalType = 3 // Destination is a town.
-	GOAL_COMPANY GoalType = 4 // Destination is a company.
+	GOAL_NONE       GoalType = 0 // Destination is not linked.
+	GOAL_TILE       GoalType = 1 // Destination is a tile.
+	GOAL_INDUSTRY   GoalType = 2 // Destination is an industry.
+	GOAL_TOWN       GoalType = 3 // Destination is a town.
+	GOAL_COMPANY    GoalType = 4 // Destination is a company.
 	GOAL_STORY_PAGE GoalType = 5 // Destination is a story page.
 )
 
@@ -63,12 +63,12 @@ func GoalTypeValues() []GoalType {
 type TownEffect int
 
 const (
-	TOWN_EFFECT_NONE TownEffect = 0 // Cargo has no effect.
+	TOWN_EFFECT_NONE       TownEffect = 0 // Cargo has no effect.
 	TOWN_EFFECT_PASSENGERS TownEffect = 1 // Cargo behaves passenger-like.
-	TOWN_EFFECT_MAIL TownEffect = 2 // Cargo behaves mail-like.
-	TOWN_EFFECT_GOODS TownEffect = 3 // Cargo behaves goods/candy-like.
-	TOWN_EFFECT_WATER TownEffect = 4 // Cargo behaves water-like.
-	TOWN_EFFECT_FOOD TownEffect = 5 // Cargo behaves food/fizzy-drinks-like.
+	TOWN_EFFECT_MAIL       TownEffect = 2 // Cargo behaves mail-like.
+	TOWN_EFFECT_GOODS      TownEffect = 3 // Cargo behaves goods/candy-like.
+	TOWN_EFFECT_WATER      TownEffect = 4 // Cargo behaves water-like.
+	TOWN_EFFECT_FOOD       TownEffect = 5 // Cargo behaves food/fizzy-drinks-like.
 )
 
 const TOWN_EFFECT_COUNT = 6

@@ -14,17 +14,17 @@ package constant
 type PacketAdminType int
 
 const (
-	ADMIN_PACKET_ADMIN_JOIN PacketAdminType = 0 // The admin announces and authenticates itself to the server using an unsecured password.
-	ADMIN_PACKET_ADMIN_QUIT PacketAdminType = 1 // The admin tells the server that it is quitting.
-	ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY PacketAdminType = 2 // The admin tells the server the update frequency of a particular piece of information.
-	ADMIN_PACKET_ADMIN_POLL PacketAdminType = 3 // The admin explicitly polls for a piece of information.
-	ADMIN_PACKET_ADMIN_CHAT PacketAdminType = 4 // The admin sends a chat message to be distributed.
-	ADMIN_PACKET_ADMIN_RCON PacketAdminType = 5 // The admin sends a remote console command.
-	ADMIN_PACKET_ADMIN_GAMESCRIPT PacketAdminType = 6 // The admin sends a JSON string for the GameScript.
-	ADMIN_PACKET_ADMIN_PING PacketAdminType = 7 // The admin sends a ping to the server, expecting a ping-reply (PONG) packet.
-	ADMIN_PACKET_ADMIN_EXTERNAL_CHAT PacketAdminType = 8 // The admin sends a chat message from external source.
-	ADMIN_PACKET_ADMIN_JOIN_SECURE PacketAdminType = 9 // The admin announces and starts a secure authentication handshake. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
-	ADMIN_PACKET_ADMIN_AUTH_RESPONSE PacketAdminType = 10 // The admin responds to the authentication request. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
+	ADMIN_PACKET_ADMIN_JOIN             PacketAdminType = 0  // The admin announces and authenticates itself to the server using an unsecured password.
+	ADMIN_PACKET_ADMIN_QUIT             PacketAdminType = 1  // The admin tells the server that it is quitting.
+	ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY PacketAdminType = 2  // The admin tells the server the update frequency of a particular piece of information.
+	ADMIN_PACKET_ADMIN_POLL             PacketAdminType = 3  // The admin explicitly polls for a piece of information.
+	ADMIN_PACKET_ADMIN_CHAT             PacketAdminType = 4  // The admin sends a chat message to be distributed.
+	ADMIN_PACKET_ADMIN_RCON             PacketAdminType = 5  // The admin sends a remote console command.
+	ADMIN_PACKET_ADMIN_GAMESCRIPT       PacketAdminType = 6  // The admin sends a JSON string for the GameScript.
+	ADMIN_PACKET_ADMIN_PING             PacketAdminType = 7  // The admin sends a ping to the server, expecting a ping-reply (PONG) packet.
+	ADMIN_PACKET_ADMIN_EXTERNAL_CHAT    PacketAdminType = 8  // The admin sends a chat message from external source.
+	ADMIN_PACKET_ADMIN_JOIN_SECURE      PacketAdminType = 9  // The admin announces and starts a secure authentication handshake. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
+	ADMIN_PACKET_ADMIN_AUTH_RESPONSE    PacketAdminType = 10 // The admin responds to the authentication request. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
 )
 
 // ADMIN_PACKET_ADMIN_NONE stands in for the null Java's valueOf returns for an
@@ -94,38 +94,38 @@ func PacketAdminTypeName(t PacketAdminType) string {
 type PacketServerType int
 
 const (
-	ADMIN_PACKET_SERVER_FULL PacketServerType = 0 // The server tells the admin it cannot accept the admin.
-	ADMIN_PACKET_SERVER_BANNED PacketServerType = 1 // The server tells the admin it is banned.
-	ADMIN_PACKET_SERVER_ERROR PacketServerType = 2 // The server tells the admin an error has occurred.
+	ADMIN_PACKET_SERVER_FULL     PacketServerType = 0 // The server tells the admin it cannot accept the admin.
+	ADMIN_PACKET_SERVER_BANNED   PacketServerType = 1 // The server tells the admin it is banned.
+	ADMIN_PACKET_SERVER_ERROR    PacketServerType = 2 // The server tells the admin an error has occurred.
 	ADMIN_PACKET_SERVER_PROTOCOL PacketServerType = 3 // The server tells the admin its protocol version.
-	ADMIN_PACKET_SERVER_WELCOME PacketServerType = 4 // The server welcomes the admin to a game.
-	ADMIN_PACKET_SERVER_NEWGAME PacketServerType = 5 // The server tells the admin its going to start a new game.
+	ADMIN_PACKET_SERVER_WELCOME  PacketServerType = 4 // The server welcomes the admin to a game.
+	ADMIN_PACKET_SERVER_NEWGAME  PacketServerType = 5 // The server tells the admin its going to start a new game.
 	ADMIN_PACKET_SERVER_SHUTDOWN PacketServerType = 6 // The server tells the admin its shutting down.
 
-	ADMIN_PACKET_SERVER_DATE PacketServerType = 7 // The server tells the admin what the current game date is.
-	ADMIN_PACKET_SERVER_CLIENT_JOIN PacketServerType = 8 // The server tells the admin that a client has joined.
-	ADMIN_PACKET_SERVER_CLIENT_INFO PacketServerType = 9 // The server gives the admin information about a client.
-	ADMIN_PACKET_SERVER_CLIENT_UPDATE PacketServerType = 10 // The server gives the admin an information update on a client.
-	ADMIN_PACKET_SERVER_CLIENT_QUIT PacketServerType = 11 // The server tells the admin that a client quit.
-	ADMIN_PACKET_SERVER_CLIENT_ERROR PacketServerType = 12 // The server tells the admin that a client caused an error.
-	ADMIN_PACKET_SERVER_COMPANY_NEW PacketServerType = 13 // The server tells the admin that a new company has started.
-	ADMIN_PACKET_SERVER_COMPANY_INFO PacketServerType = 14 // The server gives the admin information about a company.
-	ADMIN_PACKET_SERVER_COMPANY_UPDATE PacketServerType = 15 // The server gives the admin an information update on a company.
-	ADMIN_PACKET_SERVER_COMPANY_REMOVE PacketServerType = 16 // The server tells the admin that a company was removed.
+	ADMIN_PACKET_SERVER_DATE            PacketServerType = 7  // The server tells the admin what the current game date is.
+	ADMIN_PACKET_SERVER_CLIENT_JOIN     PacketServerType = 8  // The server tells the admin that a client has joined.
+	ADMIN_PACKET_SERVER_CLIENT_INFO     PacketServerType = 9  // The server gives the admin information about a client.
+	ADMIN_PACKET_SERVER_CLIENT_UPDATE   PacketServerType = 10 // The server gives the admin an information update on a client.
+	ADMIN_PACKET_SERVER_CLIENT_QUIT     PacketServerType = 11 // The server tells the admin that a client quit.
+	ADMIN_PACKET_SERVER_CLIENT_ERROR    PacketServerType = 12 // The server tells the admin that a client caused an error.
+	ADMIN_PACKET_SERVER_COMPANY_NEW     PacketServerType = 13 // The server tells the admin that a new company has started.
+	ADMIN_PACKET_SERVER_COMPANY_INFO    PacketServerType = 14 // The server gives the admin information about a company.
+	ADMIN_PACKET_SERVER_COMPANY_UPDATE  PacketServerType = 15 // The server gives the admin an information update on a company.
+	ADMIN_PACKET_SERVER_COMPANY_REMOVE  PacketServerType = 16 // The server tells the admin that a company was removed.
 	ADMIN_PACKET_SERVER_COMPANY_ECONOMY PacketServerType = 17 // The server gives the admin some economy related company information.
-	ADMIN_PACKET_SERVER_COMPANY_STATS PacketServerType = 18 // The server gives the admin some statistics about a company.
-	ADMIN_PACKET_SERVER_CHAT PacketServerType = 19 // The server received a chat message and relays it.
-	ADMIN_PACKET_SERVER_RCON PacketServerType = 20 // The server's reply to a remove console command.
-	ADMIN_PACKET_SERVER_CONSOLE PacketServerType = 21 // The server gives the admin the data that got printed to its console.
-	ADMIN_PACKET_SERVER_CMD_NAMES PacketServerType = 22 // The server sends out the names of the DoCommands to the admins.
+	ADMIN_PACKET_SERVER_COMPANY_STATS   PacketServerType = 18 // The server gives the admin some statistics about a company.
+	ADMIN_PACKET_SERVER_CHAT            PacketServerType = 19 // The server received a chat message and relays it.
+	ADMIN_PACKET_SERVER_RCON            PacketServerType = 20 // The server's reply to a remove console command.
+	ADMIN_PACKET_SERVER_CONSOLE         PacketServerType = 21 // The server gives the admin the data that got printed to its console.
+	ADMIN_PACKET_SERVER_CMD_NAMES       PacketServerType = 22 // The server sends out the names of the DoCommands to the admins.
 	// Used to be the type ID of ADMIN_PACKET_SERVER_CMD_LOGGING in
 	// NETWORK_GAME_ADMIN_VERSION 1. Kept so legacy layouts stay decodable.
-	ADMIN_PACKET_SERVER_CMD_LOGGING_OLD PacketServerType = 23
-	ADMIN_PACKET_SERVER_GAMESCRIPT PacketServerType = 24 // The server gives the admin information from the GameScript in JSON.
-	ADMIN_PACKET_SERVER_RCON_END PacketServerType = 25 // The server indicates that the remote console command has completed.
-	ADMIN_PACKET_SERVER_PONG PacketServerType = 26 // The server replies to a ping request from the admin.
-	ADMIN_PACKET_SERVER_CMD_LOGGING PacketServerType = 27 // The server gives the admin copies of incoming command packets.
-	ADMIN_PACKET_SERVER_AUTH_REQUEST PacketServerType = 28 // The server gives the admin the used authentication method and required parameters. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
+	ADMIN_PACKET_SERVER_CMD_LOGGING_OLD   PacketServerType = 23
+	ADMIN_PACKET_SERVER_GAMESCRIPT        PacketServerType = 24 // The server gives the admin information from the GameScript in JSON.
+	ADMIN_PACKET_SERVER_RCON_END          PacketServerType = 25 // The server indicates that the remote console command has completed.
+	ADMIN_PACKET_SERVER_PONG              PacketServerType = 26 // The server replies to a ping request from the admin.
+	ADMIN_PACKET_SERVER_CMD_LOGGING       PacketServerType = 27 // The server gives the admin copies of incoming command packets.
+	ADMIN_PACKET_SERVER_AUTH_REQUEST      PacketServerType = 28 // The server gives the admin the used authentication method and required parameters. Not implemented, see ADMIN_PACKET_ADMIN_JOIN.
 	ADMIN_PACKET_SERVER_ENABLE_ENCRYPTION PacketServerType = 29 // The server tells that authentication completed and requests encryption with the keys of the last ADMIN_PACKET_ADMIN_AUTH_RESPONSE. Not implemented.
 
 	INVALID_ADMIN_PACKET PacketServerType = 30 // Sentinel for unknown packets.
@@ -232,17 +232,17 @@ func PacketServerTypeName(t PacketServerType) string {
 type AdminUpdateType int
 
 const (
-	ADMIN_UPDATE_DATE AdminUpdateType = 0 // Updates about the date of the game.
-	ADMIN_UPDATE_CLIENT_INFO AdminUpdateType = 1 // Updates about the information of clients.
-	ADMIN_UPDATE_COMPANY_INFO AdminUpdateType = 2 // Updates about the generic information of companies.
-	ADMIN_UPDATE_COMPANY_ECONOMY AdminUpdateType = 3 // Updates about the economy of companies.
-	ADMIN_UPDATE_COMPANY_STATS AdminUpdateType = 4 // Updates about the statistics of companies.
-	ADMIN_UPDATE_CHAT AdminUpdateType = 5 // The admin would like to have chat messages.
-	ADMIN_UPDATE_CONSOLE AdminUpdateType = 6 // The admin would like to have console messages.
-	ADMIN_UPDATE_CMD_NAMES AdminUpdateType = 7 // The admin would like a list of all DoCommand names.
-	ADMIN_UPDATE_CMD_LOGGING AdminUpdateType = 8 // The admin would like to have DoCommand information.
-	ADMIN_UPDATE_GAMESCRIPT AdminUpdateType = 9 // The admin would like to have gamescript messages.
-	ADMIN_UPDATE_END AdminUpdateType = 10 // Must ALWAYS be on the end of this list!! (period)
+	ADMIN_UPDATE_DATE            AdminUpdateType = 0  // Updates about the date of the game.
+	ADMIN_UPDATE_CLIENT_INFO     AdminUpdateType = 1  // Updates about the information of clients.
+	ADMIN_UPDATE_COMPANY_INFO    AdminUpdateType = 2  // Updates about the generic information of companies.
+	ADMIN_UPDATE_COMPANY_ECONOMY AdminUpdateType = 3  // Updates about the economy of companies.
+	ADMIN_UPDATE_COMPANY_STATS   AdminUpdateType = 4  // Updates about the statistics of companies.
+	ADMIN_UPDATE_CHAT            AdminUpdateType = 5  // The admin would like to have chat messages.
+	ADMIN_UPDATE_CONSOLE         AdminUpdateType = 6  // The admin would like to have console messages.
+	ADMIN_UPDATE_CMD_NAMES       AdminUpdateType = 7  // The admin would like a list of all DoCommand names.
+	ADMIN_UPDATE_CMD_LOGGING     AdminUpdateType = 8  // The admin would like to have DoCommand information.
+	ADMIN_UPDATE_GAMESCRIPT      AdminUpdateType = 9  // The admin would like to have gamescript messages.
+	ADMIN_UPDATE_END             AdminUpdateType = 10 // Must ALWAYS be on the end of this list!! (period)
 )
 
 // AdminUpdateTypeOf is AdminUpdateType.valueOf. The server iterates
@@ -300,12 +300,12 @@ func AdminUpdateTypeName(t AdminUpdateType) string {
 type AdminUpdateFrequency int
 
 const (
-	ADMIN_FREQUENCY_POLL AdminUpdateFrequency = 0x01 // The admin can poll this.
-	ADMIN_FREQUENCY_DAILY AdminUpdateFrequency = 0x02 // The admin gets information about this on a daily basis.
-	ADMIN_FREQUENCY_WEEKLY AdminUpdateFrequency = 0x04 // The admin gets information about this on a weekly basis.
-	ADMIN_FREQUENCY_MONTHLY AdminUpdateFrequency = 0x08 // The admin gets information about this on a monthly basis.
+	ADMIN_FREQUENCY_POLL      AdminUpdateFrequency = 0x01 // The admin can poll this.
+	ADMIN_FREQUENCY_DAILY     AdminUpdateFrequency = 0x02 // The admin gets information about this on a daily basis.
+	ADMIN_FREQUENCY_WEEKLY    AdminUpdateFrequency = 0x04 // The admin gets information about this on a weekly basis.
+	ADMIN_FREQUENCY_MONTHLY   AdminUpdateFrequency = 0x08 // The admin gets information about this on a monthly basis.
 	ADMIN_FREQUENCY_QUARTERLY AdminUpdateFrequency = 0x10 // The admin gets information about this on a quarterly basis.
-	ADMIN_FREQUENCY_ANUALLY AdminUpdateFrequency = 0x20 // The admin gets information about this on a yearly basis.
+	ADMIN_FREQUENCY_ANUALLY   AdminUpdateFrequency = 0x20 // The admin gets information about this on a yearly basis.
 	ADMIN_FREQUENCY_AUTOMATIC AdminUpdateFrequency = 0x40 // The admin gets information about this when it changes.
 )
 
@@ -358,10 +358,10 @@ func AdminUpdateFrequencyName(f AdminUpdateFrequency) string {
 type AdminCompanyRemoveReason int
 
 const (
-	ADMIN_CRR_MANUAL AdminCompanyRemoveReason = 0 // The company is manually removed.
+	ADMIN_CRR_MANUAL    AdminCompanyRemoveReason = 0 // The company is manually removed.
 	ADMIN_CRR_AUTOCLEAN AdminCompanyRemoveReason = 1 // The company is removed due to autoclean.
-	ADMIN_CRR_BANKRUPT AdminCompanyRemoveReason = 2 // The company went belly-up.
-	ADMIN_CRR_END AdminCompanyRemoveReason = 3 // Sentinel for end.
+	ADMIN_CRR_BANKRUPT  AdminCompanyRemoveReason = 2 // The company went belly-up.
+	ADMIN_CRR_END       AdminCompanyRemoveReason = 3 // Sentinel for end.
 )
 
 // AdminCompanyRemoveReasonOf is AdminCompanyRemoveReason.valueOf.
@@ -400,4 +400,3 @@ func AdminCompanyRemoveReasonName(r AdminCompanyRemoveReason) string {
 	}
 	return adminCompanyRemoveReasonNames[int(r)]
 }
-

@@ -12,15 +12,15 @@ import "com.openttd/admin"
 import "com.openttd/admin/event"
 
 type EventRecorder struct {
-	chats []*event.ChatEvent
-	clients []*event.ClientEvent
-	companies []*event.CompanyEvent
-	consoles []*event.ConsoleEvent
-	dates []*event.DateEvent
+	chats       []*event.ChatEvent
+	clients     []*event.ClientEvent
+	companies   []*event.CompanyEvent
+	consoles    []*event.ConsoleEvent
+	dates       []*event.DateEvent
 	gameScripts []*event.GameScriptEvent
-	pongs []*event.PongEvent
-	rCons []*event.RConEvent
-	rConEnds []*event.RConEndEvent
+	pongs       []*event.PongEvent
+	rCons       []*event.RConEvent
+	rConEnds    []*event.RConEndEvent
 }
 
 // NewEventRecorder is new EventRecorder().

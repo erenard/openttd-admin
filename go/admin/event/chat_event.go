@@ -12,9 +12,9 @@ type ChatEventListener interface {
 }
 
 type ChatEvent struct {
-	openttd Openttd
+	openttd  Openttd
 	clientId int
-	message string
+	message  string
 }
 
 // NewChatEvent is ChatEvent(Game openttd, long clientId, String message): Java

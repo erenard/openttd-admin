@@ -44,32 +44,32 @@ type Game interface {
 
 type NetworkAdmin struct {
 	configuration *core.Configuration
-	gamescript *gamescript.GSExecutor
+	gamescript    *gamescript.GSExecutor
 
 	// stateLock guards running, which run() reads on its own thread while
 	// shutdown() writes it. Java leaves the plain boolean field unsynchronized.
 	stateLock sync.Mutex
-	running bool
+	running   bool
 
 	// game is volatile in Java: setGame() comes from the application's thread
 	// while run() reads it on the listener thread.
 	gameLock sync.Mutex
-	game Game
+	game     Game
 
 	// sendLock guards send, which getSend() hands to the application while
 	// run() replaces it on every reconnect. Java's field is volatile.
 	sendLock sync.Mutex
-	send *NetworkAdminSender
+	send     *NetworkAdminSender
 
 	// networkModel is Java's field, reassigned per connection and read by
 	// handlePacket on the listener thread.
-	modelLock sync.Mutex
+	modelLock    sync.Mutex
 	networkModel *NetworkModel
 
 	// socket is Java's field: the current connection, closed on shutdown() to
 	// unblock a receive() that is waiting for data.
 	socketLock sync.Mutex
-	socket *core.Socket
+	socket     *core.Socket
 }
 
 // NewNetworkAdmin is the constructor: it keeps the configuration and starts
@@ -78,11 +78,11 @@ type NetworkAdmin struct {
 func NewNetworkAdmin(configuration *core.Configuration) *NetworkAdmin {
 	return &NetworkAdmin{
 		configuration: configuration,
-		stateLock: sync.Mutex{},
-		gameLock: sync.Mutex{},
-		sendLock: sync.Mutex{},
-		modelLock: sync.Mutex{},
-		socketLock: sync.Mutex{},
+		stateLock:     sync.Mutex{},
+		gameLock:      sync.Mutex{},
+		sendLock:      sync.Mutex{},
+		modelLock:     sync.Mutex{},
+		socketLock:    sync.Mutex{},
 	}
 }
 
@@ -130,7 +130,7 @@ func (a *NetworkAdmin) setRunning(running bool) {
 func (a *NetworkAdmin) run() {
 	adminLog.Debug("started")
 	a.setRunning(true)
-	for (a.IsRunning()) {
+	for a.IsRunning() {
 		a.attempt()
 		if !a.IsRunning() {
 			break
@@ -166,7 +166,7 @@ func (a *NetworkAdmin) attempt() {
 	// Java's inner loop is while (this.running), and handlePacket's NetworkException
 	// is caught by the outer catch: it ends the connection, it does not stop
 	// the reconnect loop.
-	for (a.IsRunning()) {
+	for a.IsRunning() {
 		var packets, readError = socket.Receive()
 		if readError != nil {
 			if a.IsRunning() {
@@ -210,7 +210,7 @@ func (a *NetworkAdmin) disconnect(socket *core.Socket) {
 // returns promptly instead of waiting out the 5 s.
 func (a *NetworkAdmin) sleep() bool {
 	var deadline = time.Now().Add(time.Duration(RECONNECT_DELAY_MILLIS) * time.Millisecond)
-	for (time.Now().Before(deadline)) {
+	for time.Now().Before(deadline) {
 		if !a.IsRunning() {
 			return false
 		}
@@ -237,7 +237,7 @@ func (a *NetworkAdmin) handlePacket(packet *core.Packet) *NetworkException {
 		adminLog.Error(DescribeError(errorId))
 	case constant.ADMIN_PACKET_SERVER_PROTOCOL:
 		var protocol = New(packet.ReadUint8())
-		for (packet.ReadBool8()) {
+		for packet.ReadBool8() {
 			protocol.PutProtocol(packet.ReadUint16(), packet.ReadUint16())
 		}
 		send.SetProtocol(protocol)
@@ -369,7 +369,7 @@ func (a *NetworkAdmin) handlePacket(packet *core.Packet) *NetworkException {
 	case constant.ADMIN_PACKET_SERVER_PONG:
 		event.setPongEvent(int64(packet.ReadUint32()))
 	case constant.ADMIN_PACKET_SERVER_CMD_NAMES:
-		for (packet.ReadBool8()) {
+		for packet.ReadBool8() {
 			networkModel.PutCommandName(packet.ReadUint16(), packet.ReadString())
 		}
 	case constant.ADMIN_PACKET_SERVER_CMD_LOGGING:
@@ -483,7 +483,7 @@ func (a *NetworkAdmin) SetGSExecutor(executor *gamescript.GSExecutor) {
 // reconnect loop.
 func (a *NetworkAdmin) awaitStopped(timeoutMillis int) {
 	var deadline = time.Now().Add(time.Duration(timeoutMillis) * time.Millisecond)
-	for (time.Now().Before(deadline)) {
+	for time.Now().Before(deadline) {
 		if !a.IsRunning() {
 			return
 		}

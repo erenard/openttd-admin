@@ -15,7 +15,7 @@ import "com.openttd/network/core"
 
 type ReceivedUdpPacket struct {
 	wireTypeId int
-	packet *core.Packet
+	packet     *core.Packet
 }
 
 func (p *ReceivedUdpPacket) GetWireTypeId() int { return p.wireTypeId }
@@ -36,15 +36,15 @@ func (p *ReceivedUdpPacket) GetPacket() *core.Packet {
 }
 
 func (p *ReceivedUdpPacket) ToString() string {
-	return constant.PacketUdpTypeName(p.GetType())+" ("+strconv.Itoa(p.wireTypeId)+")"
+	return constant.PacketUdpTypeName(p.GetType()) + " (" + strconv.Itoa(p.wireTypeId) + ")"
 }
 
 type FakeUdpServer struct {
-	socket *core.Socket
-	port int
-	received []*ReceivedUdpPacket
+	socket       *core.Socket
+	port         int
+	received     []*ReceivedUdpPacket
 	receivedLock sync.Mutex
-	running bool
+	running      bool
 }
 
 // NewFakeUdpServer is the constructor: bind an ephemeral UDP port, report the

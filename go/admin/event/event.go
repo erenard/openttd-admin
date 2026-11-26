@@ -20,7 +20,7 @@ import "com.openttd/util"
 
 // EventListener is the marker interface every listener implements. It is empty
 // in Java too; its only job is to be the type the dispatcher stores.
-type EventListener interface {}
+type EventListener interface{}
 
 // EventKind is the port's stand-in for the Class keys of the dispatcher's
 // listener map: one id per event class, in the order the classes are listed in
@@ -28,15 +28,15 @@ type EventListener interface {}
 type EventKind int
 
 const (
-	EVENT_CHAT EventKind = 0
-	EVENT_CLIENT EventKind = 1
-	EVENT_COMPANY EventKind = 2
-	EVENT_CONSOLE EventKind = 3
-	EVENT_DATE EventKind = 4
+	EVENT_CHAT        EventKind = 0
+	EVENT_CLIENT      EventKind = 1
+	EVENT_COMPANY     EventKind = 2
+	EVENT_CONSOLE     EventKind = 3
+	EVENT_DATE        EventKind = 4
 	EVENT_GAME_SCRIPT EventKind = 5
-	EVENT_PONG EventKind = 6
-	EVENT_RCON EventKind = 7
-	EVENT_RCON_END EventKind = 8
+	EVENT_PONG        EventKind = 6
+	EVENT_RCON        EventKind = 7
+	EVENT_RCON_END    EventKind = 8
 )
 
 // EVENT_NONE is the sentinel the mapping table uses for "this packet dispatches
@@ -108,7 +108,7 @@ const (
 	ACTION_CREATE Action = 0
 	ACTION_UPDATE Action = 1
 	ACTION_DELETE Action = 2
-	ACTION_NONE Action = -1 // Port sentinel: "this row of the mapping table has no action"
+	ACTION_NONE   Action = -1 // Port sentinel: "this row of the mapping table has no action"
 )
 
 // ActionName is the enum constant's name.
@@ -124,4 +124,3 @@ func ActionName(action Action) string {
 		return "ACTION_UNKNOWN"
 	}
 }
-

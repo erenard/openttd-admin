@@ -15,24 +15,24 @@ import "strconv"
 import "com.openttd/network/constant"
 
 type NetworkAdminEvent struct {
-	packetServerType constant.PacketServerType
-	clientId int64
-	pingId int64
-	company int
-	color int
-	origin string
-	message string
-	date int64
+	packetServerType    constant.PacketServerType
+	clientId            int64
+	pingId              int64
+	company             int
+	color               int
+	origin              string
+	message             string
+	date                int64
 	companyRemoveReason int
-	clientError constant.NetworkErrorCode
+	clientError         constant.NetworkErrorCode
 }
 
 // NewNetworkAdminEvent is the constructor.
 func NewNetworkAdminEvent(packetServerType constant.PacketServerType) *NetworkAdminEvent {
 	return &NetworkAdminEvent{
-		packetServerType: packetServerType,
+		packetServerType:    packetServerType,
 		companyRemoveReason: -1,
-		clientError: constant.NETWORK_ERROR_NONE,
+		clientError:         constant.NETWORK_ERROR_NONE,
 	}
 }
 
@@ -89,13 +89,15 @@ func (e *NetworkAdminEvent) setClientErrorEvent(packetType constant.PacketServer
 
 // The public getters.
 func (e *NetworkAdminEvent) GetClientId() int64 { return e.clientId }
-func (e *NetworkAdminEvent) GetCompany() int { return e.company }
-func (e *NetworkAdminEvent) GetPingId() int64 { return e.pingId }
-func (e *NetworkAdminEvent) GetOrigin() string { return e.origin }
+func (e *NetworkAdminEvent) GetCompany() int    { return e.company }
+func (e *NetworkAdminEvent) GetPingId() int64   { return e.pingId }
+func (e *NetworkAdminEvent) GetOrigin() string  { return e.origin }
 func (e *NetworkAdminEvent) GetMessage() string { return e.message }
-func (e *NetworkAdminEvent) GetDate() int64 { return e.date }
-func (e *NetworkAdminEvent) GetColor() int { return e.color }
-func (e *NetworkAdminEvent) GetPacketServerType() constant.PacketServerType { return e.packetServerType }
+func (e *NetworkAdminEvent) GetDate() int64     { return e.date }
+func (e *NetworkAdminEvent) GetColor() int      { return e.color }
+func (e *NetworkAdminEvent) GetPacketServerType() constant.PacketServerType {
+	return e.packetServerType
+}
 
 // GetCompanyRemoveReason is getCompanyRemoveReason: -1 when no COMPANY_REMOVE
 // packet set it.

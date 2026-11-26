@@ -110,8 +110,8 @@ func WelcomePacket() *PacketWriter {
 	packet.WriteBool8(true)
 	packet.WriteString("") // Used to be map-name
 	packet.WriteUint32(uint32(123456789))
-	packet.WriteUint8(1) // Landscape: Temperate
-	packet.WriteUint32(uint32(1950 * 365 + 1)) // 1950-01-01
+	packet.WriteUint8(1)                     // Landscape: Temperate
+	packet.WriteUint32(uint32(1950*365 + 1)) // 1950-01-01
 	packet.WriteUint16(64)
 	packet.WriteUint16(64)
 	return packet

@@ -14,7 +14,7 @@ import "com.openttd/network/constant"
 
 type PacketWriter struct {
 	packetType constant.PacketType
-	payload []byte
+	payload    []byte
 }
 
 func New(packetType constant.PacketType) *PacketWriter {
@@ -44,27 +44,27 @@ func (w *PacketWriter) WriteBool8(value bool) *PacketWriter {
 
 func (w *PacketWriter) WriteUint16(value int) *PacketWriter {
 	w.payload = append(w.payload, byte(value&0xFF))
-	w.payload = append(w.payload, byte((value >> 8)&0xFF))
+	w.payload = append(w.payload, byte((value>>8)&0xFF))
 	return w
 }
 
 func (w *PacketWriter) WriteUint32(value uint32) *PacketWriter {
 	for shift := 0; shift < 32; shift += 8 {
-		w.payload = append(w.payload, byte(value >> shift))
+		w.payload = append(w.payload, byte(value>>shift))
 	}
 	return w
 }
 
 func (w *PacketWriter) WriteInt64(value int64) *PacketWriter {
 	for shift := 0; shift < 64; shift += 8 {
-		w.payload = append(w.payload, byte(value >> shift))
+		w.payload = append(w.payload, byte(value>>shift))
 	}
 	return w
 }
 
 func (w *PacketWriter) WriteUint64(value uint64) *PacketWriter {
 	for shift := 0; shift < 64; shift += 8 {
-		w.payload = append(w.payload, byte(value >> shift))
+		w.payload = append(w.payload, byte(value>>shift))
 	}
 	return w
 }
@@ -103,5 +103,5 @@ func (w *PacketWriter) ToBytes() []byte {
 // the enum's name; the Go port's constants carry no name, so the wire id stands
 // in for it.
 func (w *PacketWriter) ToString() string {
-	return "packet "+strconv.Itoa(w.GetWireTypeId())+" ("+strconv.Itoa(len(w.payload))+" bytes of payload)"
+	return "packet " + strconv.Itoa(w.GetWireTypeId()) + " (" + strconv.Itoa(len(w.payload)) + " bytes of payload)"
 }

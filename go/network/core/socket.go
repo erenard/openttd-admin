@@ -17,13 +17,13 @@ var log = util.GetLogger("Socket")
 // and how many bytes of it are currently held. Held bytes are always the
 // beginning of an unfinished packet, so the next read appends after them.
 type Buffer struct {
-	bytes []byte
+	bytes    []byte
 	position int
 }
 
 type Socket struct {
 	channel net.Conn
-	data *Buffer
+	data    *Buffer
 
 	// udp is set only by NewUdpListener: a bound UDP socket has no default peer,
 	// so its datagrams go out with WriteTo and come in with ReadFrom, both of
@@ -148,14 +148,14 @@ func receiveMore(channel net.Conn, data *Buffer) (*Buffer, []*Packet, error) {
 	}
 	var dataLength = data.position + n
 	if dataLength <= 0 {
-		return data, packets, errors.New("Connection lost, received data length: "+strconv.Itoa(dataLength))
+		return data, packets, errors.New("Connection lost, received data length: " + strconv.Itoa(dataLength))
 	}
 
 	// pos walks the held bytes. It starts after the first packet's length,
 	// which is read first, exactly as the Java version reads it through a
 	// Packet that shares the buffer.
 	var pos = 2
-	var packetLength = int(data.bytes[1]&0xFF) << 8 | int(data.bytes[0]&0xFF)
+	var packetLength = int(data.bytes[1]&0xFF)<<8 | int(data.bytes[0]&0xFF)
 	for dataLength >= packetLength && dataLength > 0 {
 		var buffer = make([]byte, MTU)
 		// Rewind the packet size, then copy the whole packet out of the held
@@ -171,7 +171,7 @@ func receiveMore(channel net.Conn, data *Buffer) (*Buffer, []*Packet, error) {
 		dataLength -= packetLength
 		if dataLength > 0 {
 			// Read the next packet's size.
-			packetLength = int(data.bytes[pos+1]&0xFF) << 8 | int(data.bytes[pos]&0xFF)
+			packetLength = int(data.bytes[pos+1]&0xFF)<<8 | int(data.bytes[pos]&0xFF)
 			pos += 2
 		} else {
 			// Useful for the final if: the packet is finished.

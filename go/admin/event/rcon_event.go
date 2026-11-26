@@ -16,7 +16,7 @@ type RConEvent struct {
 	// color is Java's char: the colour byte of the rcon output. It is an int
 	// here, as it is in NetworkAdminEvent, so ToString prints the number rather
 	// than the character that byte happens to be.
-	color int
+	color   int
 	message string
 }
 

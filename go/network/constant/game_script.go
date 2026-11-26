@@ -8,8 +8,8 @@
 package constant
 
 const (
-	GS_ID = "i" // The request id, so the reply can be correlated.
-	GS_CMD = "c" // The command to run.
+	GS_ID   = "i" // The request id, so the reply can be correlated.
+	GS_CMD  = "c" // The command to run.
 	GS_ARGS = "a" // The command's arguments.
 )
 
@@ -18,11 +18,11 @@ const (
 type GSCommand int
 
 const (
-	GS_COMMAND_COUNT_INDUSTRIE GSCommand = 0 // How many industries the map has.
-	GS_COMMAND_CREATE_NEWS GSCommand = 1 // Put a message in the player's news ticker.
-	GS_COMMAND_ADD_GOAL GSCommand = 2 // Attach a goal to a company, town or tile.
-	GS_COMMAND_REMOVE_GOAL GSCommand = 3 // Take one goal away again.
-	GS_COMMAND_REMOVE_ALL_GOAL GSCommand = 4 // Clear the whole goal list.
+	GS_COMMAND_COUNT_INDUSTRIE     GSCommand = 0 // How many industries the map has.
+	GS_COMMAND_CREATE_NEWS         GSCommand = 1 // Put a message in the player's news ticker.
+	GS_COMMAND_ADD_GOAL            GSCommand = 2 // Attach a goal to a company, town or tile.
+	GS_COMMAND_REMOVE_GOAL         GSCommand = 3 // Take one goal away again.
+	GS_COMMAND_REMOVE_ALL_GOAL     GSCommand = 4 // Clear the whole goal list.
 	GS_COMMAND_SET_TOWN_CARGO_GOAL GSCommand = 5 // Set a town's cargo goal.
 )
 

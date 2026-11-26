@@ -12,9 +12,9 @@ type CompanyEventListener interface {
 }
 
 type CompanyEvent struct {
-	openttd Openttd
+	openttd   Openttd
 	companyId int
-	action Action
+	action    Action
 }
 
 // NewCompanyEvent is CompanyEvent(Game openttd, short companyId, Action action):

@@ -13,7 +13,7 @@ type PongEventListener interface {
 
 type PongEvent struct {
 	openttd Openttd
-	pingId int64
+	pingId  int64
 }
 
 // NewPongEvent is PongEvent(Game openttd, long pingId).

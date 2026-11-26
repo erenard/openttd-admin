@@ -17,11 +17,11 @@ type PacketGameType int
 const (
 	// Packets sent by the socket accepting code without ever constructing a
 	// client socket instance.
-	PACKET_SERVER_FULL PacketGameType = 0 // The server is full and has no place for you.
+	PACKET_SERVER_FULL   PacketGameType = 0 // The server is full and has no place for you.
 	PACKET_SERVER_BANNED PacketGameType = 1 // The server has banned you.
 
 	// Packets used by the client to join and an error message when the revision is wrong.
-	PACKET_CLIENT_JOIN PacketGameType = 2 // The client telling the server it wants to join.
+	PACKET_CLIENT_JOIN  PacketGameType = 2 // The client telling the server it wants to join.
 	PACKET_SERVER_ERROR PacketGameType = 3 // Server sending an error message to the client.
 
 	// Unused packet types, formerly used for the pre-game lobby.
@@ -39,27 +39,27 @@ const (
 	// important data.
 	//
 	// After the join step, the first is checking NewGRFs.
-	PACKET_SERVER_CHECK_NEWGRFS PacketGameType = 8 // Server sends NewGRF IDs and MD5 checksums for the client to check.
+	PACKET_SERVER_CHECK_NEWGRFS   PacketGameType = 8 // Server sends NewGRF IDs and MD5 checksums for the client to check.
 	PACKET_CLIENT_NEWGRFS_CHECKED PacketGameType = 9 // Client acknowledges that it has all required NewGRFs.
 
 	// Checking the game, and then company passwords.
-	PACKET_SERVER_NEED_GAME_PASSWORD PacketGameType = 10 // Server requests the (hashed) game password.
-	PACKET_CLIENT_GAME_PASSWORD PacketGameType = 11 // Clients sends the (hashed) game password.
+	PACKET_SERVER_NEED_GAME_PASSWORD    PacketGameType = 10 // Server requests the (hashed) game password.
+	PACKET_CLIENT_GAME_PASSWORD         PacketGameType = 11 // Clients sends the (hashed) game password.
 	PACKET_SERVER_NEED_COMPANY_PASSWORD PacketGameType = 12 // Server requests the (hashed) company password.
-	PACKET_CLIENT_COMPANY_PASSWORD PacketGameType = 13 // Client sends the (hashed) company password.
+	PACKET_CLIENT_COMPANY_PASSWORD      PacketGameType = 13 // Client sends the (hashed) company password.
 
 	// The server welcomes the authenticated client and sends information of other clients.
-	PACKET_SERVER_WELCOME PacketGameType = 14 // Server welcomes you and gives you your ClientID.
+	PACKET_SERVER_WELCOME     PacketGameType = 14 // Server welcomes you and gives you your ClientID.
 	PACKET_SERVER_CLIENT_INFO PacketGameType = 15 // Server sends you information about a client.
 
 	// Getting the savegame/map.
-	PACKET_CLIENT_GETMAP PacketGameType = 16 // Client requests the actual map.
-	PACKET_SERVER_WAIT PacketGameType = 17 // Server tells the client there are some people waiting for the map as well.
+	PACKET_CLIENT_GETMAP    PacketGameType = 16 // Client requests the actual map.
+	PACKET_SERVER_WAIT      PacketGameType = 17 // Server tells the client there are some people waiting for the map as well.
 	PACKET_SERVER_MAP_BEGIN PacketGameType = 18 // Server tells the client that it is beginning to send the map.
-	PACKET_SERVER_MAP_SIZE PacketGameType = 19 // Server tells the client what the (compressed) size of the map is.
-	PACKET_SERVER_MAP_DATA PacketGameType = 20 // Server sends bits of the map to the client.
-	PACKET_SERVER_MAP_DONE PacketGameType = 21 // Server tells it has just sent the last bits of the map to the client.
-	PACKET_CLIENT_MAP_OK PacketGameType = 22 // Client tells the server that it received the whole map.
+	PACKET_SERVER_MAP_SIZE  PacketGameType = 19 // Server tells the client what the (compressed) size of the map is.
+	PACKET_SERVER_MAP_DATA  PacketGameType = 20 // Server sends bits of the map to the client.
+	PACKET_SERVER_MAP_DONE  PacketGameType = 21 // Server tells it has just sent the last bits of the map to the client.
+	PACKET_CLIENT_MAP_OK    PacketGameType = 22 // Client tells the server that it received the whole map.
 
 	PACKET_SERVER_JOIN PacketGameType = 23 // Tells clients that a new client has joined.
 
@@ -69,16 +69,16 @@ const (
 	//
 	// Game progress monitoring.
 	PACKET_SERVER_FRAME PacketGameType = 24 // Server tells the client what frame it is in, and thus to where the client may progress.
-	PACKET_CLIENT_ACK PacketGameType = 25 // The client tells the server which frame it has executed.
-	PACKET_SERVER_SYNC PacketGameType = 26 // Server tells the client what the random state should be.
+	PACKET_CLIENT_ACK   PacketGameType = 25 // The client tells the server which frame it has executed.
+	PACKET_SERVER_SYNC  PacketGameType = 26 // Server tells the client what the random state should be.
 
 	// Sending commands around.
 	PACKET_CLIENT_COMMAND PacketGameType = 27 // Client executed a command and sends it to the server.
 	PACKET_SERVER_COMMAND PacketGameType = 28 // Server distributes a command to (all) the clients.
 
 	// Human communication!
-	PACKET_CLIENT_CHAT PacketGameType = 29 // Client said something that should be distributed.
-	PACKET_SERVER_CHAT PacketGameType = 30 // Server distributing the message of a client (or itself).
+	PACKET_CLIENT_CHAT          PacketGameType = 29 // Client said something that should be distributed.
+	PACKET_SERVER_CHAT          PacketGameType = 30 // Server distributing the message of a client (or itself).
 	PACKET_SERVER_EXTERNAL_CHAT PacketGameType = 31 // Server distributing the message from external source.
 
 	// Remote console.
@@ -90,19 +90,19 @@ const (
 	PACKET_SERVER_MOVE PacketGameType = 35 // Server tells everyone that someone is moved to another company.
 
 	// Configuration updates.
-	PACKET_CLIENT_SET_PASSWORD PacketGameType = 36 // A client (re)sets its company's password.
-	PACKET_CLIENT_SET_NAME PacketGameType = 37 // A client changes its name.
+	PACKET_CLIENT_SET_PASSWORD   PacketGameType = 36 // A client (re)sets its company's password.
+	PACKET_CLIENT_SET_NAME       PacketGameType = 37 // A client changes its name.
 	PACKET_SERVER_COMPANY_UPDATE PacketGameType = 38 // Information (password) of a company changed.
-	PACKET_SERVER_CONFIG_UPDATE PacketGameType = 39 // Some network configuration important to the client changed.
+	PACKET_SERVER_CONFIG_UPDATE  PacketGameType = 39 // Some network configuration important to the client changed.
 
 	// A server quitting this game.
-	PACKET_SERVER_NEWGAME PacketGameType = 40 // The server is preparing to start a new game.
+	PACKET_SERVER_NEWGAME  PacketGameType = 40 // The server is preparing to start a new game.
 	PACKET_SERVER_SHUTDOWN PacketGameType = 41 // The server is shutting down.
 
 	// A client quitting.
-	PACKET_CLIENT_QUIT PacketGameType = 42 // A client tells the server it is going to quit.
-	PACKET_SERVER_QUIT PacketGameType = 43 // A server tells that a client has quit.
-	PACKET_CLIENT_ERROR PacketGameType = 44 // A client reports an error to the server.
+	PACKET_CLIENT_QUIT       PacketGameType = 42 // A client tells the server it is going to quit.
+	PACKET_SERVER_QUIT       PacketGameType = 43 // A server tells that a client has quit.
+	PACKET_CLIENT_ERROR      PacketGameType = 44 // A client reports an error to the server.
 	PACKET_SERVER_ERROR_QUIT PacketGameType = 45 // A server tells that a client has hit an error and did quit.
 
 	PACKET_END PacketGameType = 46 // Must ALWAYS be on the end of this list!! (period)

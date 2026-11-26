@@ -22,12 +22,11 @@ func Message(e error) string {
 	return fmt.Sprint(e)
 }
 
-
 type Packet struct {
 	typeId int
 	length int
-	bytes []byte
-	pos int
+	bytes  []byte
+	pos    int
 	broken bool
 }
 
@@ -96,11 +95,11 @@ func (p *Packet) Remaining() int { return p.length - p.pos }
 func (p *Packet) Broken() bool { return p.broken }
 
 func (p *Packet) readBytes(count int) []byte {
-	if count < 0 || p.pos + count > len(p.bytes) {
+	if count < 0 || p.pos+count > len(p.bytes) {
 		p.broken = true
 		return make([]byte, 0)
 	}
-	var returned = p.bytes[p.pos:p.pos+count]
+	var returned = p.bytes[p.pos : p.pos+count]
 	p.pos += count
 	return returned
 }
@@ -116,7 +115,7 @@ func (p *Packet) ReadInt64() int64 {
 	}
 	var value int64 = 0
 	for i := 7; i >= 0; i-- {
-		value |= int64(buf[i] & 0xFF) << (8*i)
+		value |= int64(buf[i]&0xFF) << (8 * i)
 	}
 	return value
 }
@@ -130,7 +129,7 @@ func (p *Packet) ReadUint64() uint64 {
 	}
 	var value uint64 = 0
 	for i := 7; i >= 0; i-- {
-		value = value << 8 | uint64(buf[i] & 0xFF)
+		value = value<<8 | uint64(buf[i]&0xFF)
 	}
 	return value
 }
@@ -141,8 +140,8 @@ func (p *Packet) ReadUint32() uint32 {
 	if p.broken {
 		return uint32(0)
 	}
-	return uint32(buf[3] & 0xFF) << 24 | uint32(buf[2] & 0xFF) << 16 |
-		uint32(buf[1] & 0xFF) << 8 | uint32(buf[0] & 0xFF)
+	return uint32(buf[3]&0xFF)<<24 | uint32(buf[2]&0xFF)<<16 |
+		uint32(buf[1]&0xFF)<<8 | uint32(buf[0]&0xFF)
 }
 
 // ReadUint16 is readUint16.
@@ -151,14 +150,14 @@ func (p *Packet) ReadUint16() int {
 	if p.broken {
 		return 0
 	}
-	return int(buf[1] & 0xFF) << 8 | int(buf[0] & 0xFF)
+	return int(buf[1]&0xFF)<<8 | int(buf[0]&0xFF)
 }
 
 // ReadUint8 is readUint8.
 func (p *Packet) ReadUint8() int {
 	var buf = p.readBytes(1)
 	if p.broken {
-	 return 0
+		return 0
 	}
 	return int(buf[0] & 0xFF)
 }
@@ -203,7 +202,7 @@ func (p *Packet) WriteUint8(v int) {
 func (p *Packet) WriteInt64(v int64) {
 	var buf = make([]byte, 8)
 	for i := 0; i < 8; i++ {
-		buf[i] = byte(v >> (8*i))
+		buf[i] = byte(v >> (8 * i))
 	}
 	p.writeBytes(buf)
 }
@@ -212,7 +211,7 @@ func (p *Packet) WriteInt64(v int64) {
 func (p *Packet) WriteUint64(v uint64) {
 	var buf = make([]byte, 8)
 	for i := 0; i < 8; i++ {
-		buf[i] = byte(v >> (8*i))
+		buf[i] = byte(v >> (8 * i))
 	}
 	p.writeBytes(buf)
 }
@@ -235,7 +234,7 @@ func (p *Packet) WriteBool8(b bool) {
 func (p *Packet) WriteBytes(bytes []byte) { p.writeBytes(bytes) }
 
 func (p *Packet) writeBytes(bytes []byte) {
-	if p.pos + len(bytes) > len(p.bytes) {
+	if p.pos+len(bytes) > len(p.bytes) {
 		p.broken = true
 		return
 	}

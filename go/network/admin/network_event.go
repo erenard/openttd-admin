@@ -11,13 +11,13 @@ import "com.openttd/network/constant"
 
 type NetworkEvent struct {
 	packetServerType constant.PacketServerType
-	clientId int64
-	company int
-	extraId int
-	color int
-	origin string
-	message string
-	date int64
+	clientId         int64
+	company          int
+	extraId          int
+	color            int
+	origin           string
+	message          string
+	date             int64
 }
 
 // NewNetworkEvent is the constructor. Java's field is final, so the packet
@@ -60,15 +60,15 @@ func (e *NetworkEvent) setConsoleEvent(origin string, message string) {
 }
 
 // The public getters.
-func (e *NetworkEvent) GetClientId() int64 { return e.clientId }
-func (e *NetworkEvent) GetCompany() int { return e.company }
-func (e *NetworkEvent) GetExtraId() int { return e.extraId }
-func (e *NetworkEvent) GetOrigin() string { return e.origin }
-func (e *NetworkEvent) GetMessage() string { return e.message }
-func (e *NetworkEvent) GetDate() int64 { return e.date }
-func (e *NetworkEvent) GetColor() int { return e.color }
+func (e *NetworkEvent) GetClientId() int64                             { return e.clientId }
+func (e *NetworkEvent) GetCompany() int                                { return e.company }
+func (e *NetworkEvent) GetExtraId() int                                { return e.extraId }
+func (e *NetworkEvent) GetOrigin() string                              { return e.origin }
+func (e *NetworkEvent) GetMessage() string                             { return e.message }
+func (e *NetworkEvent) GetDate() int64                                 { return e.date }
+func (e *NetworkEvent) GetColor() int                                  { return e.color }
 func (e *NetworkEvent) GetPacketServerType() constant.PacketServerType { return e.packetServerType }
 
 // SetClientId and SetExtraId are the two public setters Java has.
 func (e *NetworkEvent) SetClientId(clientId int64) { e.clientId = clientId }
-func (e *NetworkEvent) SetExtraId(extraId int) { e.extraId = extraId }
+func (e *NetworkEvent) SetExtraId(extraId int)     { e.extraId = extraId }

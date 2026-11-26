@@ -36,7 +36,7 @@ type SenderProvider interface {
 var nextRequestId = 0
 
 type GSExecutor struct {
-	admin SenderProvider
+	admin       SenderProvider
 	requestById map[string]GSRequest
 }
 

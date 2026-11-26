@@ -9,11 +9,11 @@
 package core
 
 type Configuration struct {
-	Host string
-	AdminPort int
+	Host       string
+	AdminPort  int
 	ClientPort int
-	Password string
-	Name string
+	Password   string
+	Name       string
 }
 
 // NewConfiguration is the constructor: the defaults Java's field initializers

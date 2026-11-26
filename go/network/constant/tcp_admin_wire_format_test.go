@@ -1,12 +1,12 @@
 // Wire format parity with the OpenTTD binary in use. The expected ids below are
 // copied from the 15.3 tag, not from the working checkout (which is 16.0-dev):
 //
-// - git show 15.3:src/network/core/tcp_admin.h (AdminPacketAdminType,
-//   AdminPacketServerType, AdminUpdateType, AdminUpdateFrequency,
-//   AdminCompanyRemoveReason)
-// - git show 15.3:src/network/network_type.h (NetworkVehicleType, DestType,
-//   NetworkAction, NetworkErrorCode)
-// - git show 15.3:src/network/core/config.h (NETWORK_GAME_ADMIN_VERSION = 3)
+//   - git show 15.3:src/network/core/tcp_admin.h (AdminPacketAdminType,
+//     AdminPacketServerType, AdminUpdateType, AdminUpdateFrequency,
+//     AdminCompanyRemoveReason)
+//   - git show 15.3:src/network/network_type.h (NetworkVehicleType, DestType,
+//     NetworkAction, NetworkErrorCode)
+//   - git show 15.3:src/network/core/config.h (NETWORK_GAME_ADMIN_VERSION = 3)
 //
 // Java derives the wire value from ordinal(): admin packets use the ordinal,
 // server packets the ordinal plus 100. The Go port spells the value out in each
@@ -21,16 +21,16 @@ import "com.openttd/network/constant"
 
 func TestAdminCommandIds(t *testing.T) {
 	assertWireIds(t, "PacketAdminType", adminIds(), []int{
-		0, // ADMIN_PACKET_ADMIN_JOIN
-		1, // ADMIN_PACKET_ADMIN_QUIT
-		2, // ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY
-		3, // ADMIN_PACKET_ADMIN_POLL
-		4, // ADMIN_PACKET_ADMIN_CHAT
-		5, // ADMIN_PACKET_ADMIN_RCON
-		6, // ADMIN_PACKET_ADMIN_GAMESCRIPT
-		7, // ADMIN_PACKET_ADMIN_PING
-		8, // ADMIN_PACKET_ADMIN_EXTERNAL_CHAT
-		9, // ADMIN_PACKET_ADMIN_JOIN_SECURE
+		0,  // ADMIN_PACKET_ADMIN_JOIN
+		1,  // ADMIN_PACKET_ADMIN_QUIT
+		2,  // ADMIN_PACKET_ADMIN_UPDATE_FREQUENCY
+		3,  // ADMIN_PACKET_ADMIN_POLL
+		4,  // ADMIN_PACKET_ADMIN_CHAT
+		5,  // ADMIN_PACKET_ADMIN_RCON
+		6,  // ADMIN_PACKET_ADMIN_GAMESCRIPT
+		7,  // ADMIN_PACKET_ADMIN_PING
+		8,  // ADMIN_PACKET_ADMIN_EXTERNAL_CHAT
+		9,  // ADMIN_PACKET_ADMIN_JOIN_SECURE
 		10, // ADMIN_PACKET_ADMIN_AUTH_RESPONSE
 	})
 	if len(constant.PacketAdminTypeValues()) != 11 {
@@ -110,16 +110,16 @@ func TestAdminCommandRoundTrip(t *testing.T) {
 
 func TestUpdateTypes(t *testing.T) {
 	assertWireIds(t, "AdminUpdateType", updateTypeIds(), []int{
-		0, // ADMIN_UPDATE_DATE
-		1, // ADMIN_UPDATE_CLIENT_INFO
-		2, // ADMIN_UPDATE_COMPANY_INFO
-		3, // ADMIN_UPDATE_COMPANY_ECONOMY
-		4, // ADMIN_UPDATE_COMPANY_STATS
-		5, // ADMIN_UPDATE_CHAT
-		6, // ADMIN_UPDATE_CONSOLE
-		7, // ADMIN_UPDATE_CMD_NAMES
-		8, // ADMIN_UPDATE_CMD_LOGGING
-		9, // ADMIN_UPDATE_GAMESCRIPT
+		0,  // ADMIN_UPDATE_DATE
+		1,  // ADMIN_UPDATE_CLIENT_INFO
+		2,  // ADMIN_UPDATE_COMPANY_INFO
+		3,  // ADMIN_UPDATE_COMPANY_ECONOMY
+		4,  // ADMIN_UPDATE_COMPANY_STATS
+		5,  // ADMIN_UPDATE_CHAT
+		6,  // ADMIN_UPDATE_CONSOLE
+		7,  // ADMIN_UPDATE_CMD_NAMES
+		8,  // ADMIN_UPDATE_CMD_LOGGING
+		9,  // ADMIN_UPDATE_GAMESCRIPT
 		10, // ADMIN_UPDATE_END
 	})
 	// The server iterates 0..ADMIN_UPDATE_END, an unknown id maps to the sentinel.
@@ -163,16 +163,16 @@ func TestCompanyRemoveReasons(t *testing.T) {
 
 func TestNetworkErrorCodes(t *testing.T) {
 	assertWireIds(t, "NetworkErrorCode", networkErrorIds(), []int{
-		0, // NETWORK_ERROR_GENERAL
-		1, // NETWORK_ERROR_DESYNC
-		2, // NETWORK_ERROR_SAVEGAME_FAILED
-		3, // NETWORK_ERROR_CONNECTION_LOST
-		4, // NETWORK_ERROR_ILLEGAL_PACKET
-		5, // NETWORK_ERROR_NEWGRF_MISMATCH
-		6, // NETWORK_ERROR_NOT_AUTHORIZED
-		7, // NETWORK_ERROR_NOT_EXPECTED
-		8, // NETWORK_ERROR_WRONG_REVISION
-		9, // NETWORK_ERROR_NAME_IN_USE
+		0,  // NETWORK_ERROR_GENERAL
+		1,  // NETWORK_ERROR_DESYNC
+		2,  // NETWORK_ERROR_SAVEGAME_FAILED
+		3,  // NETWORK_ERROR_CONNECTION_LOST
+		4,  // NETWORK_ERROR_ILLEGAL_PACKET
+		5,  // NETWORK_ERROR_NEWGRF_MISMATCH
+		6,  // NETWORK_ERROR_NOT_AUTHORIZED
+		7,  // NETWORK_ERROR_NOT_EXPECTED
+		8,  // NETWORK_ERROR_WRONG_REVISION
+		9,  // NETWORK_ERROR_NAME_IN_USE
 		10, // NETWORK_ERROR_WRONG_PASSWORD
 		11, // NETWORK_ERROR_COMPANY_MISMATCH
 		12, // NETWORK_ERROR_KICKED

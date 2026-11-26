@@ -10,11 +10,11 @@
 package gamescript
 
 type GSResponse struct {
-	Id string
-	Data string
-	Exception string
-	HasId bool
-	HasData bool
+	Id           string
+	Data         string
+	Exception    string
+	HasId        bool
+	HasData      bool
 	HasException bool
 }
 
