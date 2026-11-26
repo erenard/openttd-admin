@@ -257,6 +257,24 @@ func (s *FakeAdminServer) SendAll(packets []*PacketWriter) {
 	}
 }
 
+// SendRaw is how the Java test's RawPacket subclass is expressed: bytes whose
+// header has been edited, so the client sees a packet id the protocol does not
+// define.
+func (s *FakeAdminServer) SendRaw(bytes []byte) {
+	s.awaitConnection(10)
+	s.connectionLock.Lock()
+	if s.connection == nil {
+		s.connectionLock.Unlock()
+		log.Warn("FakeAdminServer: connection closed before sending raw bytes")
+		return
+	}
+	var _, err = s.connection.Write(bytes)
+	s.connectionLock.Unlock()
+	if err != nil {
+		log.Error(core.Message(err))
+	}
+}
+
 func (s *FakeAdminServer) writeLocked(packet *PacketWriter) {
 	var bytes = packet.ToBytes()
 	s.connectionLock.Lock()
