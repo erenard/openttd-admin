@@ -11,6 +11,12 @@ plugins {
     id 'java-library'
 }
 
+// The library version is the OpenTTD release this protocol targets, i.e.
+// GameVersion.OPENTTD. It is deliberately not project.version: the java-library jar
+// would then be renamed openttd-admin-15.3.jar, and ../strategyboard/lib and
+// ../openttd-robot expect exactly openttd-admin.jar (see AGENTS.md publishing).
+ext.libraryVersion = '15.3'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
@@ -64,6 +70,27 @@ tasks.register('integrationTest', Test) {
 task buildGameScript(type: Exec, dependsOn: 'compileJava') {
     workingDir "src/squirrel"
     commandLine 'python', 'make_tar.py'
+}
+
+// Go port (src/go): module com.openttd, go 1.27, stdlib only. go is /usr/bin/go,
+// so tools/env.sh (JDK/Gradle/python) is not needed for these tasks.
+task goVet(type: Exec) {
+    description = 'Vets and compiles the Go port (go vet com.openttd/...).'
+    group = 'build'
+    workingDir 'src/go'
+    commandLine 'go', 'vet', './...'
+}
+
+// Packages the Go library as a versioned tarball of the module source: a Go library
+// ships as source, so consumers need the whole tree (go.mod, packages, tests).
+task goPackage(type: Tar, dependsOn: 'goVet') {
+    description = "Packs the Go port into build/libs/openttd-admin-go-${project.libraryVersion}.tgz."
+    group = 'build'
+    from 'src/go'
+    archiveBaseName = 'openttd-admin-go'
+    archiveVersion = project.libraryVersion
+    compression = Compression.GZIP
+    destinationDirectory = file("$buildDir/libs")
 }
 
 sourceSets {
